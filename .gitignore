@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+cdk.out/
+.pytest_cache/
+.DS_Store
+agentcore/.env.local
