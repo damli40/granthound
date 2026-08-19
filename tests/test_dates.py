@@ -50,3 +50,17 @@ def test_no_dates_no_flags():
     assert scan.dates == []
     assert scan.all_dates_past is False
     assert scan.has_yearless_date is False
+
+
+def test_invalid_calendar_date_is_skipped_entirely():
+    scan = extract_dates("Deadline 02/30/2026 for late applicants.", TODAY)
+    assert scan.dates == []
+    assert scan.has_yearless_date is False
+
+
+def test_month_year_without_day_has_year_present():
+    scan = extract_dates("Grant cycle opens May 2026 with rolling review.", TODAY)
+    assert len(scan.dates) == 1
+    assert scan.dates[0].year_present is True
+    assert scan.dates[0].iso == "2026-05-01"
+    assert scan.has_yearless_date is False

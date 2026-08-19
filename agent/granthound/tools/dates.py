@@ -11,8 +11,9 @@ MONTHS = (
 )
 
 DATE_CANDIDATE_RE = re.compile(
-    rf"(?:(?:{MONTHS})\.?\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,?\s+\d{{4}})?)"
+    rf"(?:(?:{MONTHS})\.?\s+\d{{1,2}}(?:st|nd|rd|th)?(?!\d)(?:,?\s+\d{{4}})?)"
     rf"|(?:\d{{1,2}}\s+(?:{MONTHS})\.?(?:,?\s+\d{{4}})?)"
+    rf"|(?:(?:{MONTHS})\.?,?\s+\d{{4}}(?!\d))"
     r"|(?:\d{4}-\d{2}-\d{2})"
     r"|(?:\d{1,2}/\d{1,2}/\d{4})",
     re.IGNORECASE,
