@@ -1,0 +1,52 @@
+# Maya's org profile + seed grant candidates.
+#
+# This file is data, not code: `org` describes the nonprofit GrantHound is
+# watching grants on behalf of; `seeds` is the list of funder pages the
+# pipeline checks. The 3 entries below are real, fetch-checked candidate
+# pages (see scripts/seed_check.py), picked to exercise the deterministic
+# path end-to-end -- NOT the final curated list. Every entry is marked
+# `# provisional`: the Aug 22 seed-assembly session (~60 candidates ->
+# 25-40 kept) replaces this list with the real one. Task 7's own
+# provisional-1 program (rows/objects it wrote to the live store during the
+# M1 integration run) is deliberately left in place as the seed of the real
+# dataset -- do not delete it.
+
+org:
+  name: Riverbend Youth Collective
+  profile: |
+    501(c)(3) community youth-development org. Budget ~$185K. Two part-time
+    staff plus volunteers. Programs: after-school arts + mentoring for ages
+    10-16. Geography: Columbus, OH metro (Franklin County).
+  commitment_windows:
+    - {label: fall program launch, start: 2026-09-01, end: 2026-09-20}
+
+seeds:
+  - id: provisional-1
+    url: https://www.columbusfoundation.org/nonprofit-center/deadlines-open-houses
+    funder: The Columbus Foundation
+    source_type: community_foundation
+    is_fixture: false
+    # provisional -- fetch-checked 2026-08-20: KEEP (real 2026 deadline
+    # table, static HTML, no JS rendering needed). This is the URL used for
+    # the Task 7 M1 integration run (program_id=provisional-1).
+
+  - id: provisional-2
+    url: https://www.clevelandfoundation.org/grants/
+    funder: Cleveland Foundation
+    source_type: community_foundation
+    is_fixture: false
+    # provisional -- fetch-checked 2026-08-20: reachable (200, real prose),
+    # but the grants overview page carries no explicit deadline dates in
+    # the static HTML -- likely a landing page over a separate grants
+    # portal. Realistic seed-assembly-session case: gets a closer look
+    # (does the real program page live one click deeper?) before it's
+    # kept or dropped.
+
+  - id: provisional-3
+    url: https://walmart.org/how-we-give/local-community-grants
+    funder: Walmart.org (Walmart Foundation)
+    source_type: corporate_giving
+    is_fixture: false
+    # provisional -- fetch-checked 2026-08-20: reachable (200, substantial
+    # static HTML). Corporate-giving example alongside the two community
+    # foundations above for source_type diversity.
