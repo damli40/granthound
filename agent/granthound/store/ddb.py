@@ -33,6 +33,44 @@ def _program_pk(program_id: str) -> str:
     return f"PROG#{program_id}"
 
 
+def _to_dynamo(value):
+    """Recursively convert Python floats to Decimal for a DynamoDB write.
+
+    boto3's resource layer rejects native float outright (TypeError).
+    Callers build eval items from pydantic model dumps (FitScore,
+    FitAxes, ...) that carry plain floats, so this conversion happens at
+    the store boundary rather than leaking a "callers must pass Decimal"
+    contract out to every caller.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, float):
+        return Decimal(str(value))
+    if isinstance(value, dict):
+        return {k: _to_dynamo(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_to_dynamo(v) for v in value]
+    return value
+
+
+def _from_dynamo(value):
+    """Recursively convert Decimal back to a plain Python number on read.
+
+    Mirror of `_to_dynamo`. An exact-integer Decimal comes back as `int`
+    (DynamoDB has no int/float distinction, so this is the only exact
+    round-trip available); anything with a fractional part comes back as
+    `float`.
+    """
+    if isinstance(value, Decimal):
+        as_int = int(value)
+        return as_int if value == as_int else float(value)
+    if isinstance(value, dict):
+        return {k: _from_dynamo(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_from_dynamo(v) for v in value]
+    return value
+
+
 def put_program_meta(item: dict) -> None:
     """Put/replace the META item for a program.
 
@@ -41,35 +79,50 @@ def put_program_meta(item: dict) -> None:
     program_id = item["program_id"]
     table = _table()
     table.put_item(
-        Item={**item, "pk": _program_pk(program_id), "sk": "META"}
+        Item=_to_dynamo({**item, "pk": _program_pk(program_id), "sk": "META"})
     )
 
 
 def get_program(program_id: str) -> dict | None:
     table = _table()
     response = table.get_item(Key={"pk": _program_pk(program_id), "sk": "META"})
-    return response.get("Item")
+    item = response.get("Item")
+    return _from_dynamo(item) if item is not None else None
 
 
-def put_evaluation(program_id: str, run_id: str, eval_item: dict) -> str:
+def put_evaluation(program_id: str, run_id: str, eval_item: dict, *, at: datetime) -> str:
     """Put a new EVAL item, conditional on the SK not already existing.
+
+    `at` is the caller-owned run-start timestamp, not a clock read inside
+    this function -- a hidden `datetime.now()` here would mint a new
+    microsecond (and therefore a new SK) on every application-level
+    retry of the same logical run, silently duplicating the EVAL instead
+    of no-opping. `at` must be timezone-aware; it is normalized to UTC
+    before formatting so the SK's lexicographic order (which
+    `get_last_eval`'s ScanIndexForward=False relies on) stays consistent
+    regardless of which offset the caller passed.
 
     Returns the SK it wrote (format `EVAL#<utc-iso>#<run_id>`). On a
     ConditionalCheckFailedException (idempotent replay -- this exact
-    pk+sk pair already has an item), returns that same SK rather than
-    raising, since the caller only needs to know which SK the run lives
-    at.
+    pk+sk pair already has an item, i.e. the same run_id retried with
+    the same at), returns that same SK rather than raising or
+    overwriting the original item.
     """
-    utc_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    if at.tzinfo is None:
+        raise ValueError("at must be a timezone-aware datetime (tzinfo required)")
+
+    utc_iso = at.astimezone(timezone.utc).isoformat()
     sk = f"EVAL#{utc_iso}#{run_id}"
     table = _table()
-    item = {
-        **eval_item,
-        "pk": _program_pk(program_id),
-        "sk": sk,
-        "program_id": program_id,
-        "run_id": run_id,
-    }
+    item = _to_dynamo(
+        {
+            **eval_item,
+            "pk": _program_pk(program_id),
+            "sk": sk,
+            "program_id": program_id,
+            "run_id": run_id,
+        }
+    )
     try:
         table.put_item(Item=item, ConditionExpression=Attr("sk").not_exists())
     except table.meta.client.exceptions.ConditionalCheckFailedException:
@@ -87,7 +140,7 @@ def get_last_eval(program_id: str) -> dict | None:
         Limit=1,
     )
     items = response.get("Items", [])
-    return items[0] if items else None
+    return _from_dynamo(items[0]) if items else None
 
 
 def update_meta_pointers(
@@ -108,7 +161,7 @@ def update_meta_pointers(
         ),
         ExpressionAttributeValues={
             ":verdict": verdict,
-            ":fit_score": Decimal(str(fit_score)) if fit_score is not None else None,
+            ":fit_score": _to_dynamo(fit_score),
             ":latest_eval_sk": latest_eval_sk,
             ":latest_snapshot_sha": latest_snapshot_sha,
         },
@@ -133,5 +186,5 @@ def list_programs() -> list[dict]:
         FilterExpression="sk = :sk",
         ExpressionAttributeValues={":sk": "META"},
     ):
-        programs.extend(page.get("Items", []))
+        programs.extend(_from_dynamo(item) for item in page.get("Items", []))
     return programs

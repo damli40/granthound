@@ -83,18 +83,69 @@ def run() -> None:
             "list_programs did not include the smoke-test META item"
         )
 
-        # put_evaluation / get_last_eval
+        # put_evaluation: `at` must be a required, caller-owned, tz-aware
+        # timestamp -- reject a naive datetime outright.
+        try:
+            ddb.put_evaluation(PROGRAM_ID, RUN_ID, {}, at=datetime.now())
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("put_evaluation accepted a naive (non-tz-aware) 'at'")
+
+        # eval_item carries a nested dict of native floats (as a real
+        # FitAxes/FitScore model dump would) to prove the store-boundary
+        # Decimal conversion works recursively, not just on top-level
+        # scalars.
+        at = datetime.now(timezone.utc)
+        fit_axes = {
+            "eligibility": 4.72,
+            "explicit_funding": 3.1,
+            "effort_to_award": 5.0,
+            "strategic": 2.25,
+            "reliability": 0.0,
+        }
         eval_sk = ddb.put_evaluation(
             PROGRAM_ID,
             RUN_ID,
-            {"disposition": "added", "note": "smoke test evaluation"},
+            {"disposition": "added", "note": "smoke test evaluation", "fit_axes": fit_axes},
+            at=at,
         )
-        assert eval_sk.startswith("EVAL#") and eval_sk.endswith(RUN_ID)
+        assert eval_sk == f"EVAL#{at.isoformat()}#{RUN_ID}"
 
         last_eval = ddb.get_last_eval(PROGRAM_ID)
         assert last_eval is not None, "get_last_eval returned None"
         assert last_eval["sk"] == eval_sk
         assert last_eval["disposition"] == "added"
+
+        # Float round-trip through the write/read Decimal boundary:
+        # fractional values come back as float; the exact-integer value
+        # (5.0) is allowed to come back as int (DynamoDB has no
+        # int/float distinction) but must still be numerically 5 and
+        # never a raw Decimal leaking out of the wrapper.
+        got_axes = last_eval["fit_axes"]
+        for key, expected in fit_axes.items():
+            assert got_axes[key] == expected, f"fit_axes[{key}] did not round-trip"
+            assert not hasattr(got_axes[key], "as_tuple"), (
+                f"fit_axes[{key}] leaked a Decimal instead of int/float"
+            )
+        assert isinstance(got_axes["eligibility"], float)
+
+        # Idempotent replay: the SAME (run_id, at) must land on the SAME
+        # SK and no-op rather than overwrite -- this is the whole point
+        # of making `at` caller-owned instead of a hidden clock read.
+        # A different eval_item payload on the replay call proves the
+        # original item's data survives untouched.
+        replay_sk = ddb.put_evaluation(
+            PROGRAM_ID,
+            RUN_ID,
+            {"disposition": "REPLAY-SHOULD-NOT-STICK"},
+            at=at,
+        )
+        assert replay_sk == eval_sk, "replay with the same (run_id, at) minted a new SK"
+        replayed = ddb.get_last_eval(PROGRAM_ID)
+        assert replayed["disposition"] == "added", (
+            "idempotent replay overwrote the original EVAL item"
+        )
 
         # update_meta_pointers
         ddb.update_meta_pointers(
@@ -107,36 +158,57 @@ def run() -> None:
         updated = ddb.get_program(PROGRAM_ID)
         assert updated is not None
         assert updated["verdict"] == "WATCH"
-        assert float(updated["fit_score"]) == 2.5
+        assert updated["fit_score"] == 2.5
+        assert isinstance(updated["fit_score"], float)
         assert updated["latest_eval_sk"] == eval_sk
         assert updated["latest_snapshot_sha"] == "deadbeef"
 
-        # put_snapshot / get_norm_snapshot
+        # update_meta_pointers with fit_score=None must also round-trip
+        # (a materially different DynamoDB code path -- NULL, not Decimal).
+        ddb.update_meta_pointers(
+            PROGRAM_ID,
+            verdict="PASS",
+            fit_score=None,
+            latest_eval_sk=eval_sk,
+            latest_snapshot_sha="deadbeef",
+        )
+        cleared = ddb.get_program(PROGRAM_ID)
+        assert cleared["fit_score"] is None
+
+        # put_snapshot / get_norm_snapshot. Compute both deterministic
+        # keys up front and register them for cleanup BEFORE calling
+        # put_snapshot -- put_snapshot does two separate S3 puts, so if
+        # the raw put succeeds and the norm put fails, the raw object
+        # must still be tracked for (best-effort) deletion rather than
+        # only being registered after both puts return.
         raw_html = "<html><body>Smoke test raw content</body></html>"
         norm_md = "# Smoke test\n\nNormalized snapshot body."
         sha256 = hashlib.sha256(raw_html.encode("utf-8")).hexdigest()
         fetched_at = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        sha8 = sha256[:8]
+        raw_key = f"snapshots/{PROGRAM_ID}/{fetched_at}_{sha8}.raw.html"
+        norm_key = f"snapshots/{PROGRAM_ID}/{fetched_at}_{sha8}.norm.md"
+        s3_keys.extend([raw_key, norm_key])
 
-        raw_key, norm_key = s3.put_snapshot(
+        got_raw_key, got_norm_key = s3.put_snapshot(
             PROGRAM_ID, fetched_at, sha256, raw_html, norm_md
         )
-        s3_keys.extend([raw_key, norm_key])
-        assert raw_key == f"snapshots/{PROGRAM_ID}/{fetched_at}_{sha256[:8]}.raw.html"
-        assert norm_key == f"snapshots/{PROGRAM_ID}/{fetched_at}_{sha256[:8]}.norm.md"
+        assert got_raw_key == raw_key
+        assert got_norm_key == norm_key
 
         round_tripped = s3.get_norm_snapshot(norm_key)
         assert round_tripped == norm_md, "norm snapshot did not round-trip"
 
-        # put_diff
-        diff_key = s3.put_diff(
-            PROGRAM_ID,
-            fetched_at,
-            "a" * 64,
-            "b" * 64,
-            "- old line\n+ new line\n",
-        )
+        # put_diff -- same up-front-key-registration pattern, for
+        # consistency and so a partial failure can't orphan the object.
+        old_sha = "a" * 64
+        new_sha = "b" * 64
+        diff_key = f"diffs/{PROGRAM_ID}/{fetched_at}_{old_sha[:8]}_{new_sha[:8]}.diff"
         s3_keys.append(diff_key)
-        assert diff_key == f"diffs/{PROGRAM_ID}/{fetched_at}_aaaaaaaa_bbbbbbbb.diff"
+        got_diff_key = s3.put_diff(
+            PROGRAM_ID, fetched_at, old_sha, new_sha, "- old line\n+ new line\n"
+        )
+        assert got_diff_key == diff_key
 
     finally:
         cleanup(table, bucket_name, s3_client, eval_sk, s3_keys)
