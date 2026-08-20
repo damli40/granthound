@@ -39,3 +39,15 @@ def test_whitespace_runs_collapse_to_stable_digest():
 def test_digest_is_sha256_hex():
     d = digest("hello")
     assert len(d) == 64 and all(c in "0123456789abcdef" for c in d)
+
+
+def test_nbsp_collapses_like_regular_space():
+    a = "<p>Applications are due October 15, 2026.</p>"
+    b = "<p>Applications are due October&nbsp;15,&nbsp;2026.</p>"
+    assert digest(normalize_html(a)) == digest(normalize_html(b))
+
+
+def test_nbsp_runs_collapse_to_single_space():
+    html = "<p>Due&nbsp;&nbsp;&nbsp;October 15, 2026</p>"
+    norm = normalize_html(html)
+    assert "Due October 15, 2026" in norm

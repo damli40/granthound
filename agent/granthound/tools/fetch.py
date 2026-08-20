@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from markdownify import markdownify
 
 _STRIP_TAGS = ("script", "style", "noscript", "nav", "footer", "iframe", "svg")
-_WS_RE = re.compile(r"[ \t]+")
+_WS_RE = re.compile(r"[ \t\xa0]+")
 _NL_RE = re.compile(r"\n{3,}")
 
 
