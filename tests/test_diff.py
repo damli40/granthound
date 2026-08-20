@@ -22,3 +22,19 @@ def test_prose_change_without_date_change():
     assert r.changed is True
     assert r.date_lines_changed is False
     assert r.added_lines == 1 and r.removed_lines == 1
+
+
+def test_horizontal_rule_line_change_is_counted():
+    old = "# Grants\n\n---\n\nDeadline: October 15, 2026.\n"
+    new = "# Grants\n\n***\n\nDeadline: October 15, 2026.\n"
+    r = diff_snapshots(old, new)
+    assert r.changed is True
+    assert r.removed_lines == 1 and r.added_lines == 1
+    assert r.date_lines_changed is False
+
+
+def test_date_line_adjacent_to_hr_still_flags():
+    old = "---\nDeadline: October 15, 2026.\n---\n"
+    new = "---\nDeadline: September 30, 2026.\n---\n"
+    r = diff_snapshots(old, new)
+    assert r.date_lines_changed is True
