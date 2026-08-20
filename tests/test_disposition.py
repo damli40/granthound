@@ -1,4 +1,4 @@
-"""TDD for run_local.suggest_disposition -- the pure, deterministic mapping
+"""TDD for granthound.tools.dispositions.suggest_disposition -- the pure, deterministic mapping
 from fetch/date/diff flags to a Disposition, pinned in task-7-brief.md:
 
   http_status >= 400 or transport error  -> PAGE_UNREACHABLE
@@ -17,7 +17,7 @@ test below sets only the one flag under test and leaves the rest at their
 """
 
 from granthound.store.models import Disposition
-from run_local import suggest_disposition
+from granthound.tools.dispositions import suggest_disposition
 
 CLEAN = dict(
     http_status=200,

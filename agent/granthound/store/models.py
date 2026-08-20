@@ -45,6 +45,7 @@ class FoundDate(BaseModel):
     iso: str | None
     year_present: bool
     context: str
+    day_fabricated: bool = False
 
 
 class DateScan(BaseModel):

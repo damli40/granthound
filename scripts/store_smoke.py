@@ -11,7 +11,7 @@ Expected: prints OK and exits 0.
 import hashlib
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -41,12 +41,22 @@ from granthound.store import ddb, s3  # noqa: E402
 
 PROGRAM_ID = "smoke-test"
 RUN_ID = "smoke-run-1"
+SEQ_PROGRAM_ID = "smoke-test-seq"
 
 
-def cleanup(table, bucket_name: str, s3_client, eval_sk: str | None, s3_keys: list[str]) -> None:
+def cleanup(
+    table,
+    bucket_name: str,
+    s3_client,
+    eval_sk: str | None,
+    s3_keys: list[str],
+    extra_eval_sks: list[str] | None = None,
+) -> None:
     table.delete_item(Key={"pk": f"PROG#{PROGRAM_ID}", "sk": "META"})
     if eval_sk is not None:
         table.delete_item(Key={"pk": f"PROG#{PROGRAM_ID}", "sk": eval_sk})
+    for sk in extra_eval_sks or []:
+        table.delete_item(Key={"pk": f"PROG#{SEQ_PROGRAM_ID}", "sk": sk})
     if s3_keys:
         s3_client.delete_objects(
             Bucket=bucket_name,
@@ -64,6 +74,7 @@ def run() -> None:
 
     eval_sk = None
     s3_keys: list[str] = []
+    sequence_sks: list[str] = []
 
     try:
         # put_program_meta / get_program / list_programs
@@ -147,6 +158,71 @@ def run() -> None:
             "idempotent replay overwrote the original EVAL item"
         )
 
+        # get_last_eval(with_snapshot=True) diff-baseline seam (final
+        # review finding 3): a three-eval sequence in its own partition --
+        # good (snapshot_receipt set) -> unreachable (None) -> unreachable
+        # (None) again -- proves two things at once: (a) the default,
+        # with_snapshot=False call is untouched and still returns the
+        # newest EVAL regardless of content; (b) with_snapshot=True walks
+        # PAST both null-receipt outage evals and returns the oldest item
+        # in the sequence, because it is the only one with a receipt --
+        # not just the one immediately before the latest.
+        seq_base = datetime.now(timezone.utc)
+        seq1_at = seq_base
+        seq2_at = seq_base + timedelta(seconds=1)
+        seq3_at = seq_base + timedelta(seconds=2)
+
+        seq1_sk = ddb.put_evaluation(
+            SEQ_PROGRAM_ID,
+            "smoke-seq-1",
+            {
+                "disposition": "added",
+                "snapshot_receipt": {
+                    "sha256": "seq1sha",
+                    "s3_raw": "raw/seq1",
+                    "s3_norm": "norm/seq1",
+                    "fetched_at": "20260101T000000Z",
+                    "http_status": 200,
+                },
+            },
+            at=seq1_at,
+        )
+        sequence_sks.append(seq1_sk)
+
+        seq2_sk = ddb.put_evaluation(
+            SEQ_PROGRAM_ID,
+            "smoke-seq-2",
+            {"disposition": "page_unreachable", "snapshot_receipt": None},
+            at=seq2_at,
+        )
+        sequence_sks.append(seq2_sk)
+
+        seq3_sk = ddb.put_evaluation(
+            SEQ_PROGRAM_ID,
+            "smoke-seq-3",
+            {"disposition": "page_unreachable", "snapshot_receipt": None},
+            at=seq3_at,
+        )
+        sequence_sks.append(seq3_sk)
+
+        seq_latest = ddb.get_last_eval(SEQ_PROGRAM_ID)
+        assert seq_latest is not None
+        assert seq_latest["sk"] == seq3_sk, (
+            "get_last_eval() without with_snapshot must still return the newest EVAL "
+            "regardless of snapshot_receipt"
+        )
+
+        seq_diff_baseline = ddb.get_last_eval(SEQ_PROGRAM_ID, with_snapshot=True)
+        assert seq_diff_baseline is not None, (
+            "get_last_eval(with_snapshot=True) found no receipt-bearing EVAL"
+        )
+        assert seq_diff_baseline["sk"] == seq1_sk, (
+            "get_last_eval(with_snapshot=True) must skip past the null-receipt "
+            "outage evals and return the oldest (first) eval in the sequence, "
+            "since it is the only one with a snapshot_receipt"
+        )
+        assert seq_diff_baseline["snapshot_receipt"]["sha256"] == "seq1sha"
+
         # update_meta_pointers
         ddb.update_meta_pointers(
             PROGRAM_ID,
@@ -211,7 +287,7 @@ def run() -> None:
         assert got_diff_key == diff_key
 
     finally:
-        cleanup(table, bucket_name, s3_client, eval_sk, s3_keys)
+        cleanup(table, bucket_name, s3_client, eval_sk, s3_keys, extra_eval_sks=sequence_sks)
 
         # Verify cleanup actually left the table/bucket clean.
         assert ddb.get_program(PROGRAM_ID) is None, "META item survived cleanup"
@@ -220,6 +296,11 @@ def run() -> None:
                 Key={"pk": f"PROG#{PROGRAM_ID}", "sk": eval_sk}
             ).get("Item")
             assert leftover is None, "EVAL item survived cleanup"
+        for sk in sequence_sks:
+            leftover = table.get_item(
+                Key={"pk": f"PROG#{SEQ_PROGRAM_ID}", "sk": sk}
+            ).get("Item")
+            assert leftover is None, f"sequence EVAL item {sk} survived cleanup"
 
 
 def main() -> int:

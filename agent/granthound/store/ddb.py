@@ -130,17 +130,52 @@ def put_evaluation(program_id: str, run_id: str, eval_item: dict, *, at: datetim
     return sk
 
 
-def get_last_eval(program_id: str) -> dict | None:
+def get_last_eval(program_id: str, *, with_snapshot: bool = False) -> dict | None:
+    """Return the most recent EVAL item for a program, or None if none exist.
+
+    With `with_snapshot=False` (default, matches the old behavior): the
+    single newest EVAL item regardless of content -- used for run
+    bookkeeping (is_first_eval, run counting), where "most recent run of
+    any kind" is exactly what's wanted.
+
+    With `with_snapshot=True`: the newest EVAL item whose `snapshot_receipt`
+    is non-null, skipping past any newer EVAL items that have none (e.g. a
+    PAGE_UNREACHABLE run, which never fetched a page to snapshot). This is
+    the correct diff baseline -- diffing against a null snapshot_receipt is
+    impossible, so a plain Limit=1 query would silently skip the diff on
+    the next successful run instead of comparing against the last real
+    snapshot. Paginates a descending Query rather than capping at one page:
+    a run of several consecutive outages must not hide a good snapshot
+    further back. Each program's EVAL partition is small (one item per
+    check run), so full descending pagination is cheap.
+    """
     table = _table()
-    response = table.query(
-        KeyConditionExpression=(
-            Key("pk").eq(_program_pk(program_id)) & Key("sk").begins_with("EVAL#")
-        ),
+    if not with_snapshot:
+        response = table.query(
+            KeyConditionExpression=(
+                Key("pk").eq(_program_pk(program_id)) & Key("sk").begins_with("EVAL#")
+            ),
+            ScanIndexForward=False,
+            Limit=1,
+        )
+        items = response.get("Items", [])
+        return _from_dynamo(items[0]) if items else None
+
+    paginator = table.meta.client.get_paginator("query")
+    for page in paginator.paginate(
+        TableName=os.environ["GRANTHOUND_TABLE"],
+        KeyConditionExpression="pk = :pk AND begins_with(sk, :sk_prefix)",
+        ExpressionAttributeValues={
+            ":pk": _program_pk(program_id),
+            ":sk_prefix": "EVAL#",
+        },
         ScanIndexForward=False,
-        Limit=1,
-    )
-    items = response.get("Items", [])
-    return _from_dynamo(items[0]) if items else None
+    ):
+        for item in page.get("Items", []):
+            converted = _from_dynamo(item)
+            if converted.get("snapshot_receipt") is not None:
+                return converted
+    return None
 
 
 def update_meta_pointers(

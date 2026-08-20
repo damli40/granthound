@@ -1,10 +1,7 @@
-from datetime import date
-
 import pytest
 from pydantic import ValidationError
 
 from granthound.store.models import (
-    DateScan,
     Disposition,
     FitAxes,
     FoundDate,

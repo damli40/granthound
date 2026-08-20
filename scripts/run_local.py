@@ -66,49 +66,14 @@ _load_dotenv(REPO_ROOT / ".env")
 import requests  # noqa: E402
 
 from granthound.store import ddb, s3  # noqa: E402
-from granthound.store.models import Disposition, SnapshotReceipt  # noqa: E402
+from granthound.store.models import SnapshotReceipt  # noqa: E402
 from granthound.tools.dates import extract_dates  # noqa: E402
 from granthound.tools.diff import diff_snapshots  # noqa: E402
+from granthound.tools.dispositions import (  # noqa: E402
+    has_future_dated_date,
+    suggest_disposition,
+)
 from granthound.tools.fetch import digest, fetch_page, normalize_html  # noqa: E402
-
-
-def suggest_disposition(
-    *,
-    http_status: int | None,
-    transport_error: bool,
-    all_dates_past: bool,
-    has_yearless_date: bool,
-    has_future_dated_date: bool,
-    dates_contradict: bool,
-    is_first_eval: bool,
-    date_lines_changed: bool,
-) -> Disposition:
-    """Pure, deterministic disposition mapping -- no I/O, no clock.
-
-    Precedence (first match wins), per task-7-brief.md:
-      1. PAGE_UNREACHABLE   -- transport failed, or HTTP status >= 400
-      2. STALE_DATE_SUSPECT -- every dated (year-present) date is in the past
-      3. YEAR_TRAP_SUSPECT  -- a yearless date appears with no future-dated
-                               date anywhere on the page to vouch for it
-      4. DATE_CONTRADICTION -- two future deadline-context dates disagree
-                               by more than the contradiction gap
-      5. else: ADDED (first eval for this program) / CHANGED_DEADLINE
-               (subsequent eval, a date line changed vs. the prior
-               snapshot) / REVERIFIED_LIVE (subsequent eval, unchanged)
-    """
-    if transport_error or (http_status is not None and http_status >= 400):
-        return Disposition.PAGE_UNREACHABLE
-    if all_dates_past:
-        return Disposition.STALE_DATE_SUSPECT
-    if has_yearless_date and not has_future_dated_date:
-        return Disposition.YEAR_TRAP_SUSPECT
-    if dates_contradict:
-        return Disposition.DATE_CONTRADICTION
-    if is_first_eval:
-        return Disposition.ADDED
-    if date_lines_changed:
-        return Disposition.CHANGED_DEADLINE
-    return Disposition.REVERIFIED_LIVE
 
 
 def run_one(program_id: str, url: str, at: datetime) -> dict:
@@ -170,14 +135,20 @@ def run_one(program_id: str, url: str, at: datetime) -> dict:
     raw_key, norm_key = s3.put_snapshot(program_id, fetched_at, sha256, body, norm)
 
     date_scan = extract_dates(norm, today)
-    has_future_dated_date = any(
-        d.year_present and d.iso is not None and date.fromisoformat(d.iso) >= today
-        for d in date_scan.dates
-    )
+    future_dated = has_future_dated_date(date_scan, today)
+
+    # Diff baseline is deliberately a SEPARATE lookup from `last_eval`
+    # above: `last_eval` is "the most recent run of any kind" (used for
+    # is_first_eval bookkeeping), but a diff needs "the most recent run
+    # that actually has a snapshot to diff against". If the immediately
+    # prior run was PAGE_UNREACHABLE (snapshot_receipt=None), diffing
+    # against `last_eval` would silently skip the diff and misreport
+    # REVERIFIED_LIVE instead of reaching back to the last good snapshot.
+    diff_baseline = ddb.get_last_eval(program_id, with_snapshot=True)
 
     date_lines_changed = False
-    if last_eval is not None:
-        prev_receipt = last_eval.get("snapshot_receipt")
+    if diff_baseline is not None:
+        prev_receipt = diff_baseline.get("snapshot_receipt")
         if prev_receipt and prev_receipt.get("s3_norm"):
             prev_norm = s3.get_norm_snapshot(prev_receipt["s3_norm"])
             diff_result = diff_snapshots(prev_norm, norm)
@@ -196,7 +167,7 @@ def run_one(program_id: str, url: str, at: datetime) -> dict:
         transport_error=False,
         all_dates_past=date_scan.all_dates_past,
         has_yearless_date=date_scan.has_yearless_date,
-        has_future_dated_date=has_future_dated_date,
+        has_future_dated_date=future_dated,
         dates_contradict=date_scan.dates_contradict,
         is_first_eval=is_first_eval,
         date_lines_changed=date_lines_changed,
