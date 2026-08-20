@@ -18,10 +18,11 @@ def compute_fit_score(axes: FitAxes) -> FitScore:
     capped = axes.eligibility == 0
     if capped:
         score = min(score, ELIGIBILITY_CAP)
+    score = round(score, 4)
     if score >= APPLY_THRESHOLD:
         verdict = Verdict.APPLY
     elif score >= WATCH_THRESHOLD:
         verdict = Verdict.WATCH
     else:
         verdict = Verdict.PASS
-    return FitScore(score=round(score, 4), capped=capped, verdict_suggestion=verdict)
+    return FitScore(score=score, capped=capped, verdict_suggestion=verdict)
