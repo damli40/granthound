@@ -1,31 +1,32 @@
-"""GrantHound vertical-slice runner -- deterministic path, no LLM.
+"""GrantHound local runner -- one cycle, with or without the models.
 
-Fetches a funder page, normalizes + digests it, writes the raw/normalized
-snapshot to S3, extracts date candidates, maps the deterministic flags to a
-Disposition (no LLM in this slice -- the M2 Verifier refines this, it never
-contradicts it), writes an EVAL item to DynamoDB, and prints a one-line
-verdict summary.
+Two paths, one script:
+
+  --no-llm   the deterministic slice on its own: fetch a funder page,
+             normalize + digest it, write the raw/normalized snapshot to S3,
+             scan for dates, map the deterministic flags to a Disposition,
+             write an EVAL row, print one line. Exactly one program.
+
+  (default)  the full graph: Scout -> Verifier -> Analyst -> Clerk over one
+             or more programs, then finalization (one EVAL per program, one
+             RUN row with per-node token usage and the model id each node
+             actually billed). This is the path that costs money.
 
 Usage:
-  .venv/bin/python scripts/run_local.py --program-id <id> --no-llm [--url <override>]
+  .venv/bin/python scripts/run_local.py --no-llm --program-id <id> [--url <override>]
+  .venv/bin/python scripts/run_local.py --program-id <id> [--program-id <id> ...] [--url <override>]
+  .venv/bin/python scripts/run_local.py --all [--seeds <path>] [--limit <n>]
 
---no-llm is required in this plan: the flag exists so M2 can add the LLM
-verification path later without renaming the flag, but this slice has no
-LLM path to fall back to, so omitting it is a usage error, not a silent
-default.
-
---url overrides the page checked for this run (also used for ad-hoc,
-one-off checks of a URL that isn't in the store at all yet). Without
---url, the program's stored META url is used; this slice does not write a
-META item itself (out of scope -- see Interfaces block in the task brief),
-so --url is effectively required until a later task's seed_load populates
-META.
+--url overrides the page checked for this run (an ad-hoc check of a URL that
+is not in the store yet). It applies to exactly one program, so it is a usage
+error alongside --all or a second --program-id. Without it the program's
+stored META url is used -- scripts/seed_load.py writes those.
 
 No hidden clocks: main() reads the wall clock exactly once, as a single
-UTC-aware `at` datetime, and passes it to granthound.pipeline.deterministic,
-which derives everything time-related (the EVAL SK, `run_id`, the snapshot
-`fetched_at` string, and `today` for date-scan comparisons) from that one
-value.
+UTC-aware `at` datetime, and hands it to the pipeline, which derives
+everything time-related from that one value (the EVAL sort keys, the run id,
+the snapshot `fetched_at` strings, and `today` for the date scan). Two
+programs in one batch are therefore judged against the same day.
 """
 
 import argparse
@@ -64,11 +65,13 @@ def _load_dotenv(path: Path) -> None:
 
 _load_dotenv(REPO_ROOT / ".env")
 
+from granthound.config import Settings  # noqa: E402
 from granthound.pipeline.deterministic import (  # noqa: E402
     evaluate_program,
     persist_deterministic,
 )
-from granthound.store import ddb  # noqa: E402 -- main() resolves a stored META url
+from granthound.pipeline.run import run_batch  # noqa: E402
+from granthound.seeds.profile import DEFAULT_SEED_PATH, load_seed_file  # noqa: E402
 from granthound.store.protocol import LiveStore  # noqa: E402
 from granthound.tools.fetch import fetch_page  # noqa: E402
 
@@ -96,51 +99,79 @@ def run_one(program_id: str, url: str, at: datetime) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="GrantHound vertical-slice runner (deterministic, no LLM)."
-    )
-    parser.add_argument("--program-id", required=True, help="Program id, e.g. provisional-1")
-    parser.add_argument(
-        "--no-llm",
-        action="store_true",
-        required=True,
-        help="Required in this plan -- no LLM verification path exists yet.",
-    )
-    parser.add_argument(
-        "--url",
-        default=None,
-        help="Override URL for this run (ad-hoc check, or first run before a "
-        "stored program META exists).",
-    )
+    parser = argparse.ArgumentParser(description="GrantHound local runner.")
+    parser.add_argument("--program-id", action="append", default=[], help="Program id; repeat for several.")
+    parser.add_argument("--all", action="store_true", help="Every program in the seed file.")
+    parser.add_argument("--no-llm", action="store_true", help="Deterministic path only (one program).")
+    parser.add_argument("--url", default=None, help="URL override (one program only).")
+    parser.add_argument("--seeds", default=None, help="Seed file path (default: the packaged maya.yml).")
+    parser.add_argument("--limit", type=int, default=None, help="Cap how many programs run.")
     args = parser.parse_args()
 
-    if args.url is not None:
-        url = args.url
-    else:
-        program = ddb.get_program(args.program_id)
-        if program is None or not program.get("url"):
-            print(
-                f"error: no --url given and no stored URL for program "
-                f"'{args.program_id}'",
-                file=sys.stderr,
-            )
-            return 2
-        url = program["url"]
-
+    # Settings.from_env() first: it is the one place that names every missing
+    # environment variable at once, and it must run before any model is built.
+    settings = Settings.from_env()
+    seed_file = load_seed_file(Path(args.seeds) if args.seeds else DEFAULT_SEED_PATH)
+    store = LiveStore()
     at = datetime.now(timezone.utc)
 
-    try:
-        result = run_one(args.program_id, url, at)
-    except Exception as exc:  # noqa: BLE001 -- top-level CLI entrypoint
-        print(f"FAIL: {exc}", file=sys.stderr)
-        return 1
+    program_ids = list(args.program_id)
+    if args.all:
+        program_ids = [seed.id for seed in seed_file.seeds]
+    if args.limit is not None:
+        program_ids = program_ids[: args.limit]
+    if not program_ids:
+        print("error: pass --program-id (repeatable) or --all", file=sys.stderr)
+        return 2
+    if args.url is not None and len(program_ids) != 1:
+        print("error: --url applies to exactly one --program-id", file=sys.stderr)
+        return 2
 
-    sha_display = result["sha256"][:8] if result["sha256"] else "n/a"
-    print(
-        f"{result['program_id']} disposition={result['disposition'].value} "
-        f"dates={result['date_count']} yearless={result['yearless_count']} "
-        f"all_past={result['all_dates_past']} sha={sha_display} -> {result['eval_sk']}"
+    if args.no_llm:
+        if len(program_ids) != 1:
+            print("error: --no-llm runs exactly one program", file=sys.stderr)
+            return 2
+        program_id = program_ids[0]
+        url = args.url or (store.get_program(program_id) or {}).get("url")
+        if not url:
+            print(f"error: no --url given and no stored URL for '{program_id}'", file=sys.stderr)
+            return 2
+        try:
+            result = run_one(program_id, url, at)
+        except Exception as exc:  # noqa: BLE001 -- top-level CLI entrypoint
+            print(f"FAIL: {exc}", file=sys.stderr)
+            return 1
+        sha = result["sha256"][:8] if result["sha256"] else "n/a"
+        print(
+            f"{result['program_id']} disposition={result['disposition'].value} "
+            f"dates={result['date_count']} yearless={result['yearless_count']} "
+            f"all_past={result['all_dates_past']} sha={sha} -> {result['eval_sk']}"
+        )
+        return 0
+
+    summary = run_batch(
+        program_ids, at,
+        store=store, fetcher=fetch_page, org=seed_file.org, settings=settings,
+        url_overrides={program_ids[0]: args.url} if args.url else None,
     )
+    for outcome in summary.outcomes:
+        # outcome.flags, not the EVAL row: meta_missing and meta_pointer_failed
+        # are raised after the row is assembled, so the durable row never
+        # carries them and only this object can report them.
+        flags = f" flags={','.join(outcome.flags)}" if outcome.flags else ""
+        # eval_sk is None when the EVAL write itself failed (the program still
+        # has a verdict; there is just no row to point at).
+        target = outcome.eval_sk or "NO EVAL ROW"
+        print(f"{outcome.program_id} {outcome.verdict.value} {outcome.disposition.value}{flags} -> {target}")
+    usage = summary.run_item["node_usage"]
+    total = sum(node["total_tokens"] for node in usage.values())
+    per_node = " ".join(f"{node}={usage[node]['total_tokens']}" for node in sorted(usage))
+    print(f"run {summary.run_id} status={summary.status} tokens: total={total} {per_node}")
+    print(f"models: {summary.run_item['node_models']}")
+    if summary.errors:
+        for line in summary.errors:
+            print(f"error: {line}", file=sys.stderr)
+        return 1
     return 0
 
 
