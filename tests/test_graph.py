@@ -169,3 +169,17 @@ def test_every_prompt_declares_every_fence_label_as_data():
         text = getattr(prompts, name)
         for label in FENCE_LABELS:
             assert f"<<<{label}" in text, f"{name} does not declare the {label} fence"
+
+
+def test_every_prompt_that_can_be_rejected_is_told_when_to_give_up():
+    """Only the quote/date failures spend the MAX_REJECTIONS budget. An unknown
+    disposition, an unknown reason code, too many quotes, an out-of-range axis, a
+    length mismatch and an unknown program all reply REJECTED for free, so a model
+    resending the same bad value loops until the 300s node timeout. Every prompt
+    that tells the model to call again must also tell it when to stop."""
+    from granthound.agents import prompts
+
+    for name in ("VERIFIER", "ANALYST", "CLERK"):
+        text = getattr(prompts, name)
+        assert "REJECTED" in text, f"{name} no longer mentions REJECTED -- is this test still needed?"
+        assert prompts.GIVE_UP_RULE in text, f"{name} tells the model to retry with no bound"
