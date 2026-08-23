@@ -32,9 +32,16 @@ FENCE_RULE = (
 # keeps sending the same bad value except the 300s node timeout. This sentence
 # is that bound, asked for rather than enforced: the model is told to give the
 # part up and keep the batch moving.
+#
+# The second sentence closes a hole in the first: every prompt ends its turn on
+# a condition like "when every id is recorded or confirmed unreachable", and an
+# id the model gave up on satisfies neither -- so a literal reader would give the
+# record up and then keep the turn open anyway, which is the loop this rule
+# exists to close.
 GIVE_UP_RULE = (
     "If the same tool rejects the same program twice, stop calling it for that program: "
-    "leave out the part it keeps rejecting and move on to the next id."
+    "leave out the part it keeps rejecting and move on to the next id. An id you gave up "
+    "on counts as finished -- it must not hold your turn open."
 )
 
 SCOUT = """You are the Scout node of GrantHound, a grant-liveness checker for a small nonprofit.
