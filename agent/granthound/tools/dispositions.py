@@ -33,19 +33,35 @@ def suggest_disposition(
     dates_contradict: bool,
     is_first_eval: bool,
     date_lines_changed: bool,
+    prior_was_unreachable: bool = False,
+    has_baseline: bool = True,
 ) -> Disposition:
     """Pure, deterministic disposition mapping -- no I/O, no clock.
 
-    Precedence (first match wins), per task-7-brief.md:
+    Precedence (first match wins):
       1. PAGE_UNREACHABLE   -- transport failed, or HTTP status >= 400
       2. STALE_DATE_SUSPECT -- every dated (year-present) date is in the past
       3. YEAR_TRAP_SUSPECT  -- a yearless date appears with no future-dated
                                date anywhere on the page to vouch for it
       4. DATE_CONTRADICTION -- two future deadline-context dates disagree
                                by more than the contradiction gap
-      5. else: ADDED (first eval for this program) / CHANGED_DEADLINE
-               (subsequent eval, a date line changed vs. the prior
-               snapshot) / REVERIFIED_LIVE (subsequent eval, unchanged)
+      5. ADDED              -- first eval for this program, OR no prior
+                               snapshot exists to compare against
+      6. CHANGED_DEADLINE   -- a date-bearing line changed vs. the baseline
+                               snapshot (the last one that had a snapshot)
+      7. VERIFIED_LIVE      -- the immediately prior eval was PAGE_UNREACHABLE
+                               and the page is back, unchanged (recovery)
+      8. REVERIFIED_LIVE    -- subsequent eval, unchanged
+
+    `has_baseline` says a prior snapshot exists to compare this fetch
+    against. It is not the same question as `is_first_eval`: a program
+    whose very first check failed has an EVAL row (so it is not the first
+    eval) but never stored a snapshot (so there is no baseline). Rules
+    6-8 all assert something about a comparison -- "changed", "unchanged"
+    -- and none of them is a claim the evidence supports when nothing was
+    ever compared, so without a baseline the page is ADDED: this run is
+    the first look at its content. Defaults to True so that callers
+    predating this argument keep their existing behavior.
     """
     if transport_error or (http_status is not None and http_status >= 400):
         return Disposition.PAGE_UNREACHABLE
@@ -55,8 +71,10 @@ def suggest_disposition(
         return Disposition.YEAR_TRAP_SUSPECT
     if dates_contradict:
         return Disposition.DATE_CONTRADICTION
-    if is_first_eval:
+    if is_first_eval or not has_baseline:
         return Disposition.ADDED
     if date_lines_changed:
         return Disposition.CHANGED_DEADLINE
+    if prior_was_unreachable:
+        return Disposition.VERIFIED_LIVE
     return Disposition.REVERIFIED_LIVE

@@ -83,3 +83,137 @@ class FitScore(BaseModel):
     score: float
     capped: bool
     verdict_suggestion: Verdict
+
+
+class DiffReceipt(BaseModel):
+    """What changed versus the last snapshot that had one.
+
+    s3_key is None when nothing changed (no diff object is written for an
+    identical page). date_lines_changed is the only change signal that
+    drives a disposition; `changed` alone is a quiet note (a nav tweak or a
+    timestamp must never read as a deadline change).
+    """
+
+    s3_key: str | None
+    old_sha256: str
+    changed: bool
+    date_lines_changed: bool
+    added_lines: int
+    removed_lines: int
+
+
+class DeterministicEval(BaseModel):
+    """Everything the deterministic layer knows about one program in one run.
+
+    norm_text is the normalized page body the LLM nodes read. It is
+    excluded from every dump so it can never leak into a DynamoDB item by
+    accident; the S3 snapshot named in snapshot_receipt is the durable copy.
+    """
+
+    program_id: str
+    url: str
+    run_id: str
+    fetched_at: str
+    disposition: Disposition
+    http_status: int | None
+    transport_error: bool
+    snapshot_receipt: SnapshotReceipt | None
+    date_scan: DateScan | None
+    diff_receipt: DiffReceipt | None
+    is_first_eval: bool
+    prior_was_unreachable: bool
+    has_future_dated_date: bool
+    norm_text: str | None = Field(default=None, exclude=True)
+
+
+class ReasonCode(str, Enum):
+    """Closed set of reasons the Verifier may give. No free text anywhere."""
+
+    DEADLINE_IN_FUTURE = "deadline_in_future"
+    DEADLINE_PASSED = "deadline_passed"
+    PRIOR_CYCLE_ONLY = "prior_cycle_only"
+    NEXT_CYCLE_ANNOUNCED = "next_cycle_announced"
+    INVITATION_ONLY = "invitation_only"
+    PROGRAM_DISCONTINUED = "program_discontinued"
+    NOT_A_PROGRAM_PAGE = "not_a_program_page"
+    ROLLING_NO_DEADLINE = "rolling_no_deadline"
+    DATES_UNCLEAR = "dates_unclear"
+
+
+class VerifierRecord(BaseModel):
+    proposed: Disposition
+    final: Disposition
+    overridden: bool
+    reason: ReasonCode
+    evidence_quotes: list[str]
+    quotes_unverified: bool
+    rejections: int = 0
+
+
+class FitRecord(BaseModel):
+    axes: FitAxes
+    axis_quotes: dict[str, str]
+    fit: FitScore
+    headline_amount: float | None
+    reachable_amount: float | None
+    amount_quote: str | None
+    amount_verified: bool
+    quotes_unverified: bool
+    rejections: int = 0
+
+
+class DeadlineKind(str, Enum):
+    LOI = "loi"
+    FULL_APPLICATION = "full_application"
+    INFO_SESSION = "info_session"
+    AWARD_NOTIFICATION = "award_notification"
+    CYCLE_OPENS = "cycle_opens"
+    OTHER = "other"
+
+
+class DeadlinePick(BaseModel):
+    """One date the Clerk picked, carrying whether its DAY came off the page.
+
+    `day_fabricated` is the scanner's own signal (see FoundDate): the page
+    gave a month and a year only, e.g. "September 2026", and day 01 was
+    invented to make an ISO date out of it. It travels with the pick so the
+    arithmetic downstream can count to the end of that month instead of
+    treating an invented day as a promise the funder made.
+    """
+
+    iso: str
+    kind: DeadlineKind
+    day_fabricated: bool = False
+
+
+class DeadlineMath(BaseModel):
+    """`iso` is always the date as stored. When `day_fabricated` is true the
+    counting fields (`days_until`, `is_past`, `within_14_days`) are measured
+    to the LAST day of that month, because that is the last moment the page
+    could still be describing."""
+
+    iso: str
+    kind: DeadlineKind
+    days_until: int
+    within_14_days: bool
+    is_past: bool
+    collides_with: list[str]
+    day_fabricated: bool = False
+
+
+class DecisionPackage(BaseModel):
+    """What the Clerk hands Maya. Quotes and dates only -- no drafting field exists."""
+
+    deadlines: list[DeadlineMath]
+    requirement_quotes: list[str]
+    eligibility_quotes: list[str]
+    quotes_unverified: bool
+    rejections: int = 0
+
+
+class NodeUsage(BaseModel):
+    model_id: str | None
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+    execution_ms: int

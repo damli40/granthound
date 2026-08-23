@@ -76,7 +76,14 @@ def _is_deadline_context(context: str) -> bool:
     return any(pattern.search(lowered) for pattern in _DEADLINE_WORD_RES)
 
 
-def _end_of_month(d: date) -> date:
+def end_of_month(d: date) -> date:
+    """The last day of d's month.
+
+    Public because two places need the identical rule: liveness here, and
+    the deadline arithmetic in tools/deadlines.py. A second copy of it
+    could drift, and the two would then disagree about whether the same
+    month-only deadline has passed.
+    """
     last_day = calendar.monthrange(d.year, d.month)[1]
     return d.replace(day=last_day)
 
@@ -110,7 +117,7 @@ def extract_dates(text: str, today: date) -> DateScan:
         # "sometime in August", not August 1st specifically, so treat it
         # as still live through the LAST day of that month rather than
         # the fabricated first day.
-        return _end_of_month(parsed) if d.day_fabricated else parsed
+        return end_of_month(parsed) if d.day_fabricated else parsed
 
     all_past = bool(dated) and all(_all_past_comparison_date(d) < today for d in dated)
     has_yearless = any(not d.year_present for d in found)

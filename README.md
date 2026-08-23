@@ -14,6 +14,35 @@ and proves why.
 **Status: under construction** — quickstart, architecture diagram, and the
 measured teardown table land here before submission.
 
+## What a cycle does
+
+One cycle runs four agents in a row over each funder page. The **Scout**
+fetches the page and stores a hashed snapshot — that snapshot is the
+receipt everything else is checked against. The **Verifier** decides whether
+the program is actually live, in the funder's own words. The **Analyst**
+scores fit against your org's profile. The **Clerk** collects the dates and
+requirements for the programs worth your time.
+
+The boundary rule is what makes the verdicts checkable: **every quote an
+agent stores must appear word for word — whitespace aside — in that stored
+snapshot, and every date must be one the page actually printed** (a
+month-only date keeps its day marked as invented, and counts to month end).
+The recording tools enforce this in code, not in the prompt. A quote that
+isn't on the page is dropped rather than saved, and the program is handed to
+a human instead of being acted on. So any verdict can be re-derived from the
+snapshot it cites, by you, later, without trusting the model that produced it.
+
+## Run it
+
+```bash
+.venv/bin/python scripts/seed_load.py    # load your seed list into the store
+.venv/bin/python scripts/run_local.py --all
+```
+
+`--program-id ID` (repeatable) runs a subset; `--no-llm --program-id ID`
+runs only the deterministic fetch-and-scan half, with no model calls and no
+model costs.
+
 ## Provenance
 
 The verification *methodology* GrantHound implements (liveness rules like

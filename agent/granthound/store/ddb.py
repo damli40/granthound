@@ -5,6 +5,9 @@ Single-table layout, one partition per program:
   sk = "META"                         -- program metadata / pointers
   sk = "EVAL#<utc-iso>#<run_id>"      -- one item per evaluation run
 
+Runs get their own partition, one item each:
+  pk = "RUN#<run_id>", sk = "META"    -- one item per pipeline run
+
 Environment contract: GRANTHOUND_TABLE (table name), AWS_REGION
 (default us-east-1). Read lazily inside each call so a script can load
 `.env` into os.environ before the first store call runs.
@@ -185,22 +188,35 @@ def update_meta_pointers(
     fit_score: float | None,
     latest_eval_sk: str,
     latest_snapshot_sha: str,
-) -> None:
+) -> bool:
+    """Update the META pointers for a program that already exists.
+
+    Guarded with attribute_exists(pk): an unconditional UpdateItem is an
+    upsert, and an upsert here would mint a ghost META row (no url, no
+    funder) for any program id that was evaluated ad hoc before seed_load
+    registered it. Returns False instead of writing in that case so the
+    caller can log it; never raises for the missing-row case.
+    """
     table = _table()
-    table.update_item(
-        Key={"pk": _program_pk(program_id), "sk": "META"},
-        UpdateExpression=(
-            "SET verdict = :verdict, fit_score = :fit_score, "
-            "latest_eval_sk = :latest_eval_sk, "
-            "latest_snapshot_sha = :latest_snapshot_sha"
-        ),
-        ExpressionAttributeValues={
-            ":verdict": verdict,
-            ":fit_score": _to_dynamo(fit_score),
-            ":latest_eval_sk": latest_eval_sk,
-            ":latest_snapshot_sha": latest_snapshot_sha,
-        },
-    )
+    try:
+        table.update_item(
+            Key={"pk": _program_pk(program_id), "sk": "META"},
+            UpdateExpression=(
+                "SET verdict = :verdict, fit_score = :fit_score, "
+                "latest_eval_sk = :latest_eval_sk, "
+                "latest_snapshot_sha = :latest_snapshot_sha"
+            ),
+            ConditionExpression="attribute_exists(pk)",
+            ExpressionAttributeValues={
+                ":verdict": verdict,
+                ":fit_score": _to_dynamo(fit_score),
+                ":latest_eval_sk": latest_eval_sk,
+                ":latest_snapshot_sha": latest_snapshot_sha,
+            },
+        )
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        return False
+    return True
 
 
 def list_programs() -> list[dict]:
@@ -210,16 +226,46 @@ def list_programs() -> list[dict]:
     and each program lives in its own partition (pk="PROG#<id>"), so
     listing across all programs is structurally a Scan, not a Query --
     there is no single partition key that covers every program. Uses the
-    scan paginator (never a hand-rolled NextToken loop) filtered to
-    sk == "META" so EVAL items are excluded.
+    scan paginator (never a hand-rolled NextToken loop).
+
+    The filter needs BOTH halves. sk == "META" alone excludes EVAL items
+    but not RUN items: put_run writes pk="RUN#<run_id>", sk="META", which
+    matches an sk-only filter exactly. A run row has no url and no
+    program_id, so leaking one into this list hands the caller a program
+    it cannot fetch. begins_with(pk, "PROG#") is what keeps the two
+    partition families apart.
     """
     client = _table().meta.client
     paginator = client.get_paginator("scan")
     programs: list[dict] = []
     for page in paginator.paginate(
         TableName=os.environ["GRANTHOUND_TABLE"],
-        FilterExpression="sk = :sk",
-        ExpressionAttributeValues={":sk": "META"},
+        FilterExpression="begins_with(pk, :prefix) AND sk = :sk",
+        ExpressionAttributeValues={":prefix": "PROG#", ":sk": "META"},
     ):
         programs.extend(_from_dynamo(item) for item in page.get("Items", []))
     return programs
+
+
+def _run_pk(run_id: str) -> str:
+    return f"RUN#{run_id}"
+
+
+def put_run(item: dict) -> None:
+    """Put/replace the META item for a run. `item` must contain "run_id"."""
+    run_id = item["run_id"]
+    _table().put_item(Item=_to_dynamo({**item, "pk": _run_pk(run_id), "sk": "META"}))
+
+
+def list_runs() -> list[dict]:
+    """Return every run's META item (Scan filtered on the RUN# prefix; no GSI in v1)."""
+    client = _table().meta.client
+    paginator = client.get_paginator("scan")
+    runs: list[dict] = []
+    for page in paginator.paginate(
+        TableName=os.environ["GRANTHOUND_TABLE"],
+        FilterExpression="begins_with(pk, :prefix) AND sk = :sk",
+        ExpressionAttributeValues={":prefix": "RUN#", ":sk": "META"},
+    ):
+        runs.extend(_from_dynamo(item) for item in page.get("Items", []))
+    return runs
