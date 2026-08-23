@@ -5,10 +5,18 @@ way in and out so a test cannot mutate stored state by accident and then
 read its own mutation back as if the pipeline had written it.
 """
 
+import asyncio
 import copy
+import json
+from collections.abc import Callable
 from datetime import datetime, timezone
 
 import requests
+from strands.agent.agent_result import AgentResult
+from strands.telemetry.metrics import EventLoopMetrics
+
+from granthound.pipeline import stages
+from granthound.seeds.profile import CommitmentWindow, OrgProfile
 
 
 class MemoryStore:
@@ -115,3 +123,143 @@ def html_page(body_text: str) -> str:
 
 
 UNREACHABLE = requests.ConnectionError("connection refused")
+
+
+# --- M2 graph doubles ------------------------------------------------------
+
+LIVE_URL, DEAD_URL, DOWN_URL = "https://x.org/live", "https://x.org/dead", "https://x.org/down"
+# The two deadlines sit 25 days apart on purpose. More than 30 days apart and
+# the date scanner calls them contradictory (dates_contradict), the page is
+# suggested DATE_CONTRADICTION, and no refinement of that reaches a live
+# disposition -- so a fixture with a wider gap can never be scored and every
+# happy-path assertion below would fail for a reason that has nothing to do
+# with the graph. tests/test_stages.py uses the same dates.
+LIVE_PAGE = html_page(
+    "Riverbend Community Grants. Applications are due October 5, 2026. "
+    "Letters of intent are due September 10, 2026. Eligible applicants are 501(c)(3) "
+    "organizations serving Franklin County youth. Awards range from $5,000 to $25,000 per organization."
+)
+DEAD_PAGE = html_page("2025 Grant Cycle. Applications were due March 1, 2025. Thank you to all applicants.")
+ORG = OrgProfile(
+    name="Riverbend Youth Collective",
+    profile="501(c)(3) youth org, Columbus OH, budget ~$185K.",
+    commitment_windows=[CommitmentWindow(label="fall program launch", start="2026-09-01", end="2026-09-20")],
+)
+PAGES = {LIVE_URL: (200, LIVE_PAGE), DEAD_URL: (200, DEAD_PAGE), DOWN_URL: UNREACHABLE}
+
+
+def seeded_store() -> MemoryStore:
+    store = MemoryStore()
+    for pid, url in (("p-live", LIVE_URL), ("p-dead", DEAD_URL), ("p-down", DOWN_URL)):
+        store.put_program_meta(
+            {"program_id": pid, "url": url, "funder": pid, "source_type": "test", "is_fixture": False}
+        )
+    return store
+
+
+def _program_ids_from(prompt) -> list[str]:
+    if isinstance(prompt, str):
+        text = prompt
+    else:
+        text = " ".join(block.get("text", "") for block in prompt if isinstance(block, dict))
+    start = text.find("{")
+    end = text.find("}", start)
+    return json.loads(text[start : end + 1])["program_ids"] if start >= 0 else []
+
+
+Script = Callable[[object, list[str]], None]
+
+
+class FakeAgent:
+    """Scripted stand-in for a Strands Agent node.
+
+    Satisfies the AgentBase protocol (invoke_async, __call__, stream_async),
+    runs `script(ctx, program_ids)` against the RunContext the graph passes
+    in invocation_state, and yields a real AgentResult so the Graph's
+    result/metrics plumbing is exercised unchanged.
+    """
+
+    def __init__(self, name: str, script: Script, *, model_id: str = "fake-model") -> None:
+        self.name = name
+        self.script = script
+        self.model_id = model_id
+        self.calls = 0
+
+    async def invoke_async(self, prompt=None, **kwargs):
+        result = None
+        async for event in self.stream_async(prompt, **kwargs):
+            if "result" in event:
+                result = event["result"]
+        return result
+
+    def __call__(self, prompt=None, **kwargs):
+        return asyncio.run(self.invoke_async(prompt, **kwargs))
+
+    async def stream_async(self, prompt=None, *, invocation_state=None, **kwargs):
+        self.calls += 1
+        self.script(invocation_state["ctx"], _program_ids_from(prompt))
+        yield {
+            "result": AgentResult(
+                stop_reason="end_turn",
+                message={"role": "assistant", "content": [{"text": f"{self.name} DONE"}]},
+                metrics=EventLoopMetrics(),
+                state={},
+            )
+        }
+
+
+def _noop(ctx, ids) -> None:
+    return None
+
+
+def scripted_executors(scout=None, verifier=None, analyst=None, clerk=None) -> dict[str, FakeAgent]:
+    return {
+        "scout": FakeAgent("scout", scout or _noop, model_id="fake-haiku"),
+        "verifier": FakeAgent("verifier", verifier or _noop, model_id="fake-haiku"),
+        "analyst": FakeAgent("analyst", analyst or _noop, model_id="fake-sonnet"),
+        "clerk": FakeAgent("clerk", clerk or _noop, model_id="fake-haiku"),
+    }
+
+
+# "Good model" scripts: what a cooperative LLM would do through the tools.
+def good_scout(ctx, ids) -> None:
+    for pid in ids:
+        stages.scout_fetch(ctx, pid)
+
+
+def good_verifier(ctx, ids) -> None:
+    for pid in ids:
+        brief = stages.verifier_brief(ctx, pid)
+        if brief.startswith("UNREACHABLE"):
+            continue
+        if "suggested disposition: stale_date_suspect" in brief:
+            stages.verifier_record(
+                ctx, pid, "verified_dead_prior_year", "prior_cycle_only", ["Applications were due March 1, 2025."]
+            )
+        else:
+            stages.verifier_record(
+                ctx, pid, "verified_live", "deadline_in_future", ["Applications are due October 5, 2026."]
+            )
+
+
+def good_analyst(ctx, ids) -> None:
+    for pid in stages.needs_analysis(ctx):
+        stages.analyst_record(
+            ctx, pid,
+            5.0, "Eligible applicants are 501(c)(3) organizations serving Franklin County youth.",
+            4.0, "Riverbend Community Grants.",
+            4.0, "Applications are due October 5, 2026.",
+            3.0, "Letters of intent are due September 10, 2026.",
+            4.0, "Applications are due October 5, 2026.",
+            headline_amount=25000, reachable_amount=25000,
+            amount_quote="Awards range from $5,000 to $25,000 per organization.",
+        )
+
+
+def good_clerk(ctx, ids) -> None:
+    for pid in stages.needs_package(ctx):
+        stages.clerk_record(
+            ctx, pid, ["2026-10-05", "2026-09-10"], ["full_application", "loi"],
+            ["Awards range from $5,000 to $25,000 per organization."],
+            ["Eligible applicants are 501(c)(3) organizations serving Franklin County youth."],
+        )
