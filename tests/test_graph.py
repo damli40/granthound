@@ -179,7 +179,24 @@ def test_every_prompt_that_can_be_rejected_is_told_when_to_give_up():
     that tells the model to call again must also tell it when to stop."""
     from granthound.agents import prompts
 
+    # Literal substrings, not `prompts.GIVE_UP_RULE in text`: comparing the
+    # prompts against the constant compares the constant to itself, so any
+    # edit to it -- including deleting a sentence, or setting it to "" --
+    # keeps this test green while the bound it pins disappears. Both
+    # sentences are pinned separately because they close different holes:
+    # the first stops the retrying, the second stops the model from holding
+    # its turn open on the id it just gave up on. Rewording the rule SHOULD
+    # fail here until someone consciously updates these strings.
+    GIVE_UP_TRIGGER = "rejects the same program twice"
+    GIVE_UP_ACTION = "move on to the next id"
+    TURN_MUST_END = "must not hold your turn open"
+
+    for phrase in (GIVE_UP_TRIGGER, GIVE_UP_ACTION, TURN_MUST_END):
+        assert phrase in prompts.GIVE_UP_RULE, f"GIVE_UP_RULE lost {phrase!r}"
+
     for name in ("VERIFIER", "ANALYST", "CLERK"):
         text = getattr(prompts, name)
         assert "REJECTED" in text, f"{name} no longer mentions REJECTED -- is this test still needed?"
-        assert prompts.GIVE_UP_RULE in text, f"{name} tells the model to retry with no bound"
+        assert GIVE_UP_TRIGGER in text, f"{name} never names the condition to stop retrying on"
+        assert GIVE_UP_ACTION in text, f"{name} tells the model to stop but not what to do instead"
+        assert TURN_MUST_END in text, f"{name} lets a given-up id hold the turn open (the 0f5ae3c hole)"
