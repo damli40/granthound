@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone
 
 import pytest
@@ -6,6 +7,7 @@ from granthound.agents import tools
 from granthound.agents.factories import default_executors
 from granthound.agents.models import model_id_of
 from granthound.config import HAIKU_MODEL_ID, SONNET_MODEL_ID, Settings
+from granthound.pipeline.context import RunContext
 from granthound.pipeline.graph import build_graph
 from granthound.pipeline.run import run_batch
 from granthound.store.models import Disposition, Verdict
@@ -113,6 +115,31 @@ def test_tool_shims_expose_the_expected_schemas():
         assert schema["required"] == required, shim.tool_name
         assert "tool_context" not in schema["properties"]
     assert set(tools.record_fit.tool_spec["inputSchema"]["json"]["properties"]) >= {"headline_amount", "reachable_amount", "amount_quote"}
+
+
+def test_a_tool_shim_reaches_the_stage_function_through_invocation_state():
+    """The only offline proof that the @tool(context=True) wiring works.
+
+    Every other test here drives the stage functions directly through a
+    FakeAgent script, so a shim that read the wrong key out of
+    invocation_state would pass all of them and fail on the first live
+    Bedrock call. This runs one decorated tool through the SDK's own tool
+    execution path -- no model, no network.
+    """
+    ctx = RunContext.create([("p-live", LIVE_URL)], AT, store=seeded_store(), fetcher=make_fetcher(PAGES), org=ORG)
+
+    async def call(shim, payload):
+        last = None
+        async for event in shim.stream(
+            {"toolUseId": "t1", "name": shim.tool_name, "input": payload}, {"ctx": ctx, "agent": None}
+        ):
+            last = event
+        return last
+
+    result = asyncio.run(call(tools.fetch_and_snapshot, {"program_id": "p-live"}))["tool_result"]
+    assert result["status"] == "success"
+    assert result["content"][0]["text"].startswith("FETCHED p-live")
+    assert ctx.work("p-live").det is not None
 
 
 def test_default_executors_build_four_agents_with_configured_models():
