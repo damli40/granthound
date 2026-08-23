@@ -124,3 +124,80 @@ class DeterministicEval(BaseModel):
     prior_was_unreachable: bool
     has_future_dated_date: bool
     norm_text: str | None = Field(default=None, exclude=True)
+
+
+class ReasonCode(str, Enum):
+    """Closed set of reasons the Verifier may give. No free text anywhere."""
+
+    DEADLINE_IN_FUTURE = "deadline_in_future"
+    DEADLINE_PASSED = "deadline_passed"
+    PRIOR_CYCLE_ONLY = "prior_cycle_only"
+    NEXT_CYCLE_ANNOUNCED = "next_cycle_announced"
+    INVITATION_ONLY = "invitation_only"
+    PROGRAM_DISCONTINUED = "program_discontinued"
+    NOT_A_PROGRAM_PAGE = "not_a_program_page"
+    ROLLING_NO_DEADLINE = "rolling_no_deadline"
+    DATES_UNCLEAR = "dates_unclear"
+
+
+class VerifierRecord(BaseModel):
+    proposed: Disposition
+    final: Disposition
+    overridden: bool
+    reason: ReasonCode
+    evidence_quotes: list[str]
+    quotes_unverified: bool = False
+    rejections: int = 0
+
+
+class FitRecord(BaseModel):
+    axes: FitAxes
+    axis_quotes: dict[str, str]
+    fit: FitScore
+    headline_amount: float | None
+    reachable_amount: float | None
+    amount_quote: str | None
+    amount_verified: bool
+    quotes_unverified: bool = False
+    rejections: int = 0
+
+
+class DeadlineKind(str, Enum):
+    LOI = "loi"
+    FULL_APPLICATION = "full_application"
+    INFO_SESSION = "info_session"
+    AWARD_NOTIFICATION = "award_notification"
+    CYCLE_OPENS = "cycle_opens"
+    OTHER = "other"
+
+
+class DeadlinePick(BaseModel):
+    iso: str
+    kind: DeadlineKind
+
+
+class DeadlineMath(BaseModel):
+    iso: str
+    kind: DeadlineKind
+    days_until: int
+    within_14_days: bool
+    is_past: bool
+    collides_with: list[str]
+
+
+class DecisionPackage(BaseModel):
+    """What the Clerk hands Maya. Quotes and dates only -- no drafting field exists."""
+
+    deadlines: list[DeadlineMath]
+    requirement_quotes: list[str]
+    eligibility_quotes: list[str]
+    quotes_unverified: bool = False
+    rejections: int = 0
+
+
+class NodeUsage(BaseModel):
+    model_id: str | None
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+    execution_ms: int
