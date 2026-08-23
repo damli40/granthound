@@ -125,3 +125,14 @@ def test_close_substring_inside_word_is_not_a_deadline_false_positive():
     )
     scan = extract_dates(text, TODAY)
     assert scan.dates_contradict is False
+
+
+def test_lowercase_month_words_are_not_dates_by_design():
+    from datetime import date
+
+    from granthound.tools.dates import extract_dates
+
+    today = date(2026, 8, 21)
+    assert extract_dates("applications close on may 20, 2026", today).dates == []
+    found = extract_dates("Applications close on May 20, 2026", today).dates
+    assert [d.iso for d in found] == ["2026-05-20"]

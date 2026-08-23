@@ -33,19 +33,23 @@ def suggest_disposition(
     dates_contradict: bool,
     is_first_eval: bool,
     date_lines_changed: bool,
+    prior_was_unreachable: bool = False,
 ) -> Disposition:
     """Pure, deterministic disposition mapping -- no I/O, no clock.
 
-    Precedence (first match wins), per task-7-brief.md:
+    Precedence (first match wins):
       1. PAGE_UNREACHABLE   -- transport failed, or HTTP status >= 400
       2. STALE_DATE_SUSPECT -- every dated (year-present) date is in the past
       3. YEAR_TRAP_SUSPECT  -- a yearless date appears with no future-dated
                                date anywhere on the page to vouch for it
       4. DATE_CONTRADICTION -- two future deadline-context dates disagree
                                by more than the contradiction gap
-      5. else: ADDED (first eval for this program) / CHANGED_DEADLINE
-               (subsequent eval, a date line changed vs. the prior
-               snapshot) / REVERIFIED_LIVE (subsequent eval, unchanged)
+      5. ADDED              -- first eval for this program
+      6. CHANGED_DEADLINE   -- a date-bearing line changed vs. the baseline
+                               snapshot (the last one that had a snapshot)
+      7. VERIFIED_LIVE      -- the immediately prior eval was PAGE_UNREACHABLE
+                               and the page is back, unchanged (recovery)
+      8. REVERIFIED_LIVE    -- subsequent eval, unchanged
     """
     if transport_error or (http_status is not None and http_status >= 400):
         return Disposition.PAGE_UNREACHABLE
@@ -59,4 +63,6 @@ def suggest_disposition(
         return Disposition.ADDED
     if date_lines_changed:
         return Disposition.CHANGED_DEADLINE
+    if prior_was_unreachable:
+        return Disposition.VERIFIED_LIVE
     return Disposition.REVERIFIED_LIVE

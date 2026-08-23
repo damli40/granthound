@@ -51,12 +51,15 @@ def cleanup(
     eval_sk: str | None,
     s3_keys: list[str],
     extra_eval_sks: list[str] | None = None,
+    run_ids: list[str] | None = None,
 ) -> None:
     table.delete_item(Key={"pk": f"PROG#{PROGRAM_ID}", "sk": "META"})
     if eval_sk is not None:
         table.delete_item(Key={"pk": f"PROG#{PROGRAM_ID}", "sk": eval_sk})
     for sk in extra_eval_sks or []:
         table.delete_item(Key={"pk": f"PROG#{SEQ_PROGRAM_ID}", "sk": sk})
+    for run_id in run_ids or []:
+        table.delete_item(Key={"pk": f"RUN#{run_id}", "sk": "META"})
     if s3_keys:
         s3_client.delete_objects(
             Bucket=bucket_name,
@@ -75,6 +78,7 @@ def run() -> None:
     eval_sk = None
     s3_keys: list[str] = []
     sequence_sks: list[str] = []
+    run_ids: list[str] = []
 
     try:
         # put_program_meta / get_program / list_programs
@@ -286,8 +290,46 @@ def run() -> None:
         )
         assert got_diff_key == diff_key
 
+        # M2: run items roundtrip. Register the run id for cleanup BEFORE
+        # the put, same pre-registration pattern as the S3 keys above.
+        run_item = {
+            "run_id": f"smoke-{fetched_at}",
+            "status": "smoke",
+            "program_ids": [PROGRAM_ID],
+        }
+        run_ids.append(run_item["run_id"])
+        ddb.put_run(run_item)
+        assert any(r["run_id"] == run_item["run_id"] for r in ddb.list_runs()), (
+            "run item not listed"
+        )
+
+        # M2: pointer update must refuse to create a ghost META row. An
+        # unconditional UpdateItem is an upsert, so without the
+        # attribute_exists guard this call would mint a META row with no
+        # url and no funder for a program id that was never registered.
+        ghost_id = f"ghost-{fetched_at}"
+        assert (
+            ddb.update_meta_pointers(
+                ghost_id,
+                verdict="PASS",
+                fit_score=None,
+                latest_eval_sk="x",
+                latest_snapshot_sha="y",
+            )
+            is False
+        ), "pointer update upserted a ghost META row"
+        assert ddb.get_program(ghost_id) is None
+
     finally:
-        cleanup(table, bucket_name, s3_client, eval_sk, s3_keys, extra_eval_sks=sequence_sks)
+        cleanup(
+            table,
+            bucket_name,
+            s3_client,
+            eval_sk,
+            s3_keys,
+            extra_eval_sks=sequence_sks,
+            run_ids=run_ids,
+        )
 
         # Verify cleanup actually left the table/bucket clean.
         assert ddb.get_program(PROGRAM_ID) is None, "META item survived cleanup"
@@ -301,6 +343,11 @@ def run() -> None:
                 Key={"pk": f"PROG#{SEQ_PROGRAM_ID}", "sk": sk}
             ).get("Item")
             assert leftover is None, f"sequence EVAL item {sk} survived cleanup"
+        for run_id in run_ids:
+            leftover = table.get_item(
+                Key={"pk": f"RUN#{run_id}", "sk": "META"}
+            ).get("Item")
+            assert leftover is None, f"RUN item {run_id} survived cleanup"
 
 
 def main() -> int:

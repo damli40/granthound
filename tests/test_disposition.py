@@ -87,3 +87,39 @@ def test_subsequent_eval_unchanged_is_reverified_live():
 
 def test_subsequent_eval_with_date_line_change_is_changed_deadline():
     assert _case(is_first_eval=False, date_lines_changed=True) == Disposition.CHANGED_DEADLINE
+
+
+def test_recovery_from_unreachable_prior_is_verified_live():
+    from granthound.store.models import Disposition
+    from granthound.tools.dispositions import suggest_disposition
+
+    result = suggest_disposition(
+        http_status=200,
+        transport_error=False,
+        all_dates_past=False,
+        has_yearless_date=False,
+        has_future_dated_date=True,
+        dates_contradict=False,
+        is_first_eval=False,
+        date_lines_changed=False,
+        prior_was_unreachable=True,
+    )
+    assert result is Disposition.VERIFIED_LIVE
+
+
+def test_recovery_with_a_moved_date_line_is_still_changed_deadline():
+    from granthound.store.models import Disposition
+    from granthound.tools.dispositions import suggest_disposition
+
+    result = suggest_disposition(
+        http_status=200,
+        transport_error=False,
+        all_dates_past=False,
+        has_yearless_date=False,
+        has_future_dated_date=True,
+        dates_contradict=False,
+        is_first_eval=False,
+        date_lines_changed=True,
+        prior_was_unreachable=True,
+    )
+    assert result is Disposition.CHANGED_DEADLINE

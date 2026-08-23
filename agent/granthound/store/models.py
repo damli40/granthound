@@ -83,3 +83,44 @@ class FitScore(BaseModel):
     score: float
     capped: bool
     verdict_suggestion: Verdict
+
+
+class DiffReceipt(BaseModel):
+    """What changed versus the last snapshot that had one.
+
+    s3_key is None when nothing changed (no diff object is written for an
+    identical page). date_lines_changed is the only change signal that
+    drives a disposition; `changed` alone is a quiet note (a nav tweak or a
+    timestamp must never read as a deadline change).
+    """
+
+    s3_key: str | None
+    old_sha256: str
+    changed: bool
+    date_lines_changed: bool
+    added_lines: int
+    removed_lines: int
+
+
+class DeterministicEval(BaseModel):
+    """Everything the deterministic layer knows about one program in one run.
+
+    norm_text is the normalized page body the LLM nodes read. It is
+    excluded from every dump so it can never leak into a DynamoDB item by
+    accident; the S3 snapshot named in snapshot_receipt is the durable copy.
+    """
+
+    program_id: str
+    url: str
+    run_id: str
+    fetched_at: str
+    disposition: Disposition
+    http_status: int | None
+    transport_error: bool
+    snapshot_receipt: SnapshotReceipt | None
+    date_scan: DateScan | None
+    diff_receipt: DiffReceipt | None
+    is_first_eval: bool
+    prior_was_unreachable: bool
+    has_future_dated_date: bool
+    norm_text: str | None = Field(default=None, exclude=True)

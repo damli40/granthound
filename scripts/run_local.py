@@ -22,15 +22,16 @@ so --url is effectively required until a later task's seed_load populates
 META.
 
 No hidden clocks: main() reads the wall clock exactly once, as a single
-UTC-aware `at` datetime, and run_one derives everything time-related
-(the EVAL SK via store.ddb.put_evaluation's `at`, the snapshot `fetched_at`
-string, and `today` for date-scan comparisons) from that one value.
+UTC-aware `at` datetime, and passes it to granthound.pipeline.deterministic,
+which derives everything time-related (the EVAL SK, `run_id`, the snapshot
+`fetched_at` string, and `today` for date-scan comparisons) from that one
+value.
 """
 
 import argparse
 import os
 import sys
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -63,138 +64,33 @@ def _load_dotenv(path: Path) -> None:
 
 _load_dotenv(REPO_ROOT / ".env")
 
-import requests  # noqa: E402
-
-from granthound.store import ddb, s3  # noqa: E402
-from granthound.store.models import SnapshotReceipt  # noqa: E402
-from granthound.tools.dates import extract_dates  # noqa: E402
-from granthound.tools.diff import diff_snapshots  # noqa: E402
-from granthound.tools.dispositions import (  # noqa: E402
-    has_future_dated_date,
-    suggest_disposition,
+from granthound.pipeline.deterministic import (  # noqa: E402
+    evaluate_program,
+    persist_deterministic,
 )
-from granthound.tools.fetch import digest, fetch_page, normalize_html  # noqa: E402
+from granthound.store import ddb  # noqa: E402 -- main() resolves a stored META url
+from granthound.store.protocol import LiveStore  # noqa: E402
+from granthound.tools.fetch import fetch_page  # noqa: E402
 
 
 def run_one(program_id: str, url: str, at: datetime) -> dict:
-    """Run one fetch-through-EVAL cycle for a program. Pure business logic --
-    argparse and console printing live in main().
+    """One deterministic fetch-through-EVAL cycle (the --no-llm path).
 
-    `at` is the single run-start timestamp (UTC-aware, read once by the
-    caller) that this function derives every time-related value from:
-    `today` for date-scan comparisons, `fetched_at` for the snapshot key
-    and SnapshotReceipt, and it is passed straight through to
-    ddb.put_evaluation's required `at` keyword for the EVAL item's SK.
+    Business logic lives in granthound.pipeline.deterministic; this wrapper
+    only binds the live store and the real fetcher and flattens the result
+    for the console line in main().
     """
-    today: date = at.date()
-    fetched_at = at.strftime("%Y%m%dT%H%M%SZ")
-    run_id = f"run-{fetched_at}"
-
-    last_eval = ddb.get_last_eval(program_id)
-    is_first_eval = last_eval is None
-
-    transport_error = False
-    http_status: int | None = None
-    body = ""
-    try:
-        http_status, body = fetch_page(url)
-    except requests.RequestException:
-        transport_error = True
-
-    if transport_error or (http_status is not None and http_status >= 400):
-        disposition = suggest_disposition(
-            http_status=http_status,
-            transport_error=transport_error,
-            all_dates_past=False,
-            has_yearless_date=False,
-            has_future_dated_date=False,
-            dates_contradict=False,
-            is_first_eval=is_first_eval,
-            date_lines_changed=False,
-        )
-        eval_item = {
-            "disposition": disposition.value,
-            "url": url,
-            "http_status": http_status,
-            "transport_error": transport_error,
-            "snapshot_receipt": None,
-        }
-        eval_sk = ddb.put_evaluation(program_id, run_id, eval_item, at=at)
-        return {
-            "program_id": program_id,
-            "disposition": disposition,
-            "date_count": 0,
-            "yearless_count": 0,
-            "all_dates_past": False,
-            "sha256": None,
-            "eval_sk": eval_sk,
-        }
-
-    norm = normalize_html(body)
-    sha256 = digest(norm)
-    raw_key, norm_key = s3.put_snapshot(program_id, fetched_at, sha256, body, norm)
-
-    date_scan = extract_dates(norm, today)
-    future_dated = has_future_dated_date(date_scan, today)
-
-    # Diff baseline is deliberately a SEPARATE lookup from `last_eval`
-    # above: `last_eval` is "the most recent run of any kind" (used for
-    # is_first_eval bookkeeping), but a diff needs "the most recent run
-    # that actually has a snapshot to diff against". If the immediately
-    # prior run was PAGE_UNREACHABLE (snapshot_receipt=None), diffing
-    # against `last_eval` would silently skip the diff and misreport
-    # REVERIFIED_LIVE instead of reaching back to the last good snapshot.
-    diff_baseline = ddb.get_last_eval(program_id, with_snapshot=True)
-
-    date_lines_changed = False
-    if diff_baseline is not None:
-        prev_receipt = diff_baseline.get("snapshot_receipt")
-        if prev_receipt and prev_receipt.get("s3_norm"):
-            prev_norm = s3.get_norm_snapshot(prev_receipt["s3_norm"])
-            diff_result = diff_snapshots(prev_norm, norm)
-            date_lines_changed = diff_result.date_lines_changed
-            if diff_result.changed:
-                s3.put_diff(
-                    program_id,
-                    fetched_at,
-                    prev_receipt.get("sha256", ""),
-                    sha256,
-                    diff_result.diff_text,
-                )
-
-    disposition = suggest_disposition(
-        http_status=http_status,
-        transport_error=False,
-        all_dates_past=date_scan.all_dates_past,
-        has_yearless_date=date_scan.has_yearless_date,
-        has_future_dated_date=future_dated,
-        dates_contradict=date_scan.dates_contradict,
-        is_first_eval=is_first_eval,
-        date_lines_changed=date_lines_changed,
-    )
-
-    snapshot_receipt = SnapshotReceipt(
-        sha256=sha256,
-        s3_raw=raw_key,
-        s3_norm=norm_key,
-        fetched_at=fetched_at,
-        http_status=http_status,
-    )
-    eval_item = {
-        "disposition": disposition.value,
-        "url": url,
-        "snapshot_receipt": snapshot_receipt.model_dump(),
-        "date_scan": date_scan.model_dump(),
-    }
-    eval_sk = ddb.put_evaluation(program_id, run_id, eval_item, at=at)
-
+    store = LiveStore()
+    det = evaluate_program(program_id, url, at, store=store, fetcher=fetch_page)
+    eval_sk = persist_deterministic(det, store=store, at=at)
+    dates = det.date_scan.dates if det.date_scan else []
     return {
         "program_id": program_id,
-        "disposition": disposition,
-        "date_count": len(date_scan.dates),
-        "yearless_count": sum(1 for d in date_scan.dates if not d.year_present),
-        "all_dates_past": date_scan.all_dates_past,
-        "sha256": sha256,
+        "disposition": det.disposition,
+        "date_count": len(dates),
+        "yearless_count": sum(1 for d in dates if not d.year_present),
+        "all_dates_past": det.date_scan.all_dates_past if det.date_scan else False,
+        "sha256": det.snapshot_receipt.sha256 if det.snapshot_receipt else None,
         "eval_sk": eval_sk,
     }
 
