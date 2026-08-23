@@ -11,3 +11,4 @@ cdk.out/
 .pytest_cache/
 .DS_Store
 agentcore/.env.local
+.worktrees/
