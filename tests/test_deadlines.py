@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from granthound.seeds.profile import CommitmentWindow
 from granthound.store.models import DeadlineKind, DeadlinePick
@@ -42,3 +42,13 @@ def test_window_edges_are_inclusive():
     picks = [DeadlinePick(iso="2026-09-20", kind=DeadlineKind.OTHER), DeadlinePick(iso="2026-09-21", kind=DeadlineKind.OTHER)]
     first, second = deadline_math(picks, TODAY, WINDOWS)
     assert first.collides_with == ["fall program launch"] and second.collides_with == []
+
+
+def test_a_window_built_from_a_yaml_datetime_is_usable_here():
+    """The two halves of the defect this file and profile.py share: whatever
+    CommitmentWindow stores must be parseable by date.fromisoformat below. A
+    YAML `start: 2026-09-01 00:00:00` arrives as a datetime, and storing its
+    full isoformat used to raise here, once per program, mid-run."""
+    windows = [CommitmentWindow(label="fall program launch", start=datetime(2026, 9, 1, 0, 0), end=date(2026, 9, 20))]
+    [m] = deadline_math([DeadlinePick(iso="2026-09-01", kind=DeadlineKind.LOI)], TODAY, windows)
+    assert m.collides_with == ["fall program launch"]

@@ -1,6 +1,8 @@
+from datetime import date
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from granthound.seeds.profile import DEFAULT_SEED_PATH, Seed, build_meta_item, load_seed_file
 
@@ -32,6 +34,26 @@ def test_yaml_dates_become_iso_strings(tmp_path: Path):
     assert window.start == "2026-09-01" and isinstance(window.start, str)
     assert [s.id for s in sf.seeds] == ["a", "b"]
     assert sf.seeds[1].is_fixture is False
+
+
+def test_a_yaml_datetime_window_canonicalizes_to_a_date_only_string(tmp_path: Path):
+    """A window written with a time is a datetime, not a date, and datetime is a
+    date subclass -- so the naive isinstance check stored "2026-09-01T00:00:00",
+    which deadline_math cannot parse. It must arrive as a bare date."""
+    path = tmp_path / "seeds.yml"
+    path.write_text(YAML.replace("start: 2026-09-01", "start: 2026-09-01 00:00:00"))
+    [window] = load_seed_file(path).org.commitment_windows
+    assert window.start == "2026-09-01"
+    assert date.fromisoformat(window.start) == date(2026, 9, 1)
+
+
+@pytest.mark.parametrize("bad", ["next fall", "20260901", "2026-09-01T00:00:00"])
+def test_an_unparseable_or_non_canonical_window_fails_at_load_time(tmp_path: Path, bad: str):
+    """Fail here, where pydantic names the field, not later inside deadline_math."""
+    path = tmp_path / "seeds.yml"
+    path.write_text(YAML.replace("start: 2026-09-01", f"start: '{bad}'"))
+    with pytest.raises(ValidationError, match="start"):
+        load_seed_file(path)
 
 
 def test_duplicate_seed_ids_are_rejected(tmp_path: Path):

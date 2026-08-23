@@ -2,10 +2,12 @@
 
 yaml.safe_load turns `start: 2026-09-01` into a datetime.date; DynamoDB
 cannot store that, and the rest of the pipeline compares ISO strings, so
-dates are converted to ISO strings at the edge (before validation).
+dates are converted to ISO strings at the edge (before validation). The
+one form every consumer accepts is a bare YYYY-MM-DD string, so that is
+the only form a CommitmentWindow is allowed to hold -- see _date_to_iso.
 """
 
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import yaml
@@ -24,7 +26,31 @@ class CommitmentWindow(BaseModel):
     @field_validator("start", "end", mode="before")
     @classmethod
     def _date_to_iso(cls, value):
-        return value.isoformat() if isinstance(value, date) else value
+        """Canonicalize to a bare YYYY-MM-DD string, or fail here at load time.
+
+        datetime is tested BEFORE date because datetime is a subclass of
+        date: a YAML `start: 2026-09-01 00:00:00` is a datetime, and the
+        date branch would turn it into "2026-09-01T00:00:00" -- a string
+        every downstream date.fromisoformat rejects, so the failure would
+        land inside deadline_math, once per program, mid-run, naming
+        neither this file nor this field.
+
+        A string is parsed and round-tripped for the same reason: a typo
+        ("next fall") or a non-canonical form ("20260901", which
+        date.fromisoformat accepts and silently rewrites) fails here,
+        where pydantic still names the offending field. Any other type is
+        returned untouched so pydantic rejects it as a non-string.
+        """
+        if isinstance(value, datetime):
+            return value.date().isoformat()
+        if isinstance(value, date):
+            return value.isoformat()
+        if isinstance(value, str):
+            parsed = date.fromisoformat(value)
+            if parsed.isoformat() != value:
+                raise ValueError(f"expected a bare YYYY-MM-DD date, got {value!r}")
+            return value
+        return value
 
 
 class OrgProfile(BaseModel):
