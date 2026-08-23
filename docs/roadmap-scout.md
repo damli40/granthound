@@ -12,6 +12,15 @@ item is a verbatim quote + source URL + date, substring-validated like every
 other quote in the pipeline. The model never paraphrases claims about a
 named organizer. No receipt, no item.
 
+**Presentation (refined 2026-08-23): a summary line MAY sit on top of the
+receipts, never instead of them.** The model's only prose job is
+compression: each summary bullet must cite the quote ids it compresses, and
+the validator enforces no-quote-no-bullet (a bullet citing nothing is
+rejected back to the model, same as an invalid quote today). Item shape:
+`{summary_line, quote_ids[], quotes[]}`. Summaries of raw reading — prose
+first, links attached after — stay rejected: that shape ships unevidenced
+claims about named funders.
+
 **Persona fit:** Maya's version of the problem is real and already encoded
 in the grants-ops playbook (T&C amendment watch, headline-vs-reachable
 math, eligibility gates). A hackathon-builder flavor of the same agent is a
