@@ -146,7 +146,7 @@ class VerifierRecord(BaseModel):
     overridden: bool
     reason: ReasonCode
     evidence_quotes: list[str]
-    quotes_unverified: bool = False
+    quotes_unverified: bool
     rejections: int = 0
 
 
@@ -158,7 +158,7 @@ class FitRecord(BaseModel):
     reachable_amount: float | None
     amount_quote: str | None
     amount_verified: bool
-    quotes_unverified: bool = False
+    quotes_unverified: bool
     rejections: int = 0
 
 
@@ -191,7 +191,7 @@ class DecisionPackage(BaseModel):
     deadlines: list[DeadlineMath]
     requirement_quotes: list[str]
     eligibility_quotes: list[str]
-    quotes_unverified: bool = False
+    quotes_unverified: bool
     rejections: int = 0
 
 

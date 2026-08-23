@@ -50,3 +50,40 @@ def test_amount_in_quote_accepts_plain_comma_and_k_forms():
 def test_amount_in_quote_rejects_a_different_number():
     assert not amount_in_quote(25000, "up to $5,000 per organization")
     assert not amount_in_quote(2500, "up to $25,000 per organization")
+
+
+def test_amount_in_quote_rejects_numbers_that_are_not_money():
+    """A bare number on a funder page is usually a year, a day or a count.
+
+    amount_verified is a receipt value, so a match has to be anchored to a
+    currency marker; nothing else is a dollar figure.
+    """
+    assert not amount_in_quote(2000, "The program has run since 2000...")
+    assert not amount_in_quote(25, "Applications are due October 25, 2026.")
+    assert not amount_in_quote(50, "up to 50 grants of $10,000 each")
+
+
+def test_amount_in_quote_rejects_a_unit_glued_to_the_scale_suffix():
+    """25Kg is a shipping weight, not $25,000. A letter after K/M/B kills the match."""
+    assert not amount_in_quote(25000, "materials up to 25Kg per shipment")
+    assert not amount_in_quote(25000, "materials up to $25Kg per shipment")
+
+
+def test_amount_in_quote_accepts_spelled_out_scales_and_billions():
+    assert amount_in_quote(1500000, "a $1.5 million fund")
+    assert amount_in_quote(25000, "$25 thousand available")
+    assert amount_in_quote(1000000000, "a $1B endowment")
+
+
+def test_all_ok_is_false_when_nothing_was_quoted():
+    """An empty quote list is not a pass.
+
+    check.bad is empty when the model cited nothing at all, so a caller
+    written as `if check.bad: reject()` would accept zero evidence. all_ok
+    requires that at least one quote was checked and every one passed.
+    """
+    assert validate_quotes([], PAGE).all_ok is False
+    assert validate_quotes(["Applications are due October 15, 2026."], PAGE).all_ok is True
+    assert validate_quotes(
+        ["Applications are due October 15, 2026.", "Applications close October 15"], PAGE
+    ).all_ok is False
