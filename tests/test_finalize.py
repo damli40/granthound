@@ -194,6 +194,43 @@ def test_a_fetch_that_explodes_is_recorded_not_lost():
     assert item["stage"] == "final" and item["url"] == LIVE_URL
 
 
+def test_an_eval_write_failure_still_counts_the_program():
+    """A lost row must not also lose the program from the run's own numbers.
+
+    Dropping the outcome would leave the RUN item naming three programs
+    while its verdict, disposition and flag counts summed to two -- a
+    headline a reader believes, wrong, unless they go digging in `errors`.
+    """
+    ctx = make_ctx()
+    real = ctx.store.put_evaluation
+
+    def flaky(program_id, run_id, eval_item, *, at):
+        if program_id == "p-dead":
+            raise RuntimeError("ddb rejected the item")
+        return real(program_id, run_id, eval_item, at=at)
+
+    ctx.store.put_evaluation = flaky
+    summary = finalize_run(ctx, node_usage={}, pipeline_status="ok", error=None)
+    assert summary.status == "partial"
+    assert any("p-dead" in message and "ddb rejected the item" in message for message in summary.errors)
+
+    by_id = {o.program_id: o for o in summary.outcomes}
+    assert set(by_id) == {"p-live", "p-dead", "p-down"}
+    failed = by_id["p-dead"]
+    assert failed.eval_sk is None and "eval_write_failed" in failed.flags
+    assert by_id["p-live"].eval_sk and by_id["p-down"].eval_sk
+
+    run = ctx.store.runs[ctx.run_id]
+    assert run["program_ids"] == ["p-dead", "p-down", "p-live"]
+    assert sum(run["verdict_counts"].values()) == 3
+    assert sum(run["disposition_counts"].values()) == 3
+    assert run["flag_counts"]["eval_write_failed"] == 1
+    assert any("p-dead" in message for message in run["errors"])
+
+    assert len(ctx.store.evals["p-live"]) == 1 and len(ctx.store.evals["p-down"]) == 1
+    assert ctx.store.evals.get("p-dead") is None
+
+
 def test_a_pointer_write_failure_costs_no_other_program_its_eval():
     ctx = make_ctx()
     real = ctx.store.update_meta_pointers

@@ -23,7 +23,9 @@ class ProgramOutcome:
     program_id: str
     verdict: Verdict
     disposition: Disposition
-    eval_sk: str
+    # None when the EVAL row could not be written: the program still has an
+    # outcome (see finalize_run), but there is no stored row to point at.
+    eval_sk: str | None
     flags: list[str]
 
 
@@ -146,6 +148,14 @@ def finalize_run(
             sk = ctx.store.put_evaluation(pid, ctx.run_id, item, at=ctx.at)
         except Exception as exc:  # noqa: BLE001 -- keep writing the other programs; report at the end
             errors.append(f"{pid}: put_evaluation failed: {type(exc).__name__}: {exc}")
+            # The row is lost; the program is not. It still gets an outcome,
+            # flagged and with no eval_sk, so the run's own counts add up to
+            # the number of programs the run says it checked. Counts that
+            # quietly sum to N-1 read as if this program had never been in
+            # the batch -- the failure would be visible only to a reader who
+            # went looking through `errors`.
+            work.flag("eval_write_failed")
+            outcomes.append(ProgramOutcome(pid, verdict, disposition, None, sorted(set(work.flags))))
             continue
         sha = work.det.snapshot_receipt.sha256 if work.det and work.det.snapshot_receipt else ""
         fit_score = work.fit.fit.score if work.fit else None
