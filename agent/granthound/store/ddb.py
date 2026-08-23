@@ -226,16 +226,22 @@ def list_programs() -> list[dict]:
     and each program lives in its own partition (pk="PROG#<id>"), so
     listing across all programs is structurally a Scan, not a Query --
     there is no single partition key that covers every program. Uses the
-    scan paginator (never a hand-rolled NextToken loop) filtered to
-    sk == "META" so EVAL items are excluded.
+    scan paginator (never a hand-rolled NextToken loop).
+
+    The filter needs BOTH halves. sk == "META" alone excludes EVAL items
+    but not RUN items: put_run writes pk="RUN#<run_id>", sk="META", which
+    matches an sk-only filter exactly. A run row has no url and no
+    program_id, so leaking one into this list hands the caller a program
+    it cannot fetch. begins_with(pk, "PROG#") is what keeps the two
+    partition families apart.
     """
     client = _table().meta.client
     paginator = client.get_paginator("scan")
     programs: list[dict] = []
     for page in paginator.paginate(
         TableName=os.environ["GRANTHOUND_TABLE"],
-        FilterExpression="sk = :sk",
-        ExpressionAttributeValues={":sk": "META"},
+        FilterExpression="begins_with(pk, :prefix) AND sk = :sk",
+        ExpressionAttributeValues={":prefix": "PROG#", ":sk": "META"},
     ):
         programs.extend(_from_dynamo(item) for item in page.get("Items", []))
     return programs

@@ -70,6 +70,9 @@ class MemoryStore:
         return [copy.deepcopy(item) for item in self.meta.values()]
 
     def put_run(self, item: dict) -> None:
+        # Runs live in their own dict, never in self.meta -- mirrors the
+        # real table, where a run is its own pk partition and must never
+        # surface from list_programs().
         self.runs[item["run_id"]] = copy.deepcopy(item)
 
     # --- S3 side ---------------------------------------------------------

@@ -13,7 +13,7 @@ Rules carried over unchanged:
 """
 
 from collections.abc import Callable
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import requests
 
@@ -33,14 +33,24 @@ Fetcher = Callable[[str], tuple[int, str]]
 
 
 def run_id_for(at: datetime) -> str:
-    return f"run-{at.strftime('%Y%m%dT%H%M%SZ')}"
+    """Run id derived from the run clock, always stamped in UTC.
+
+    The trailing Z in the format string is a literal, so it only tells
+    the truth if the value is converted first. Without the astimezone, a
+    tz-aware UTC+1 `at` of 13:00 yields run-20260821T130000Z while
+    put_evaluation's SK -- which does normalize -- carries 12:00, so the
+    SK and the run id embedded inside it disagree by an hour. The
+    conversion is a no-op for a UTC caller, so the format every other
+    task consumes is unchanged.
+    """
+    return f"run-{at.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
 
 
 def evaluate_program(
     program_id: str, url: str, at: datetime, *, store: Store, fetcher: Fetcher
 ) -> DeterministicEval:
     today: date = at.date()
-    fetched_at = at.strftime("%Y%m%dT%H%M%SZ")
+    fetched_at = at.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_id = run_id_for(at)
 
     last_eval = store.get_last_eval(program_id)
@@ -68,6 +78,10 @@ def evaluate_program(
             is_first_eval=is_first_eval,
             date_lines_changed=False,
             prior_was_unreachable=prior_was_unreachable,
+            # Nothing was fetched, so nothing was compared. Rule 1
+            # (PAGE_UNREACHABLE) short-circuits before this is read; it
+            # is passed anyway so the call states what this path knows.
+            has_baseline=False,
         )
         return DeterministicEval(
             program_id=program_id,
@@ -125,6 +139,10 @@ def evaluate_program(
         is_first_eval=is_first_eval,
         date_lines_changed=bool(diff_receipt and diff_receipt.date_lines_changed),
         prior_was_unreachable=prior_was_unreachable,
+        # A diff receipt exists only when a prior snapshot was found and
+        # read. No receipt means nothing was compared, so this run cannot
+        # claim the page is "unchanged" -- see rule 5.
+        has_baseline=diff_receipt is not None,
     )
 
     return DeterministicEval(

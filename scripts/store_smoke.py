@@ -303,6 +303,20 @@ def run() -> None:
             "run item not listed"
         )
 
+        # M2: a RUN row is pk="RUN#<id>", sk="META" -- the same sk as a
+        # program META row. list_programs must exclude it on the pk
+        # prefix, or every caller that iterates programs gets a row with
+        # no url and no program_id. This assertion has to run AFTER
+        # put_run; the list_programs check earlier in this script fires
+        # before any run item exists and asserts inclusion, not exclusion.
+        listed = ddb.list_programs()
+        assert not any("run_id" in p for p in listed), (
+            "list_programs leaked a RUN item as if it were a program"
+        )
+        assert all(p.get("program_id") for p in listed), (
+            "list_programs returned a row with no program_id"
+        )
+
         # M2: pointer update must refuse to create a ghost META row. An
         # unconditional UpdateItem is an upsert, so without the
         # attribute_exists guard this call would mint a META row with no

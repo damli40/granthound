@@ -115,3 +115,40 @@ def test_recovery_after_outage_diffs_against_last_good_snapshot_and_reads_verifi
     assert det3.diff_receipt.old_sha256 == det1.snapshot_receipt.sha256
     det3b = evaluate_program("p1", URL, at3, store=store, fetcher=make_fetcher({URL: (200, LIVE_MOVED)}))
     assert det3b.disposition is Disposition.CHANGED_DEADLINE
+
+
+def test_first_ever_fetch_failing_then_recovering_reads_added_not_verified_live():
+    store = MemoryStore()
+    det1 = evaluate_program("p1", URL, AT, store=store, fetcher=make_fetcher({URL: UNREACHABLE}))
+    assert det1.disposition is Disposition.PAGE_UNREACHABLE
+    persist_deterministic(det1, store=store, at=AT)
+
+    at2 = AT + timedelta(hours=12)
+    det2 = evaluate_program("p1", URL, at2, store=store, fetcher=make_fetcher({URL: (200, LIVE)}))
+    # A prior EVAL row exists, so this is not the first eval, and the prior
+    # one was unreachable -- the two conditions that used to yield
+    # VERIFIED_LIVE. But no snapshot was ever stored, so nothing was
+    # compared and "back, unchanged" has no evidence behind it. This run is
+    # the first look at the page's content, which is what ADDED means.
+    assert det2.is_first_eval is False
+    assert det2.prior_was_unreachable is True
+    assert det2.diff_receipt is None
+    assert det2.disposition is Disposition.ADDED
+
+
+def test_non_utc_at_stamps_run_id_and_snapshot_key_in_utc():
+    store = MemoryStore()
+    at_local = datetime(2026, 8, 21, 13, 0, tzinfo=timezone(timedelta(hours=1)))  # 12:00 UTC
+    det = evaluate_program("p1", URL, at_local, store=store, fetcher=make_fetcher({URL: (200, LIVE)}))
+
+    # The Z in the stamp format is a literal, so these only tell the truth
+    # if `at` is converted first -- 13:00+01:00 is 12:00 Zulu, not 13:00.
+    assert det.run_id == "run-20260821T120000Z"
+    assert det.fetched_at == "20260821T120000Z"
+    assert det.snapshot_receipt.fetched_at == "20260821T120000Z"
+    assert "20260821T120000Z" in det.snapshot_receipt.s3_norm
+
+    # The payoff: put_evaluation normalizes the SK to UTC on its own, so an
+    # unconverted run id would sit an hour ahead of the SK that carries it.
+    sk = persist_deterministic(det, store=store, at=at_local)
+    assert sk == "EVAL#2026-08-21T12:00:00+00:00#run-20260821T120000Z"
