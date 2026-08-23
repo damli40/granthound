@@ -1,0 +1,44 @@
+from datetime import date
+
+from granthound.seeds.profile import CommitmentWindow
+from granthound.store.models import DeadlineKind, DeadlinePick
+from granthound.tools.deadlines import deadline_math
+
+TODAY = date(2026, 8, 21)
+WINDOWS = [CommitmentWindow(label="fall program launch", start="2026-09-01", end="2026-09-20")]
+
+
+def test_days_until_and_flags():
+    picks = [DeadlinePick(iso="2026-09-01", kind=DeadlineKind.FULL_APPLICATION)]
+    [m] = deadline_math(picks, TODAY, WINDOWS)
+    assert m.days_until == 11 and m.within_14_days is True and m.is_past is False
+    assert m.collides_with == ["fall program launch"]
+
+
+def test_past_deadline_is_flagged_not_dropped():
+    picks = [DeadlinePick(iso="2026-08-01", kind=DeadlineKind.LOI)]
+    [m] = deadline_math(picks, TODAY, WINDOWS)
+    assert m.is_past is True and m.days_until == -20 and m.within_14_days is False
+
+
+def test_no_collision_outside_every_window():
+    picks = [DeadlinePick(iso="2026-10-15", kind=DeadlineKind.FULL_APPLICATION)]
+    [m] = deadline_math(picks, TODAY, WINDOWS)
+    assert m.collides_with == [] and m.within_14_days is False
+
+
+def test_output_is_sorted_and_deduplicated_regardless_of_input_order():
+    picks = [
+        DeadlinePick(iso="2026-10-15", kind=DeadlineKind.FULL_APPLICATION),
+        DeadlinePick(iso="2026-09-01", kind=DeadlineKind.LOI),
+        DeadlinePick(iso="2026-10-15", kind=DeadlineKind.FULL_APPLICATION),
+    ]
+    out = deadline_math(picks, TODAY, WINDOWS)
+    assert [(m.iso, m.kind) for m in out] == [("2026-09-01", DeadlineKind.LOI), ("2026-10-15", DeadlineKind.FULL_APPLICATION)]
+    assert out == deadline_math(list(reversed(picks)), TODAY, WINDOWS)
+
+
+def test_window_edges_are_inclusive():
+    picks = [DeadlinePick(iso="2026-09-20", kind=DeadlineKind.OTHER), DeadlinePick(iso="2026-09-21", kind=DeadlineKind.OTHER)]
+    first, second = deadline_math(picks, TODAY, WINDOWS)
+    assert first.collides_with == ["fall program launch"] and second.collides_with == []

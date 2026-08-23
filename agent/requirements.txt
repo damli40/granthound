@@ -7,3 +7,4 @@ beautifulsoup4>=4.12
 markdownify>=0.13
 python-dateutil>=2.9
 Jinja2>=3.1
+pyyaml>=6.0
