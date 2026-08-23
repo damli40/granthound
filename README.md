@@ -24,12 +24,13 @@ scores fit against your org's profile. The **Clerk** collects the dates and
 requirements for the programs worth your time.
 
 The boundary rule is what makes the verdicts checkable: **every quote an
-agent stores must appear, character for character, in that stored snapshot,
-and every date must be one the page actually printed.** The recording tools
-enforce this in code, not in the prompt. A quote that isn't on the page is
-dropped rather than saved, and the program is handed to a human instead of
-being scored. So any verdict can be re-derived from the snapshot it cites,
-by you, later, without trusting the model that produced it.
+agent stores must appear word for word — whitespace aside — in that stored
+snapshot, and every date must be one the page actually printed** (a
+month-only date keeps its day marked as invented, and counts to month end).
+The recording tools enforce this in code, not in the prompt. A quote that
+isn't on the page is dropped rather than saved, and the program is handed to
+a human instead of being acted on. So any verdict can be re-derived from the
+snapshot it cites, by you, later, without trusting the model that produced it.
 
 ## Run it
 

@@ -377,3 +377,74 @@ def test_quotes_are_checked_against_the_window_the_model_was_shown():
     assert tail in ctx.work("p-long").det.norm_text
     out = stages.verifier_record(ctx, "p-long", "verified_live", "deadline_in_future", [tail])
     assert out.startswith("REJECTED verifier:") and "not found verbatim" in out
+
+
+# --- the month-only deadline seam ------------------------------------------
+
+MONTH_ONLY_URL = "https://x.org/month-only"
+MONTH_ONLY_PAGE = html_page(
+    "Riverbend Community Grants. Applications are due September 2026. "
+    "Letters of intent are due October 5, 2026. Eligible applicants are 501(c)(3) "
+    "organizations serving Franklin County youth. Awards range from $5,000 to $25,000 per organization."
+)
+MID_SEPTEMBER = datetime(2026, 9, 15, 12, 0, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def month_only_ctx():
+    """A page whose only application deadline is a month and a year, read
+    halfway through that month."""
+    fetcher = make_fetcher({MONTH_ONLY_URL: (200, MONTH_ONLY_PAGE)})
+    return RunContext.create(
+        [("p-month", MONTH_ONLY_URL)], MID_SEPTEMBER, store=MemoryStore(), fetcher=fetcher, org=ORG
+    )
+
+
+def test_a_month_only_deadline_is_not_reported_as_past_mid_month(month_only_ctx):
+    """The whole seam, end to end.
+
+    "Applications are due September 2026." gives no day, so the scanner
+    stores 2026-09-01 with the day marked fabricated, and liveness calls
+    the program live on 2026-09-15. Before this fix the decision package
+    disagreed with liveness on the same page -- days_until=-14,
+    is_past=True -- and told a human a still-open deadline had passed. The
+    ISO stays as stored; only the counting runs to the end of the month.
+    The October date on the same page is a real printed day and must be
+    counted exactly as before.
+    """
+    ctx = month_only_ctx
+    stages.scout_fetch(ctx, "p-month")
+    scan = ctx.work("p-month").det.date_scan
+    fabricated = {d.iso: d.day_fabricated for d in scan.dates if d.year_present}
+    assert fabricated == {"2026-09-01": True, "2026-10-05": False}
+    assert scan.all_dates_past is False
+
+    stages.verifier_record(
+        ctx, "p-month", "verified_live", "deadline_in_future", ["Applications are due September 2026."]
+    )
+    assert ctx.work("p-month").verifier.final == Disposition.VERIFIED_LIVE
+
+    stages.analyst_record(
+        ctx, "p-month",
+        5.0, ELIGIBILITY_QUOTE,
+        4.0, "Riverbend Community Grants.",
+        4.0, "Applications are due September 2026.",
+        3.0, "Letters of intent are due October 5, 2026.",
+        4.0, "Applications are due September 2026.",
+    )
+    assert stages.needs_package(ctx) == ["p-month"]
+
+    out = stages.clerk_record(
+        ctx, "p-month", ["2026-09-01", "2026-10-05"], ["full_application", "loi"],
+        [AWARD_QUOTE], [ELIGIBILITY_QUOTE],
+    )
+    assert out.startswith("RECORDED p-month: deadlines=2")
+    picked = {d.iso: d for d in ctx.work("p-month").package.deadlines}
+
+    month_only = picked["2026-09-01"]
+    assert month_only.day_fabricated is True
+    assert month_only.is_past is False and month_only.days_until == 15
+
+    printed = picked["2026-10-05"]
+    assert printed.day_fabricated is False
+    assert printed.is_past is False and printed.days_until == 20

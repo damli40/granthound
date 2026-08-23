@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timezone
 
+import botocore.httpsession
 import pytest
 
 from granthound.agents import tools
@@ -142,7 +143,38 @@ def test_a_tool_shim_reaches_the_stage_function_through_invocation_state():
     assert ctx.work("p-live").det is not None
 
 
-def test_default_executors_build_four_agents_with_configured_models():
+def test_default_executors_build_four_agents_with_configured_models(monkeypatch):
+    """The only test that builds real BedrockModels, so the only one that
+    builds a real boto3 client -- and a boto3 client resolves credentials
+    when it is created, not when it is called.
+
+    On a machine with no credentials that resolution walks the chain down
+    to the EC2 instance-metadata endpoint and makes an HTTP request to
+    169.254.169.254: measured 5.5s here against 0.4s with credentials
+    present, and an indefinite hang on a network that blackholes rather
+    than refuses. No test in this suite is allowed to touch the network,
+    so the credentials are pinned to dummies AND the metadata probe is
+    switched off outright. Either alone would do it; both are here so
+    that a change to how the chain is ordered cannot quietly re-open it.
+    Nothing is sent anywhere -- no request is ever made with these.
+
+    The wall clock is the symptom, not the rule, and it is not a reliable
+    detector: once the host has a cached negative route to 169.254.169.254
+    the same probe costs milliseconds. So the rule is asserted instead of
+    timed -- every outbound botocore request is turned into a failure for
+    the duration of this test. If the chain ever reaches the network
+    again, this fails by name rather than getting slow.
+    """
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "testing")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "testing")
+    monkeypatch.setenv("AWS_SESSION_TOKEN", "testing")
+    monkeypatch.setenv("AWS_EC2_METADATA_DISABLED", "true")
+
+    def refuse_network(self, request):
+        raise AssertionError(f"this test tried to reach the network: {request.method} {request.url}")
+
+    monkeypatch.setattr(botocore.httpsession.URLLib3Session, "send", refuse_network)
+
     settings = Settings.from_env({"GRANTHOUND_TABLE": "t", "GRANTHOUND_BUCKET": "b", "AWS_REGION": "us-east-1"})
     ex = default_executors(settings)
     assert list(ex) == ["scout", "verifier", "analyst", "clerk"]

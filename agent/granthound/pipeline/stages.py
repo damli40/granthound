@@ -127,10 +127,28 @@ def _dates_block(det: DeterministicEval) -> str:
     return _fenced("DATES", _dates_listing(det))
 
 
-def _dated_isos(det: DeterministicEval) -> list[str]:
+def _dated_isos(det: DeterministicEval) -> dict[str, bool]:
+    """The ISO dates the Clerk may pick, each mapped to whether its DAY was
+    invented rather than printed on the page.
+
+    Keys, in sorted order, are exactly the list this used to return, so
+    iterating or joining it still yields the dates themselves.
+
+    A date maps to True only when every scanner entry that produced it had
+    its day fabricated -- the page gave a month and a year and nothing
+    more. If the page also printed the full date somewhere, the day is real
+    information and the stricter, un-extended arithmetic applies.
+    """
     if det.date_scan is None:
-        return []
-    return sorted({d.iso for d in det.date_scan.dates if d.year_present and d.iso})
+        return {}
+    fabricated: dict[str, bool] = {}
+    for found in det.date_scan.dates:
+        if not (found.year_present and found.iso):
+            continue
+        # AND across every entry that produced this ISO: one printed day
+        # anywhere on the page settles it, and settles it as real.
+        fabricated[found.iso] = fabricated.get(found.iso, True) and found.day_fabricated
+    return {iso: fabricated[iso] for iso in sorted(fabricated)}
 
 
 def _dates_listing(det: DeterministicEval) -> str:
@@ -475,7 +493,7 @@ def clerk_brief(ctx: RunContext, program_id: str) -> str:
     if problem:
         return problem
     det, rec, fit = work.det, work.verifier, work.fit
-    isos = ", ".join(_dated_isos(det)) or "(none)"
+    isos = ", ".join(_dated_isos(det).keys()) or "(none)"
     kinds = ", ".join(k.value for k in DeadlineKind)
     return (
         f"PROGRAM {program_id}\nurl: {det.url}\ntoday: {ctx.today.isoformat()}\n"
@@ -510,10 +528,15 @@ def clerk_record(
     picks: list[DeadlinePick] = []
     for iso, kind in zip(deadline_isos, deadline_kinds):
         if iso not in allowed_isos:
-            bad.append((iso, f"not a date the scanner found on this page; allowed: {', '.join(allowed_isos) or 'none'}"))
+            bad.append(
+                (iso, f"not a date the scanner found on this page; allowed: {', '.join(allowed_isos.keys()) or 'none'}")
+            )
             continue
         try:
-            picks.append(DeadlinePick(iso=iso, kind=DeadlineKind(kind)))
+            # day_fabricated rides along from the scanner: the arithmetic
+            # cannot re-derive it, because by this point the invented day
+            # looks exactly like a printed one.
+            picks.append(DeadlinePick(iso=iso, kind=DeadlineKind(kind), day_fabricated=allowed_isos[iso]))
         except ValueError:
             bad.append((kind, f"unknown deadline kind; allowed: {', '.join(k.value for k in DeadlineKind)}"))
 

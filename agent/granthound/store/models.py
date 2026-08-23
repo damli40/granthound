@@ -172,17 +172,33 @@ class DeadlineKind(str, Enum):
 
 
 class DeadlinePick(BaseModel):
+    """One date the Clerk picked, carrying whether its DAY came off the page.
+
+    `day_fabricated` is the scanner's own signal (see FoundDate): the page
+    gave a month and a year only, e.g. "September 2026", and day 01 was
+    invented to make an ISO date out of it. It travels with the pick so the
+    arithmetic downstream can count to the end of that month instead of
+    treating an invented day as a promise the funder made.
+    """
+
     iso: str
     kind: DeadlineKind
+    day_fabricated: bool = False
 
 
 class DeadlineMath(BaseModel):
+    """`iso` is always the date as stored. When `day_fabricated` is true the
+    counting fields (`days_until`, `is_past`, `within_14_days`) are measured
+    to the LAST day of that month, because that is the last moment the page
+    could still be describing."""
+
     iso: str
     kind: DeadlineKind
     days_until: int
     within_14_days: bool
     is_past: bool
     collides_with: list[str]
+    day_fabricated: bool = False
 
 
 class DecisionPackage(BaseModel):
