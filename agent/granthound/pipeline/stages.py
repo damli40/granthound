@@ -327,8 +327,13 @@ def verifier_record(
 
 
 def needs_analysis(ctx: RunContext) -> list[str]:
+    """Programs the Analyst should score: a live liveness call the lattice
+    did not have to override. An overridden record ends in NEEDS_HUMAN no
+    matter what the Analyst says, so scoring it only spends tokens."""
     return sorted(
-        pid for pid, work in ctx.programs.items() if work.verifier is not None and work.verifier.final in LIVE_FAMILY
+        pid
+        for pid, work in ctx.programs.items()
+        if work.verifier is not None and not work.verifier.overridden and work.verifier.final in LIVE_FAMILY
     )
 
 

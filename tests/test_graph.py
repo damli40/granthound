@@ -7,7 +7,7 @@ import pytest
 from granthound.agents import tools
 from granthound.agents.factories import default_executors
 from granthound.agents.models import model_id_of
-from granthound.config import HAIKU_MODEL_ID, SONNET_MODEL_ID, Settings
+from granthound.config import ANALYST_MODEL_ID, HAIKU_MODEL_ID, Settings
 from granthound.pipeline.context import RunContext
 from granthound.pipeline.graph import build_graph
 from granthound.pipeline.run import run_batch
@@ -178,7 +178,7 @@ def test_default_executors_build_four_agents_with_configured_models(monkeypatch)
     settings = Settings.from_env({"GRANTHOUND_TABLE": "t", "GRANTHOUND_BUCKET": "b", "AWS_REGION": "us-east-1"})
     ex = default_executors(settings)
     assert list(ex) == ["scout", "verifier", "analyst", "clerk"]
-    assert model_id_of(ex["analyst"]) == SONNET_MODEL_ID
+    assert model_id_of(ex["analyst"]) == ANALYST_MODEL_ID
     assert all(model_id_of(ex[n]) == HAIKU_MODEL_ID for n in ("scout", "verifier", "clerk"))
     assert ex["scout"].tool_names == ["fetch_and_snapshot"]
     assert ex["verifier"].tool_names == ["get_verification_brief", "record_verification"]

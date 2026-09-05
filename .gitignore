@@ -12,3 +12,8 @@ cdk.out/
 .DS_Store
 agentcore/.env.local
 .worktrees/
+agentcore/.cache/
+agentcore/cdk/node_modules/
+agentcore/cdk/cdk.out/
+infra/lambdas/trigger/build/
+web/.DS_Store

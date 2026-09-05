@@ -1,13 +1,13 @@
 import pytest
 
-from granthound.config import HAIKU_MODEL_ID, SONNET_MODEL_ID, Settings
+from granthound.config import ANALYST_MODEL_ID, HAIKU_MODEL_ID, Settings
 
 
 def test_defaults_fill_in_when_optional_vars_are_absent():
     s = Settings.from_env({"GRANTHOUND_TABLE": "t", "GRANTHOUND_BUCKET": "b"})
     assert s.region == "us-east-1"
     assert s.haiku_model_id == HAIKU_MODEL_ID == "global.anthropic.claude-haiku-4-5-20251001-v1:0"
-    assert s.analyst_model_id == SONNET_MODEL_ID == "global.anthropic.claude-sonnet-5"
+    assert s.analyst_model_id == ANALYST_MODEL_ID == "global.anthropic.claude-sonnet-4-6"
 
 
 def test_every_missing_variable_is_named_at_once():

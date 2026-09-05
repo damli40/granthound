@@ -3,8 +3,9 @@
 Every missing variable is named in one error (they are set together and
 forgotten together); an empty string counts as missing (a forgotten CDK
 context value arrives as "" not as absent). Model ids default to the
-global inference profiles recorded in M0 Task 0 and can be overridden per
-environment -- the run log records what was actually used.
+global inference profiles this account can actually invoke (see the
+constants below) and can be overridden per environment -- the run log
+records what was actually used.
 """
 
 import os
@@ -12,7 +13,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 HAIKU_MODEL_ID = "global.anthropic.claude-haiku-4-5-20251001-v1:0"
-SONNET_MODEL_ID = "global.anthropic.claude-sonnet-5"
+# Sonnet 5 is account-tier gated on this account ("contact AWS Sales"), so the
+# Analyst defaults to Sonnet 4.6, the model the live run of record billed.
+ANALYST_MODEL_ID = "global.anthropic.claude-sonnet-4-6"
 DEFAULT_REGION = "us-east-1"
 
 _REQUIRED = ("GRANTHOUND_TABLE", "GRANTHOUND_BUCKET")
@@ -41,5 +44,5 @@ class Settings:
             bucket=read("GRANTHOUND_BUCKET"),
             region=read("AWS_REGION") or DEFAULT_REGION,
             haiku_model_id=read("GRANTHOUND_HAIKU_MODEL_ID") or HAIKU_MODEL_ID,
-            analyst_model_id=read("GRANTHOUND_ANALYST_MODEL_ID") or SONNET_MODEL_ID,
+            analyst_model_id=read("GRANTHOUND_ANALYST_MODEL_ID") or ANALYST_MODEL_ID,
         )

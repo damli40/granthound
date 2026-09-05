@@ -448,3 +448,14 @@ def test_a_month_only_deadline_is_not_reported_as_past_mid_month(month_only_ctx)
     printed = picked["2026-10-05"]
     assert printed.day_fabricated is False
     assert printed.is_past is False and printed.days_until == 20
+
+
+def test_needs_analysis_skips_an_overridden_record(ctx):
+    from granthound.store.models import Disposition, ReasonCode, VerifierRecord
+
+    stages.scout_fetch(ctx, "p-live")
+    ctx.work("p-live").verifier = VerifierRecord(
+        proposed=Disposition.VERIFIED_DEAD_CLOSED, final=Disposition.VERIFIED_LIVE, overridden=True,
+        reason=ReasonCode.DEADLINE_IN_FUTURE, evidence_quotes=["q"], quotes_unverified=False,
+    )
+    assert stages.needs_analysis(ctx) == []

@@ -54,7 +54,7 @@ def ensure_complete(ctx: RunContext) -> None:
         if work.verifier is None:
             work.flag("verifier_missing")
             continue
-        if work.verifier.final in LIVE_FAMILY and work.fit is None:
+        if work.verifier.final in LIVE_FAMILY and not work.verifier.overridden and work.fit is None:
             work.flag("analyst_missing")
             continue
         if pid in stages.needs_package(ctx) and work.package is None:

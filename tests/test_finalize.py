@@ -259,3 +259,12 @@ def test_run_log_failure_is_not_swallowed():
     with pytest.raises(RuntimeError, match="ddb down"):
         finalize_run(ctx, node_usage={}, pipeline_status="ok", error=None)
     assert all(len(ctx.store.evals[pid]) == 1 for pid in ("p-live", "p-dead", "p-down"))
+
+
+def test_overridden_live_record_is_not_flagged_analyst_missing():
+    ctx = make_ctx(ids=("p-live",))
+    stages.scout_fetch(ctx, "p-live")
+    ctx.work("p-live").verifier = verifier(Disposition.VERIFIED_LIVE, proposed=Disposition.VERIFIED_DEAD_CLOSED)
+    ensure_complete(ctx)
+    assert "analyst_missing" not in ctx.work("p-live").flags
+    assert derive_verdict(ctx.work("p-live"))[0] is Verdict.NEEDS_HUMAN
