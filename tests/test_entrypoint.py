@@ -31,6 +31,8 @@ def test_cycle_mode_limit_takes_the_first_n():
         {"mode": "nightly"},
         {"mode": "cycle", "limit": 0},
         {"mode": "cycle", "limit": True},
+        {"mode": "cycle", "limt": 3},
+        {"program_ids": ["a"], "limit": 2},
         "just a string",
     ],
 )

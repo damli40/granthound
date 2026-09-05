@@ -4,10 +4,16 @@ beyond reading runtime.env.
 The entrypoint accepts exactly one of two shapes:
   {"program_ids": ["a", "b"]}          run exactly these programs
   {"mode": "cycle", "limit": 5?}       run every program the store knows
-Anything else is a PayloadError the caller turns into an error reply, never
-a run. Chunks are five programs wide (M2 -> M3 contract): one clock read per
-chunk keeps every program in it judged against the same day, and five is
-what keeps the Scout under its node timeout.
+"limit" belongs to cycle mode only. Anything else is a PayloadError the
+caller turns into an error reply, never a run -- an unrecognised key
+included, because a typo has to fail loudly rather than quietly change what
+runs: {"mode": "cycle", "limt": 3} would otherwise evaluate the entire
+catalogue and report success, and {"program_ids": [...], "limit": 2} would
+drop the limit without saying so.
+
+Chunks are five programs wide (M2 -> M3 contract): one clock read per chunk
+keeps every program in it judged against the same day, and five is what
+keeps the Scout under its node timeout.
 """
 
 import os
@@ -54,11 +60,16 @@ def parse_payload(payload, known_ids: Callable[[], list[str]]) -> list[str]:
     """
     if not isinstance(payload, dict):
         raise PayloadError("payload must be a JSON object")
+    unknown = set(payload) - {"program_ids", "mode", "limit"}
+    if unknown:
+        raise PayloadError(f'unknown payload key(s): {", ".join(sorted(unknown))}')
     has_ids = "program_ids" in payload
     has_mode = "mode" in payload
     if has_ids == has_mode:
         raise PayloadError('payload needs exactly one of "program_ids" or "mode"')
     if has_ids:
+        if "limit" in payload:
+            raise PayloadError('"limit" only applies to mode')
         ids = payload["program_ids"]
         if not isinstance(ids, list) or not ids or not all(isinstance(pid, str) and pid for pid in ids):
             raise PayloadError('"program_ids" must be a non-empty list of non-empty strings')
