@@ -1,0 +1,17 @@
+{
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "GrantHound": {
+            "runtimeId": "GrantHound_GrantHound-TDPvgUH71K",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:343607094293:runtime/GrantHound_GrantHound-TDPvgUH71K",
+            "roleArn": "arn:aws:iam::343607094293:role/AgentCore-GrantHound-defa-ApplicationAgentGrantHoun-qLXTnSsL3w9Q"
+          }
+        },
+        "stackName": "AgentCore-GrantHound-default",
+        "deployHash": "8fd8ea2e26d4d48d"
+      }
+    }
+  }
+}
