@@ -5,9 +5,15 @@ leaves nothing behind. Nothing else lives in this stack -- Lambdas and the
 Scheduler arrive in the M3 plan.
 """
 
-from aws_cdk import CfnOutput, RemovalPolicy, Stack
+import json
+from pathlib import Path
+
+from aws_cdk import CfnOutput, Duration, RemovalPolicy, Stack
 from aws_cdk import aws_dynamodb as dynamodb
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_s3 as s3
+from aws_cdk import aws_scheduler as scheduler
 from constructs import Construct
 
 
@@ -38,3 +44,54 @@ class GranthoundStoreStack(Stack):
 
         CfnOutput(self, "TableName", value=table.table_name)
         CfnOutput(self, "BucketName", value=bucket.bucket_name)
+
+
+INFRA_DIR = Path(__file__).resolve().parent
+
+
+class GranthoundScheduleStack(Stack):
+    """EventBridge Scheduler -> trigger Lambda -> InvokeAgentRuntime, every 12 hours.
+
+    The runtime ARN is a CDK context value (-c runtimeArn=...) read from
+    infra/runtime-arn.txt, so this stack can only be synthesized after the
+    runtime exists.
+    """
+
+    def __init__(self, scope: Construct, construct_id: str, *, runtime_arn: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+        if not runtime_arn.startswith("arn:aws:bedrock-agentcore:"):
+            raise ValueError(f"runtimeArn context does not look like a runtime ARN: {runtime_arn!r}")
+
+        code_dir = INFRA_DIR / "lambdas" / "trigger"
+        build_dir = code_dir / "build"
+        asset_dir = build_dir if (build_dir / "handler.py").exists() else code_dir
+        trigger = _lambda.Function(
+            self,
+            "Trigger",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="handler.handler",
+            code=_lambda.Code.from_asset(str(asset_dir)),
+            timeout=Duration.seconds(60),
+            environment={"GRANTHOUND_RUNTIME_ARN": runtime_arn},
+        )
+        trigger.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["bedrock-agentcore:InvokeAgentRuntime"],
+                resources=[runtime_arn, f"{runtime_arn}/*"],
+            )
+        )
+
+        role = iam.Role(self, "SchedulerRole", assumed_by=iam.ServicePrincipal("scheduler.amazonaws.com"))
+        trigger.grant_invoke(role)
+        scheduler.CfnSchedule(
+            self,
+            "Every12h",
+            schedule_expression="rate(12 hours)",
+            flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(mode="OFF"),
+            target=scheduler.CfnSchedule.TargetProperty(
+                arn=trigger.function_arn,
+                role_arn=role.role_arn,
+                input=json.dumps({"payload": {"mode": "cycle"}}),
+            ),
+        )
+        CfnOutput(self, "TriggerFunctionName", value=trigger.function_name)
