@@ -71,3 +71,31 @@ def test_main_refuses_a_bad_payload_before_touching_aws(monkeypatch):
 
     result = asyncio.run(main.invoke({}, None))
     assert result["accepted"] is False and "program_ids" in result["error"]
+
+
+def test_a_failed_cycle_still_releases_the_async_task(monkeypatch):
+    """Setup failing must not strand the runtime in HealthyBusy.
+
+    The caller already holds an "accepted" reply, so if run_chunks dies before
+    the finally, nothing ever completes the async task and the runtime reports
+    busy for ever while evaluating nothing. LiveStore raising on construction
+    stands in for a store or seed-file failure; no AWS is reached either way.
+    """
+    pytest.importorskip("bedrock_agentcore")
+    import asyncio
+
+    monkeypatch.setenv("GRANTHOUND_TABLE", "t")
+    monkeypatch.setenv("GRANTHOUND_BUCKET", "b")
+    import main
+
+    def refuse_to_build():
+        raise RuntimeError("store unavailable")
+
+    completed: list[int] = []
+    monkeypatch.setattr(main, "LiveStore", refuse_to_build)
+    monkeypatch.setattr(main.app, "complete_async_task", completed.append)
+
+    settings = main.Settings.from_env({"GRANTHOUND_TABLE": "t", "GRANTHOUND_BUCKET": "b"})
+    asyncio.run(main.run_chunks([["p-a"]], settings, 123))
+
+    assert completed == [123]

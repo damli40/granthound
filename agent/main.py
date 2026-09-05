@@ -36,10 +36,14 @@ _TASKS: set[asyncio.Task] = set()
 
 
 async def run_chunks(chunks: list[list[str]], settings: Settings, task_id: int) -> None:
-    store = LiveStore()
-    org = load_seed_file(DEFAULT_SEED_PATH).org
-    last_run_id = None
     try:
+        # Setup sits inside the try so that a store or seed-file failure still reaches
+        # the finally below. Otherwise the caller keeps the "accepted" reply it already
+        # has while the async task is never released: the runtime reports HealthyBusy
+        # for ever and not one program is evaluated.
+        store = LiveStore()
+        org = load_seed_file(DEFAULT_SEED_PATH).org
+        last_run_id = None
         for ids in chunks:
             at = datetime.now(timezone.utc)
             if run_id_for(at) == last_run_id:
@@ -58,6 +62,8 @@ async def run_chunks(chunks: list[list[str]], settings: Settings, task_id: int) 
                 )
             except Exception:  # noqa: BLE001 -- one chunk failing must not stop the cycle
                 log.exception("chunk failed ids=%s", ids)
+    except Exception:  # noqa: BLE001 -- a failed cycle must still release the async task
+        log.exception("cycle failed before finishing chunks=%d", len(chunks))
     finally:
         app.complete_async_task(task_id)
 
