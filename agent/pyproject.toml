@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "granthound"
+version = "0.1.0"
+description = "GrantHound: verified grant decisions for small nonprofits (Strands Agents on AgentCore)"
+requires-python = ">=3.10"
+dependencies = [
+    "aws-opentelemetry-distro",
+    "bedrock-agentcore >= 1.9.1",
+    "botocore[crt] >= 1.35.0",
+    "strands-agents >= 1.52",
+    "strands-agents-tools >= 0.8.6",
+    "boto3 >= 1.34",
+    "pydantic >= 2.7",
+    "requests >= 2.32",
+    "beautifulsoup4 >= 4.12",
+    "markdownify >= 0.13",
+    "python-dateutil >= 2.9",
+    "Jinja2 >= 3.1",
+    "pyyaml >= 6.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
