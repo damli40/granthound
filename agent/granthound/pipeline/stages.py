@@ -344,8 +344,9 @@ def _for_analysis(ctx: RunContext, program_id: str) -> tuple[ProgramWork | None,
     work = ctx.work(program_id)
     if work is None:
         return None, f"UNKNOWN_PROGRAM {program_id}: not in this batch"
-    if work.verifier is None or work.verifier.final not in LIVE_FAMILY or work.det is None or work.det.norm_text is None:
-        liveness = work.verifier.final.value if work.verifier else "unverified"
+    rec = work.verifier
+    if rec is None or rec.final not in LIVE_FAMILY or rec.overridden or work.det is None or work.det.norm_text is None:
+        liveness = rec.final.value if rec else "unverified"
         return work, f"NOT_FOR_ANALYSIS {program_id}: liveness={liveness}; do not score it."
     return work, None
 

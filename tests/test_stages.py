@@ -459,3 +459,28 @@ def test_needs_analysis_skips_an_overridden_record(ctx):
         reason=ReasonCode.DEADLINE_IN_FUTURE, evidence_quotes=["q"], quotes_unverified=False,
     )
     assert stages.needs_analysis(ctx) == []
+
+
+def test_analyst_gate_rejects_only_the_overridden_record_in_a_mixed_batch(ctx):
+    """A batch with one ordinary live program keeps the Analyst node running, so the
+    per-program gate -- not the batch-level condition -- is what has to turn the
+    overridden record away."""
+    from granthound.store.models import ReasonCode, VerifierRecord
+
+    stages.scout_fetch(ctx, "p-live")
+    stages.verifier_record(ctx, "p-live", "verified_live", "deadline_in_future", ["Applications are due October 5, 2026."])
+    stages.scout_fetch(ctx, "p-dead")
+    ctx.work("p-dead").verifier = VerifierRecord(
+        proposed=Disposition.VERIFIED_DEAD_CLOSED, final=Disposition.VERIFIED_LIVE, overridden=True,
+        reason=ReasonCode.DEADLINE_IN_FUTURE, evidence_quotes=["q"], quotes_unverified=False,
+    )
+
+    assert stages.needs_analysis(ctx) == ["p-live"]
+    assert stages.analyst_brief(ctx, "p-live").startswith("PROGRAM p-live")
+    assert stages.analyst_brief(ctx, "p-dead").startswith("NOT_FOR_ANALYSIS")
+    out = stages.analyst_record(
+        ctx, "p-dead",
+        5.0, "q", 4.0, "q", 4.0, "q", 4.0, "q", 4.0, "q",
+    )
+    assert out.startswith("NOT_FOR_ANALYSIS")
+    assert ctx.work("p-dead").fit is None
