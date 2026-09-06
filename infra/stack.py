@@ -139,14 +139,57 @@ class GranthoundWebStack(Stack):
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
             ),
+            # A private S3 origin answers a missing/unlisted key with 403, not 404,
+            # and a directory-style path like /fixtures/sunset-fund/ (no index.html
+            # in the request) is exactly that: no such key. Map both 403 and 404
+            # back to the single-page app's index so a fixture folder link (or any
+            # deep link) renders the inbox instead of raw S3 AccessDenied XML.
+            error_responses=[
+                cloudfront.ErrorResponse(
+                    http_status=403,
+                    response_http_status=200,
+                    response_page_path="/index.html",
+                ),
+                cloudfront.ErrorResponse(
+                    http_status=404,
+                    response_http_status=200,
+                    response_page_path="/index.html",
+                ),
+            ],
         )
-        s3deploy.BucketDeployment(
+        # Two BucketDeployments, not one, because content_type on BucketDeployment
+        # applies to the whole deployment, not per file, and deadlines.ics needs
+        # text/calendar while everything else keeps its guessed type. The .ics
+        # deployment must run with prune=False: a pruning deployment deletes any
+        # bucket key its own sources didn't just write, so two pruning
+        # deployments into the same bucket would each erase what the other one
+        # uploaded (the main deploy would delete deadlines.ics on every deploy,
+        # and vice versa for everything else).
+        deploy = s3deploy.BucketDeployment(
             self,
             "Deploy",
-            sources=[s3deploy.Source.asset(str(WEB_DIR))],
+            sources=[s3deploy.Source.asset(str(WEB_DIR), exclude=["deadlines.ics"])],
             destination_bucket=bucket,
             distribution=distribution,
             distribution_paths=["/*"],
         )
+        deploy_ics = s3deploy.BucketDeployment(
+            self,
+            "DeployDeadlinesIcs",
+            sources=[s3deploy.Source.asset(str(WEB_DIR), exclude=["**", "!deadlines.ics"])],
+            destination_bucket=bucket,
+            content_type="text/calendar",
+            prune=False,
+            distribution=distribution,
+            distribution_paths=["/deadlines.ics"],
+        )
+        # CloudFormation has no natural ordering between these two custom
+        # resources -- neither references the other's output -- so without an
+        # explicit dependency it can run DeployDeadlinesIcs before Deploy, and
+        # Deploy (prune=True, and deadlines.ics is outside its own manifest)
+        # then deletes the .ics key that DeployDeadlinesIcs just wrote. Forcing
+        # DeployDeadlinesIcs to run after Deploy on every deployment is what
+        # actually keeps deadlines.ics in the bucket.
+        deploy_ics.node.add_dependency(deploy)
         CfnOutput(self, "SiteUrl", value=f"https://{distribution.distribution_domain_name}")
         CfnOutput(self, "FixtureUrl", value=f"https://{distribution.distribution_domain_name}/fixtures/sunset-fund/index.html")

@@ -288,6 +288,7 @@
     $("#drawer-kicker").innerHTML = `${chip(p.verdict)} ${p.is_fixture ? '<span class="chip FIXTURE">TEST FUNDER</span>' : ""}`;
     $("#drawer-title").textContent = p.funder || p.program_id;
     $("#drawer").hidden = false; $("#scrim").hidden = false;
+    document.body.style.overflow = "hidden";
     renderTabs();
     $("#drawer-close").focus();
   }
@@ -299,7 +300,7 @@
     });
     $("#panel").innerHTML = panelHtml(p);
   }
-  function closeDrawer() { $("#drawer").hidden = true; $("#scrim").hidden = true; const c = document.querySelector(`.card[data-id="${CSS.escape(state.selected || "")}"]`); if (c) c.focus(); }
+  function closeDrawer() { $("#drawer").hidden = true; $("#scrim").hidden = true; document.body.style.overflow = ""; const c = document.querySelector(`.card[data-id="${CSS.escape(state.selected || "")}"]`); if (c) c.focus(); }
 
   function render() { renderStrip(); renderFilters(); renderCards(); }
 
