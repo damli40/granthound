@@ -50,7 +50,7 @@
     clerk_missing: "The date and requirement collector recorded nothing; sent to a human.",
     eval_write_failed: "The evaluation row could not be written.",
     scout_error: "The page fetch failed.",
-    scout_missed: "The page was never fetched.",
+    scout_missed: "The page fetcher recorded nothing; a fallback fetched the page.",
     meta_missing: "This program is not registered in the store.",
     meta_pointer_failed: "The program's latest-run pointer could not be updated."
   };
@@ -79,12 +79,28 @@
     if (!m) return null;
     return new Date(Date.UTC(Number(m[1]), Number(m[2]), 0)).getUTCDate();
   }
+  /* The single earliest-possible-day number, used identically for urgency
+     styling and for bucket membership. A day_fabricated deadline's
+     days_until is measured to the month's LAST day (see deadlines.py);
+     the earliest it could actually fall on is the 1st of that month, so
+     subtract the rest of the month to get there. Non-fabricated deadlines
+     pass through unchanged -- days_until already names one exact day. */
+  function earliestDays(d) {
+    if (!d) return null;
+    if (!d.day_fabricated) return d.days_until;
+    const dim = daysInMonth(d.iso);
+    return dim ? d.days_until - (dim - 1) : d.days_until;
+  }
   function deadlines(p) { return (p.decision_package && p.decision_package.deadlines) || []; }
   function nextDeadline(p) {
     const future = deadlines(p).filter(d => !d.is_past).sort((a, b) => a.days_until - b.days_until);
     return future[0] || null;
   }
-  function bucketOf(d) { if (!d) return null; if (d.days_until <= 30) return "30"; if (d.days_until <= 60) return "60"; if (d.days_until <= 90) return "90"; return "later"; }
+  function bucketOf(d) {
+    if (!d) return null;
+    const e = earliestDays(d);
+    if (e <= 30) return "30"; if (e <= 60) return "60"; if (e <= 90) return "90"; return "later";
+  }
   function runFor(p) { return (state.data.runs || []).find(r => r.run_id === p.run_id) || null; }
   function quotesOf(p) {
     const out = [];
@@ -164,19 +180,18 @@
       const d = nextDeadline(p);
       let due = "";
       if (d) {
+        // Urgency and bucket membership both key off earliestDays(d), the
+        // single earliest-possible-day number, so a month-only deadline
+        // can never be red-urgent yet missing from its due-within bucket.
+        const earliest = earliestDays(d);
+        const dueClass = earliest <= 3 ? "urgent" : earliest <= 14 ? "soon" : "";
         if (d.day_fabricated) {
           // The stored day was invented (the page only said a month and
           // year), so days_until was measured to the LAST day of that
           // month (see deadlines.py). Print the bound the count was
-          // actually measured to, and key urgency off the EARLIEST day the
-          // deadline could fall on -- the first of the month -- so a
-          // possibly-imminent month-only deadline is never shown calm.
-          const dim = daysInMonth(d.iso);
-          const earliest = dim ? d.days_until - (dim - 1) : d.days_until;
-          const dueClass = earliest <= 3 ? "urgent" : earliest <= 14 ? "soon" : "";
+          // actually measured to; the count itself stays the stored one.
           due = `<span class="due ${dueClass}">${esc(KIND[d.kind] || "Date")} by end of ${esc(monthYear(d.iso))} · ${d.days_until} days as of run</span>`;
         } else {
-          const dueClass = d.days_until <= 3 ? "urgent" : d.days_until <= 14 ? "soon" : "";
           due = `<span class="due ${dueClass}">${esc(KIND[d.kind] || "Date")} ${esc(fmtDate(d.iso))} · ${d.days_until} days as of run</span>`;
         }
       }

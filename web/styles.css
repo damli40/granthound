@@ -37,7 +37,7 @@ h1 { margin: 4px 0 6px; font-size: 2rem; font-weight: 600; }
 .chip { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.05em; color: var(--chip-ink); border: 0; cursor: default; }
 .chip.APPLY { background: var(--apply); } .chip.PASS { background: var(--pass); } .chip.WATCH { background: var(--watch); }
 .chip.NEEDS_HUMAN { background: var(--review); } .chip.NONE { background: var(--ink-2); } .chip.FIXTURE { background: var(--fixture); }
-button.chip { cursor: pointer; opacity: 0.55; } button.chip[aria-pressed="true"] { opacity: 1; outline: 2px solid var(--ink); outline-offset: 1px; }
+button.chip { cursor: pointer; opacity: 0.75; } button.chip[aria-pressed="true"] { opacity: 1; outline: 2px solid var(--ink); outline-offset: 1px; }
 
 .cards { display: grid; gap: 12px; }
 .card { border: 1px solid var(--rule); background: var(--panel); padding: 14px 16px; cursor: pointer; }
