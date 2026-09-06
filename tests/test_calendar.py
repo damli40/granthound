@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from granthound.calendar import build_ics
+from granthound.calendar import _fold, build_ics
 
 NOW = datetime(2026, 9, 6, 8, 0, tzinfo=timezone.utc)
 
@@ -47,3 +47,22 @@ def test_programs_without_a_package_or_with_no_future_dates_produce_no_events():
 def test_fixture_events_are_labelled():
     ics = build_ics([program(is_fixture=True)], now=NOW)
     assert "SUMMARY:[TEST FUNDER] Riverbend\\, Fund\\; Inc: LOI" in ics
+
+
+def test_multibyte_line_folds_by_octet_and_unfolds_cleanly():
+    # 40 CJK characters, 3 UTF-8 octets each: 120 octets of payload alone,
+    # nowhere close to fitting in one 75-octet line, and a naive character
+    # cut at 70 (as opposed to an octet cut) would swallow the whole thing
+    # in one step, since 40 characters is under the 70-character cap.
+    line = "SUMMARY:" + ("東" * 40)
+    physical = _fold(line).split("\r\n")
+    assert len(physical) > 1
+    assert all(len(p.encode("utf-8")) <= 75 for p in physical)
+    assert all(p.startswith(" ") for p in physical[1:])
+    assert all(p != " " for p in physical)                     # no lone-space continuation line
+    assert physical[0] + "".join(p[1:] for p in physical[1:]) == line
+
+
+def test_ascii_line_folds_exactly_as_before():
+    line = "DESCRIPTION:Verdict APPLY. Collides with: fall program launch. https://x.org/live"
+    assert _fold(line) == line[:70] + "\r\n " + line[70:]

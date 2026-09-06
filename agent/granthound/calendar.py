@@ -28,11 +28,29 @@ def _event_date(iso: str, day_fabricated: bool) -> date:
 
 
 def _fold(line: str) -> str:
-    """RFC 5545 folds lines longer than 75 octets; split on characters, good enough for ASCII-heavy text."""
+    """RFC 5545 folds lines longer than 75 octets, excluding the break.
+
+    Cuts by UTF-8 octet, not by character: a character-count cut is wrong
+    for anything outside ASCII (CJK, Arabic, ...), where a 70-character
+    prefix can already be 200+ octets -- over the limit and never folded
+    again, and a source string short enough in characters to be consumed
+    whole leaves a continuation line that is nothing but the leading
+    space. Every cut lands on a code-point boundary, never mid-character:
+    it starts at a 70-octet prefix and backs off while the next byte is a
+    UTF-8 continuation byte (10xxxxxx). 70 octets keeps ASCII output
+    byte-identical to the previous character-based cut (an ASCII byte is
+    never a continuation byte, so no backing off ever happens), while
+    sitting well inside RFC 5545's 75-octet line limit for both the first
+    line and every space-prefixed continuation line.
+    """
     out, chunk = [], line
     while len(chunk.encode("utf-8")) > 75:
-        out.append(chunk[:70])
-        chunk = " " + chunk[70:]
+        data = chunk.encode("utf-8")
+        cut = 70
+        while cut > 0 and (data[cut] & 0xC0) == 0x80:
+            cut -= 1
+        out.append(data[:cut].decode("utf-8"))
+        chunk = " " + data[cut:].decode("utf-8")
     out.append(chunk)
     return "\r\n".join(out)
 
