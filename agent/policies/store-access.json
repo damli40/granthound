@@ -20,7 +20,12 @@
       "Effect": "Allow",
       "Action": ["kms:Decrypt"],
       "Resource": "*",
-      "Condition": {"StringEquals": {"kms:ViaService": "ssm.us-east-1.amazonaws.com"}}
+      "Condition": {
+        "StringEquals": {
+          "kms:ViaService": "ssm.us-east-1.amazonaws.com",
+          "kms:EncryptionContext:PARAMETER_ARN": "arn:aws:ssm:us-east-1:343607094293:parameter/granthound/telegram"
+        }
+      }
     }
   ]
 }

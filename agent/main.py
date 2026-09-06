@@ -65,11 +65,15 @@ async def run_chunks(chunks: list[list[str]], settings: Settings, task_id: int) 
                 summaries.append(summary)
             except Exception:  # noqa: BLE001 -- one chunk failing must not stop the cycle
                 log.exception("chunk failed ids=%s", ids)
-        if summaries:
-            try:
-                log.info("telegram: %s", notify_cycle(summaries, env=os.environ))
-            except Exception:  # noqa: BLE001 -- belt and braces; notify_cycle already swallows
-                log.exception("telegram notify raised")
+        # Called even when every chunk failed (summaries == []): an all-failed cycle
+        # must still say so, not go silent.
+        try:
+            log.info(
+                "telegram: %s",
+                notify_cycle(summaries, env=os.environ, chunks_attempted=len(chunks)),
+            )
+        except Exception:  # noqa: BLE001 -- belt and braces; notify_cycle already swallows
+            log.exception("telegram notify raised")
     except Exception:  # noqa: BLE001 -- a failed cycle must still release the async task
         log.exception("cycle failed before finishing chunks=%d", len(chunks))
     finally:

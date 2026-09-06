@@ -128,3 +128,31 @@ def test_run_chunks_notifies_after_the_chunks_and_a_notify_failure_does_not_bloc
 
     asyncio.run(main.run_chunks([["p-a"], ["p-b"]], settings, 7))
     assert seen == [2] and completed == [7]
+
+
+def test_run_chunks_notifies_even_when_every_chunk_fails(monkeypatch):
+    """An all-failed cycle must still say so; it must not go silent."""
+    pytest.importorskip("bedrock_agentcore")
+    import asyncio
+
+    import main
+    from granthound.config import Settings
+
+    settings = Settings.from_env({"GRANTHOUND_TABLE": "t", "GRANTHOUND_BUCKET": "b"})
+    completed = []
+    monkeypatch.setattr(main.app, "complete_async_task", lambda task_id: completed.append(task_id))
+    monkeypatch.setattr(main, "LiveStore", lambda: object())
+    monkeypatch.setattr(main, "load_seed_file", lambda path: type("S", (), {"org": None})())
+
+    async def always_fails(ids, at, **kw):
+        raise RuntimeError("chunk exploded")
+    monkeypatch.setattr(main, "run_batch_async", always_fails)
+
+    calls = []
+    def spy(summaries, **kw):
+        calls.append((summaries, kw.get("chunks_attempted")))
+        return "skipped: no GRANTHOUND_TELEGRAM_PARAM"
+    monkeypatch.setattr(main, "notify_cycle", spy)
+
+    asyncio.run(main.run_chunks([["p-a"], ["p-b"]], settings, 9))
+    assert calls == [([], 2)] and completed == [9]

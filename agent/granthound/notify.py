@@ -4,8 +4,16 @@ The bot token and chat id live in one SSM SecureString named by
 GRANTHOUND_TELEGRAM_PARAM, value "<token>|<chat id>". They never touch the
 repo. Every failure here is a return value the caller logs; a cycle is
 never failed by a notification.
+
+The token must never reach a log either. `send_telegram` posts to a URL that
+contains it, so any connection-class failure there is reduced to the
+exception's type name only -- never its message, which `requests` fills with
+the failing URL. Any other failure on this path (SSM, formatting) is scrubbed
+for a /bot<token>/ segment before its text is returned, on the chance a
+lower-level library ever echoes the request back into its own error.
 """
 
+import re
 from collections import Counter
 from collections.abc import Mapping
 
@@ -14,20 +22,29 @@ import requests
 VERDICT_LABEL = {"APPLY": "APPLY", "PASS": "PASS", "WATCH": "WATCH", "NEEDS_HUMAN": "NEEDS REVIEW"}
 ORDER = ("APPLY", "WATCH", "NEEDS_HUMAN", "PASS")
 
+_BOT_URL = re.compile(r"/bot[^/\s]+/")
 
-def format_cycle_summary(summaries: list, *, site_url: str | None) -> str:
+
+def format_cycle_summary(summaries: list, *, site_url: str | None, chunks_attempted: int | None = None) -> str:
     counts: Counter = Counter()
     for s in summaries:
         counts.update(s.run_item.get("verdict_counts") or {})
     pages = sum(len(s.outcomes) for s in summaries)
     unfinished = sum(1 for s in summaries if s.status != "ok")
-    parts = [f"GrantHound checked {pages} pages."]
+    parts = [f"GrantHound evaluated {pages} program{'s' if pages != 1 else ''}."]
     verdict_bits = [f"{VERDICT_LABEL[v]} {counts[v]}" for v in ORDER if counts.get(v)]
     if verdict_bits:
         parts.append(" / ".join(verdict_bits) + ".")
+    total_counted = sum(counts.values())
+    if total_counted != pages:
+        parts.append(f"Verdict counts cover {total_counted} of {pages}.")
     if unfinished:
         parts.append(f"{unfinished} run{'s' if unfinished != 1 else ''} did not finish.")
-    parts.append("runs " + ", ".join(s.run_id for s in summaries) + ".")
+    if chunks_attempted is not None and chunks_attempted != len(summaries):
+        missing = chunks_attempted - len(summaries)
+        parts.append(f"{missing} of {chunks_attempted} chunks did not report.")
+    if summaries:
+        parts.append("runs " + ", ".join(s.run_id for s in summaries) + ".")
     if site_url:
         parts.append(site_url)
     return "\n".join(parts)
@@ -57,7 +74,14 @@ def send_telegram(token: str, chat_id: str, text: str, *, post=None) -> bool:
     return response.status_code == 200
 
 
-def notify_cycle(summaries: list, *, env: Mapping[str, str], post=None, ssm_client=None) -> str:
+def notify_cycle(
+    summaries: list,
+    *,
+    env: Mapping[str, str],
+    chunks_attempted: int | None = None,
+    post=None,
+    ssm_client=None,
+) -> str:
     param = (env.get("GRANTHOUND_TELEGRAM_PARAM") or "").strip()
     if not param:
         return "skipped: no GRANTHOUND_TELEGRAM_PARAM"
@@ -66,7 +90,15 @@ def notify_cycle(summaries: list, *, env: Mapping[str, str], post=None, ssm_clie
         if target is None:
             return "skipped: parameter not found"
         token, chat_id = target
-        text = format_cycle_summary(summaries, site_url=(env.get("GRANTHOUND_SITE_URL") or "").strip() or None)
-        return "sent" if send_telegram(token, chat_id, text, post=post) else "failed: telegram api rejected the message"
+        text = format_cycle_summary(
+            summaries,
+            site_url=(env.get("GRANTHOUND_SITE_URL") or "").strip() or None,
+            chunks_attempted=chunks_attempted,
+        )
+        try:
+            sent = send_telegram(token, chat_id, text, post=post)
+        except Exception as exc:  # noqa: BLE001 -- the request URL carries the token; never surface its text
+            return f"failed: {type(exc).__name__}"
+        return "sent" if sent else "failed: telegram api rejected the message"
     except Exception as exc:  # noqa: BLE001 -- a notification must never fail the cycle
-        return f"failed: {type(exc).__name__}: {exc}"
+        return f"failed: {type(exc).__name__}: {_BOT_URL.sub('/bot[redacted]/', str(exc))}"
