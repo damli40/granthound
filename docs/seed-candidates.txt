@@ -33,7 +33,14 @@ https://www.starkcf.org/for-grantees/for-organizations/community-responsive-gran
 # GAR Foundation (Akron/Summit County, NE Ohio-wide reach) | community_foundation | Grants for Nonprofits apply page, names focus areas and an eligibility quiz | seen 2026-09-06
 https://www.garfoundation.org/apply
 
-# Community Foundation of the Mahoning Valley | community_foundation | Grant Opportunities page, names quarterly deadlines through 2026 (Apr 15/Jul 15/Oct 15) plus youth-relevant funds (Fund for Women & Girls, Young Philanthropist Fund) | seen 2026-09-06
+# CORRECTED 2026-09-06 after review: "quarterly deadlines" over-stated a
+# cadence the page never claims -- there is no January deadline anywhere
+# on the page. What it actually shows is several separately named funds,
+# each with its own single 2026 deadline: Fund for Women & Girls Impact
+# Builder Grant (Apr 15), Young Philanthropist Fund (Apr 15), Steel Valley
+# Homes for Youth Fund (Jul 15), and the CFMV General Grant plus several
+# other named funds (Oct 15).
+# Community Foundation of the Mahoning Valley | community_foundation | Grant Opportunities page, names several funds each with its own single 2026 deadline (Fund for Women & Girls / Young Philanthropist Fund Apr 15, Steel Valley Homes for Youth Fund Jul 15, General Grant Oct 15) | seen 2026-09-06
 https://www.cfmv.org/grant-opportunities/
 
 # Osteopathic Heritage Foundations (Columbus, Ohio-wide reach) | community_foundation | Funding Opportunities page for a statewide-reach central-Ohio funder; site itself warns RFP windows open/close within 60 days -- worth a liveness check rather than trusting a stale bookmark | seen 2026-09-06
@@ -120,7 +127,12 @@ https://alphauniverse.com/legal/create-action-2024-program/
 # Fender Play Foundation | national_funder | main site, states music-program eligibility (weekly instruction, min 8 months/year, 1+ year operating) | seen 2026-09-06
 https://fenderplayfoundation.org/
 
-# VH1 Save The Music Foundation | national_funder | Our Grant Programs FAQ page, states program tiers (Intro to Music, Core, Music Technology) though invitation-only | seen 2026-09-06
+# CORRECTED 2026-09-06 after review: the page brands itself "Save The
+# Music" / "Save The Music Foundation" throughout (its FAQ text, e.g.
+# "Save The Music (STM) partners with public school districts..."); it
+# never says "VH1" anywhere. The funder field now reads Save The Music
+# Foundation.
+# Save The Music Foundation | national_funder | Our Grant Programs FAQ page, states program tiers (Intro to Music Grant, Core Grant for Band/Strings/Mariachi/Sonidos Latinos, Music Tech Grant) though invitation-only | seen 2026-09-06
 https://www.savethemusic.org/faqs/our-program/
 
 # NEA Big Read (administered by Arts Midwest) | national_funder | program hub page, states award cap $20,000 and the 2026-27 application cycle tied to the America250 theme | seen 2026-09-06
@@ -178,10 +190,27 @@ https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-fou
 # Cleveland Foundation | community_foundation | Other Grant Opportunities overview page, one click deeper than the Apply-for-a-Grant page already tried above | seen 2026-09-06
 https://www.clevelandfoundation.org/grants/other-grant-opportunities/overview
 
-# Muskingum County Community Foundation | community_foundation | Grant Guidelines and Application page, names Spring/Fall cycles | seen 2026-09-06
+# CORRECTED 2026-09-06 after review: mcfohio.org brands itself "Marietta
+# Community Foundation" throughout (page headline reads "Marietta
+# Community Foundation Awards Over $127K in 2025 Spring Grant Cycle");
+# no "Muskingum" text appears on the page. The seed id
+# muskingum-county-community-foundation is kept as-is (it carries eval
+# history) but its funder field now reads Marietta Community Foundation.
+# Marietta Community Foundation | community_foundation | Grant Guidelines and Application page, names Spring/Fall cycles | seen 2026-09-06
 https://www.mcfohio.org/grants
 
-# Delaware County Foundation (Delaware, OH) | community_foundation | Community Grants page, states a $5,000-$25,000 Associates Board program and a Jul 31 2026 deadline | seen 2026-09-06
+# CORRECTED 2026-09-06 after review: the original line below over-claimed.
+# The page does not mention an "Associates Board" program or a
+# $5,000-$25,000 range anywhere -- that language came from a different
+# funder's search summary and was pasted in by mistake. What the page
+# actually says: "Apply for funding Grant Cycle 2025 (Opens June 15th,
+# Closes July 31st)" and a Timeline table reading "June 15th - Grant
+# opportunity opens / July 31st - Grant submission deadline / Mid-December
+# - Grants Announced", with awards "expected to range between $2,500 to
+# $20,000". The July 31 date is yearless in the timeline table (only the
+# "Grant Cycle 2025" label carries a year, and it is last year's, not
+# 2026's -- a live year-trap on this page, not something we introduced).
+# Delaware County Foundation (Delaware, OH) | community_foundation | Community Grants page, states "Grant Cycle 2025 (Opens June 15th, Closes July 31st)" with a yearless July 31st deadline in the Timeline table and awards of $2,500-$20,000 | seen 2026-09-06
 https://delawarecf.org/community-grants-3/
 
 # Fairfield County Foundation (Lancaster, OH) | community_foundation | Grants page | seen 2026-09-06
@@ -227,6 +256,7 @@ REJECT https://education.ohio.gov/Topics/Federal-Programs/Programs/21st-Century 
 REJECT https://education.ohio.gov/Topics/Finance-and-Funding/Grants-Administration/Grant-Opportunities (169 chars < 5000 (js-shell suspect), zero date-candidate hits)
 REJECT https://www.ohiochildrensfoundation.org/grant-requests/ (1880 chars < 5000 (js-shell suspect), zero date-candidate hits)
 KEEP https://www.walmart.org/how-we-give/program-guidelines/spark-good-local-grants-guidelines (14534 chars, 6 date hits)
+# removed after review: same page as provisional-3 (redirect target)
 KEEP https://corporate.lowes.com/our-responsibilities/lowes-hometowns (6415 chars, 3 date hits)
 REJECT https://www.t-mobile.com/brand/hometown-grants (http status 403)
 REJECT https://www.t-mobile.com/news/un-carrier/t-mobiles-hometown-grants-program-delivers-nearly-18m-across-400-communities (http status 403)

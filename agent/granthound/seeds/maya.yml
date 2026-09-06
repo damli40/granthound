@@ -109,7 +109,7 @@ seeds:
 
   - id: muskingum-county-community-foundation
     url: https://www.mcfohio.org/grants
-    funder: Muskingum County Community Foundation
+    funder: Marietta Community Foundation
     source_type: community_foundation
     is_fixture: false
 
@@ -117,12 +117,6 @@ seeds:
     url: https://delawarecf.org/community-grants-3/
     funder: Delaware County Foundation
     source_type: community_foundation
-    is_fixture: false
-
-  - id: walmart-spark-good-local-grants
-    url: https://www.walmart.org/how-we-give/program-guidelines/spark-good-local-grants-guidelines
-    funder: Walmart.org (Walmart Foundation)
-    source_type: corporate_giving
     is_fixture: false
 
   - id: lowes-hometowns
@@ -139,7 +133,7 @@ seeds:
 
   - id: vh1-save-the-music-foundation
     url: https://www.savethemusic.org/faqs/our-program/
-    funder: VH1 Save The Music Foundation
+    funder: Save The Music Foundation
     source_type: national_funder
     is_fixture: false
 

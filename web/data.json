@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-06T08:06:06.558696+00:00",
+ "generated_at": "2026-09-06T08:37:09.614948+00:00",
  "sample": false,
  "org": {
   "name": "Riverbend Youth Collective",
@@ -878,126 +878,172 @@
    "url": "https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html",
    "source_type": "fixture",
    "is_fixture": true,
-   "eval_sk": "EVAL#2026-09-06T08:02:23.245014+00:00#run-20260906T080223Z",
-   "snapshot_text": "Sunset Community Fund: Fall Youth Arts Grants 2026\n\n# Fall Youth Arts Grants 2026\n\n**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications are sent by December 1, 2026.\n\n*This page is a test funder page operated by the GrantHound project so that a page change can be demonstrated on a schedule. It is disclosed as a fixture in the GrantHound README and on camera. Sunset Community Fund is not a real foundation.*\n\n## About the fund\n\nThe Sunset Community Fund is a county-level fund that pays for after-school arts and mentoring in Franklin County, Ohio. It was founded in 2014 by a group of parents and retired teachers who wanted a single small-grant source that neighbourhood programs could reach without a development director. The fund makes grants totalling about $180,000 a year, spread across roughly twenty organizations, so the typical award is deliberately small and the paperwork is deliberately short. Every application is read by a volunteer review committee of local teachers and working artists, most of whom have run a youth program themselves and know what a realistic budget looks like. The committee meets twice a year, reads every complete application in full, and writes a short set of notes back to each applicant whether or not the request is funded.\n\n## What we fund\n\nWe fund after-school and summer arts programs for young people, including visual art, music, theatre, dance, creative writing, and media production. We fund mentoring programs that carry a real arts component, meaning the young person makes something and an adult with practice in that form works alongside them. We fund equipment for youth art rooms, such as kilns, sewing machines, drum kits, cameras, printers, and the storage that keeps them usable. We fund artist stipends, because a program that expects working artists to teach for free is a program that will not last a second year. We do not fund capital campaigns, building purchases, or renovations, we do not fund scholarships paid to individuals, and we do not fund galas, auctions, or other fundraising events, however well attended they are.\n\n## Eligibility\n\nApplicants must be 501(c)(3) organizations serving young people ages 8 to 18 in Franklin County, Ohio. Organizations with an annual budget under $500,000 receive priority. Fiscal sponsorship is accepted with a signed letter from the sponsor.\n\nPrograms that operate outside Franklin County are not eligible, even when the applicant organization is headquartered inside the county, because the fund is answerable to donors who gave for this county's young people. For-profit entities are not eligible in any form, including a for-profit studio applying through a nonprofit partner that would pass the money straight through. Programs that charge participation fees above $50 per term are not eligible, because a fee above that line has been shown, in this county, to shut out the families the fund exists to reach.\n\n## Award size\n\nAwards range from $5,000 to $15,000. Most first-time grantees receive between $5,000 and $8,000. Multi-year funding is not offered; prior grantees may reapply each cycle.\n\n## How to apply\n\nSend a two-page narrative that says who the program serves, what the young people will make, and who will teach them. Send a one-page budget for the program, not for the whole organization, showing what this grant would pay for line by line. Send your most recent Form 990, or a signed fiscal sponsor letter if you are applying under a sponsor. Send two references, each a person outside your organization who has seen the program run, with a phone number and an email address for each. Send a program calendar with the start and end dates and the weekly meeting times, submit the whole package by email as a single PDF, and expect no interview stage, because the committee reads only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* December 1, 2026: award notifications\n* January 15, 2027: funds disbursed\n\n## Frequently asked questions\n\n**Do you accept late applications?** No. The deadline of October 15, 2026 at 5:00 p.m. Eastern is the deadline, and an application that arrives at 5:01 p.m. is not read. The committee has a fixed number of volunteer hours and holds the line so that the organizations who met the date are not penalised for meeting it.\n\n**Can we be funded for part of what we asked for?** Yes. Partial funding is common and is not a comment on the quality of the application. If the committee funds part of a request, the award letter will say which budget lines it covers, and you may spend it only on those lines unless you write to us first and we agree in writing to a change.\n\n**What reporting do you require?** One report, one page, due June 30, 2027. Tell us how many young people took part, what they made, what the money actually paid for, and what you would do differently. We do not require receipts with the report, but keep them for a year in case we ask. A missing report makes an organization ineligible for the following cycle.\n\n**Can a school apply?** Not directly. Public and charter schools are not eligible applicants for this fund, because the fund is meant to reach programs that sit outside the school budget. A school can take part in a funded program as a partner, and a nonprofit partner can apply on behalf of that partnership, name the school in the narrative, and hold the grant.\n\n**Do you consider equipment-only requests?** Yes, up to $5,000. An equipment-only request should still explain the program the equipment serves, who will maintain the equipment, and where it will be stored between sessions. Requests for equipment that will live in a private home or a leased space the organization does not control are not funded.\n\n**Can we submit two proposals in one cycle?** No. One organization, one proposal, one cycle. If two proposals arrive from the same organization, the committee reads the one that arrived first and returns the second unread. An organization applying under a fiscal sponsor counts as its own applicant, and the sponsor may sponsor more than one applicant.\n\n## Contact\n\nProgram questions: grants at sunsetcommunityfund dot example. Please put \"Fall Youth Arts 2026\" in the subject line.",
-   "diff_text": null,
+   "eval_sk": "EVAL#2026-09-06T08:34:24.853473+00:00#run-20260906T083424Z",
+   "snapshot_text": "Sunset Community Fund: Fall Youth Arts Grants 2026\n\n# Fall Youth Arts Grants 2026\n\n**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications go out about six weeks after the deadline.\n\n*This page is a test funder page operated by the GrantHound project so that a page change can be demonstrated on a schedule. It is disclosed as a fixture in the GrantHound README and on camera. Sunset Community Fund is not a real foundation.*\n\n## About the fund\n\nThe Sunset Community Fund is a county-level fund that pays for after-school arts and mentoring in Franklin County, Ohio. It was founded in 2014 by a group of parents and retired teachers who wanted a single small-grant source that neighbourhood programs could reach without a development director. The fund makes grants totalling about $180,000 a year, spread across roughly twenty organizations, so the typical award is deliberately small and the paperwork is deliberately short. Every application is read by a volunteer review committee of local teachers and working artists, most of whom have run a youth program themselves and know what a realistic budget looks like. The committee meets twice a year, reads every complete application in full, and writes a short set of notes back to each applicant whether or not the request is funded.\n\n## What we fund\n\nWe fund after-school and summer arts programs for young people, including visual art, music, theatre, dance, creative writing, and media production. We fund mentoring programs that carry a real arts component, meaning the young person makes something and an adult with practice in that form works alongside them. We fund equipment for youth art rooms, such as kilns, sewing machines, drum kits, cameras, printers, and the storage that keeps them usable. We fund artist stipends, because a program that expects working artists to teach for free is a program that will not last a second year. We do not fund capital campaigns, building purchases, or renovations, we do not fund scholarships paid to individuals, and we do not fund galas, auctions, or other fundraising events, however well attended they are.\n\n## Eligibility\n\nApplicants must be 501(c)(3) organizations serving young people ages 8 to 18 in Franklin County, Ohio. Organizations with an annual budget under $500,000 receive priority. Fiscal sponsorship is accepted with a signed letter from the sponsor.\n\nPrograms that operate outside Franklin County are not eligible, even when the applicant organization is headquartered inside the county, because the fund is answerable to donors who gave for this county's young people. For-profit entities are not eligible in any form, including a for-profit studio applying through a nonprofit partner that would pass the money straight through. Programs that charge participation fees above $50 per term are not eligible, because a fee above that line has been shown, in this county, to shut out the families the fund exists to reach.\n\n## Award size\n\nAwards range from $5,000 to $15,000. Most first-time grantees receive between $5,000 and $8,000. Multi-year funding is not offered; prior grantees may reapply each cycle.\n\n## How to apply\n\nSend a two-page narrative that says who the program serves, what the young people will make, and who will teach them. Send a one-page budget for the program, not for the whole organization, showing what this grant would pay for line by line. Send your most recent Form 990, or a signed fiscal sponsor letter if you are applying under a sponsor. Send two references, each a person outside your organization who has seen the program run, with a phone number and an email address for each. Send a program calendar with the start and end dates and the weekly meeting times, submit the whole package by email as a single PDF, and expect no interview stage, because the committee reads only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* Award notifications go out about six weeks after the deadline\n* Funds are disbursed early in the new year\n\n## Frequently asked questions\n\n**Do you accept late applications?** No. The deadline of October 15, 2026 at 5:00 p.m. Eastern is the deadline, and an application that arrives at 5:01 p.m. is not read. The committee has a fixed number of volunteer hours and holds the line so that the organizations who met the date are not penalised for meeting it.\n\n**Can we be funded for part of what we asked for?** Yes. Partial funding is common and is not a comment on the quality of the application. If the committee funds part of a request, the award letter will say which budget lines it covers, and you may spend it only on those lines unless you write to us first and we agree in writing to a change.\n\n**What reporting do you require?** One report, one page, by the end of the following school year. Tell us how many young people took part, what they made, what the money actually paid for, and what you would do differently. We do not require receipts with the report, but keep them for a year in case we ask. A missing report makes an organization ineligible for the following cycle.\n\n**Can a school apply?** Not directly. Public and charter schools are not eligible applicants for this fund, because the fund is meant to reach programs that sit outside the school budget. A school can take part in a funded program as a partner, and a nonprofit partner can apply on behalf of that partnership, name the school in the narrative, and hold the grant.\n\n**Do you consider equipment-only requests?** Yes, up to $5,000. An equipment-only request should still explain the program the equipment serves, who will maintain the equipment, and where it will be stored between sessions. Requests for equipment that will live in a private home or a leased space the organization does not control are not funded.\n\n**Can we submit two proposals in one cycle?** No. One organization, one proposal, one cycle. If two proposals arrive from the same organization, the committee reads the one that arrived first and returns the second unread. An organization applying under a fiscal sponsor counts as its own applicant, and the sponsor may sponsor more than one applicant.\n\n## Contact\n\nProgram questions: grants at sunsetcommunityfund dot example. Please put \"Fall Youth Arts 2026\" in the subject line.",
+   "diff_text": "--- \n+++ \n@@ -4,3 +4,3 @@\n \n-**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications are sent by December 1, 2026.\n+**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications go out about six weeks after the deadline.\n \n@@ -35,4 +35,4 @@\n * October 15, 2026: applications due, 5:00 p.m. Eastern\n-* December 1, 2026: award notifications\n-* January 15, 2027: funds disbursed\n+* Award notifications go out about six weeks after the deadline\n+* Funds are disbursed early in the new year\n \n@@ -44,3 +44,3 @@\n \n-**What reporting do you require?** One report, one page, due June 30, 2027. Tell us how many young people took part, what they made, what the money actually paid for, and what you would do differently. We do not require receipts with the report, but keep them for a year in case we ask. A missing report makes an organization ineligible for the following cycle.\n+**What reporting do you require?** One report, one page, by the end of the following school year. Tell us how many young people took part, what they made, what the money actually paid for, and what you would do differently. We do not require receipts with the report, but keep them for a year in case we ask. A missing report makes an organization ineligible for the following cycle.\n ",
    "receipt_unreadable": false,
-   "verdict": "NEEDS_HUMAN",
-   "disposition": "date_contradiction",
-   "liveness_disposition": "date_contradiction",
-   "deterministic_disposition": "date_contradiction",
+   "verdict": "APPLY",
+   "disposition": "changed_deadline",
+   "liveness_disposition": "changed_deadline",
+   "deterministic_disposition": "changed_deadline",
    "pipeline_status": "ok",
-   "fit": null,
+   "fit": {
+    "axes": {
+     "reliability": 5,
+     "effort_to_award": 4,
+     "eligibility": 5,
+     "strategic": 3,
+     "explicit_funding": 5
+    },
+    "amount_quote": "Awards range from $5,000 to $15,000. Most first-time grantees receive between $5,000 and $8,000.",
+    "reachable_amount": 5000,
+    "amount_verified": true,
+    "fit": {
+     "verdict_suggestion": "APPLY",
+     "score": 4.5,
+     "capped": false
+    },
+    "quotes_unverified": false,
+    "axis_quotes": {
+     "reliability": "August 15, 2026: applications open * October 8, 2026: last day for questions * October 15, 2026: applications due, 5:00 p.m. Eastern",
+     "effort_to_award": "Send a two-page narrative that says who the program serves, what the young people will make, and who will teach them. Send a one-page budget for the program, not for the whole organization, showing what this grant would pay for line by line.",
+     "eligibility": "Applicants must be 501(c)(3) organizations serving young people ages 8 to 18 in Franklin County, Ohio. Organizations with an annual budget under $500,000 receive priority.",
+     "strategic": "Multi-year funding is not offered; prior grantees may reapply each cycle.",
+     "explicit_funding": "We fund after-school and summer arts programs for young people, including visual art, music, theatre, dance, creative writing, and media production. We fund mentoring programs that carry a real arts component, meaning the young person makes something and an adult with practice in that form works alongside them."
+    },
+    "rejections": 0,
+    "headline_amount": 15000
+   },
    "verifier": {
-    "final": "date_contradiction",
+    "quotes_unverified": false,
+    "rejections": 0,
     "evidence_quotes": [
      "Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.",
-     "This page is a test funder page operated by the GrantHound project so that a page change can be demonstrated on a schedule."
+     "October 8, 2026: last day for questions",
+     "October 15, 2026: applications due, 5:00 p.m. Eastern"
     ],
-    "rejections": 0,
-    "reason": "dates_unclear",
-    "proposed": "date_contradiction",
-    "quotes_unverified": false,
-    "overridden": false
+    "overridden": false,
+    "final": "changed_deadline",
+    "proposed": "changed_deadline",
+    "reason": "deadline_in_future"
    },
-   "decision_package": null,
+   "decision_package": {
+    "requirement_quotes": [
+     "Send a two-page narrative that says who the program serves, what the young people will make, and who will teach them. Send a one-page budget for the program, not for the whole organization, showing what this grant would pay for line by line.",
+     "Send your most recent Form 990, or a signed fiscal sponsor letter if you are applying under a sponsor. Send two references, each a person outside your organization who has seen the program run, with a phone number and an email address for each."
+    ],
+    "quotes_unverified": false,
+    "rejections": 1,
+    "eligibility_quotes": [
+     "Applicants must be 501(c)(3) organizations serving young people ages 8 to 18 in Franklin County, Ohio. Organizations with an annual budget under $500,000 receive priority.",
+     "Programs that charge participation fees above $50 per term are not eligible, because a fee above that line has been shown, in this county, to shut out the families the fund exists to reach."
+    ],
+    "deadlines": [
+     {
+      "is_past": true,
+      "collides_with": [],
+      "within_14_days": false,
+      "kind": "cycle_opens",
+      "iso": "2026-08-15",
+      "days_until": -22,
+      "day_fabricated": false
+     },
+     {
+      "within_14_days": false,
+      "day_fabricated": false,
+      "iso": "2026-10-08",
+      "days_until": 32,
+      "is_past": false,
+      "kind": "other",
+      "collides_with": []
+     },
+     {
+      "collides_with": [],
+      "is_past": false,
+      "days_until": 39,
+      "day_fabricated": false,
+      "within_14_days": false,
+      "kind": "full_application",
+      "iso": "2026-10-15"
+     }
+    ]
+   },
    "flags": [],
    "snapshot_receipt": {
-    "s3_raw": "snapshots/fixtures/sunset-fund/20260906T080223Z_42520f26.raw.html",
-    "sha256": "42520f261c35e4ac563fd25a6595c67ee4707249ba9dfdeff256b95d48c71fd9",
-    "s3_norm": "snapshots/fixtures/sunset-fund/20260906T080223Z_42520f26.norm.md",
-    "fetched_at": "20260906T080223Z",
-    "http_status": 200
+    "sha256": "00bbf251103066258e085e764ac969ad39e2a2148761e586d6c9baf85f309de0",
+    "http_status": 200,
+    "fetched_at": "20260906T083424Z",
+    "s3_norm": "snapshots/fixtures/sunset-fund/20260906T083424Z_00bbf251.norm.md",
+    "s3_raw": "snapshots/fixtures/sunset-fund/20260906T083424Z_00bbf251.raw.html"
    },
-   "diff_receipt": null,
+   "diff_receipt": {
+    "changed": true,
+    "removed_lines": 4,
+    "date_lines_changed": true,
+    "s3_key": "diffs/fixtures/sunset-fund/20260906T083424Z_42520f26_00bbf251.diff",
+    "old_sha256": "42520f261c35e4ac563fd25a6595c67ee4707249ba9dfdeff256b95d48c71fd9",
+    "added_lines": 4
+   },
    "date_scan": {
-    "all_dates_past": false,
     "dates": [
      {
-      "raw": "August 15, 2026",
       "iso": "2026-08-15",
-      "context": "Sunset Community Fund: Fall Youth Arts Grants 2026\n\n# Fall Youth Arts Grants 2026\n\n**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications are sent by December 1, 2026.\n\n*This",
-      "day_fabricated": false,
-      "year_present": true
+      "year_present": true,
+      "raw": "August 15, 2026",
+      "context": "Sunset Community Fund: Fall Youth Arts Grants 2026\n\n# Fall Youth Arts Grants 2026\n\n**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications go out about six weeks after the dea",
+      "day_fabricated": false
      },
      {
       "iso": "2026-10-15",
-      "raw": "October 15, 2026",
-      "context": ": Fall Youth Arts Grants 2026\n\n# Fall Youth Arts Grants 2026\n\n**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications are sent by December 1, 2026.\n\n*This page is a test funder page operated by",
       "day_fabricated": false,
+      "context": ": Fall Youth Arts Grants 2026\n\n# Fall Youth Arts Grants 2026\n\n**Applications open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications go out about six weeks after the deadline.\n\n*This page is a test funder pag",
+      "raw": "October 15, 2026",
       "year_present": true
      },
      {
-      "raw": "December 1, 2026",
-      "year_present": true,
-      "iso": "2026-12-01",
       "day_fabricated": false,
-      "context": "ons open August 15, 2026. Applications are due October 15, 2026 at 5:00 p.m. Eastern.** Award notifications are sent by December 1, 2026.\n\n*This page is a test funder page operated by the GrantHound project so that a page change can be demonstrated on a sc"
-     },
-     {
-      "raw": "October 8, 2026",
       "context": "single PDF, and expect no interview stage, because the committee reads only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: appli",
-      "day_fabricated": false,
-      "iso": "2026-10-08",
-      "year_present": true
+      "raw": "October 8, 2026",
+      "year_present": true,
+      "iso": "2026-10-08"
      },
      {
+      "iso": "2026-08-15",
       "raw": "August 15, 2026",
       "year_present": true,
-      "iso": "2026-08-15",
-      "context": "ew stage, because the committee reads only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* ",
-      "day_fabricated": false
+      "day_fabricated": false,
+      "context": "ew stage, because the committee reads only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* "
      },
      {
+      "year_present": true,
+      "day_fabricated": false,
       "iso": "2026-10-08",
-      "context": " only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* December 1, 2026: award notifications",
+      "context": " only what you send; questions are answered until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* Award notifications go out about six ",
+      "raw": "October 8, 2026"
+     },
+     {
+      "iso": "2026-10-15",
+      "year_present": true,
+      "context": "d until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* Award notifications go out about six weeks after the deadline\n* Funds are disbur",
       "day_fabricated": false,
-      "raw": "October 8, 2026",
+      "raw": "October 15, 2026"
+     },
+     {
+      "context": "isbursed early in the new year\n\n## Frequently asked questions\n\n**Do you accept late applications?** No. The deadline of October 15, 2026 at 5:00 p.m. Eastern is the deadline, and an application that arrives at 5:01 p.m. is not read. The committee has a fix",
+      "day_fabricated": false,
+      "raw": "October 15, 2026",
+      "iso": "2026-10-15",
       "year_present": true
-     },
-     {
-      "iso": "2026-10-15",
-      "year_present": true,
-      "day_fabricated": false,
-      "raw": "October 15, 2026",
-      "context": "d until October 8, 2026.\n\n## Timeline\n\n* August 15, 2026: applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* December 1, 2026: award notifications\n* January 15, 2027: funds disbursed\n\n## Fr"
-     },
-     {
-      "year_present": true,
-      "context": ": applications open\n* October 8, 2026: last day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* December 1, 2026: award notifications\n* January 15, 2027: funds disbursed\n\n## Frequently asked questions\n\n**Do you accept late applicati",
-      "iso": "2026-12-01",
-      "raw": "December 1, 2026",
-      "day_fabricated": false
-     },
-     {
-      "year_present": true,
-      "iso": "2027-01-15",
-      "context": "ast day for questions\n* October 15, 2026: applications due, 5:00 p.m. Eastern\n* December 1, 2026: award notifications\n* January 15, 2027: funds disbursed\n\n## Frequently asked questions\n\n**Do you accept late applications?** No. The deadline of October 15, 2",
-      "raw": "January 15, 2027",
-      "day_fabricated": false
-     },
-     {
-      "year_present": true,
-      "raw": "October 15, 2026",
-      "iso": "2026-10-15",
-      "context": "uary 15, 2027: funds disbursed\n\n## Frequently asked questions\n\n**Do you accept late applications?** No. The deadline of October 15, 2026 at 5:00 p.m. Eastern is the deadline, and an application that arrives at 5:01 p.m. is not read. The committee has a fix",
-      "day_fabricated": false
-     },
-     {
-      "year_present": true,
-      "raw": "June 30, 2027",
-      "context": "ou write to us first and we agree in writing to a change.\n\n**What reporting do you require?** One report, one page, due June 30, 2027. Tell us how many young people took part, what they made, what the money actually paid for, and what you would do diffe",
-      "day_fabricated": false,
-      "iso": "2027-06-30"
      }
     ],
     "has_yearless_date": false,
-    "dates_contradict": true
+    "dates_contradict": false,
+    "all_dates_past": false
    },
-   "run_id": "run-20260906T080223Z",
-   "fetched_at": "20260906T080223Z",
+   "run_id": "run-20260906T083424Z",
+   "fetched_at": "20260906T083424Z",
    "http_status": 200,
-   "is_first_eval": true,
+   "is_first_eval": false,
    "error": null
   },
   {
@@ -1166,7 +1212,7 @@
   },
   {
    "program_id": "muskingum-county-community-foundation",
-   "funder": "Muskingum County Community Foundation",
+   "funder": "Marietta Community Foundation",
    "url": "https://www.mcfohio.org/grants",
    "source_type": "community_foundation",
    "is_fixture": false,
@@ -2575,7 +2621,7 @@
   },
   {
    "program_id": "vh1-save-the-music-foundation",
-   "funder": "VH1 Save The Music Foundation",
+   "funder": "Save The Music Foundation",
    "url": "https://www.savethemusic.org/faqs/our-program/",
    "source_type": "national_funder",
    "is_fixture": false,
@@ -2625,130 +2671,6 @@
     "dates_contradict": false,
     "has_yearless_date": false,
     "all_dates_past": true
-   },
-   "run_id": "run-20260906T080405Z",
-   "fetched_at": "20260906T080405Z",
-   "http_status": 200,
-   "is_first_eval": true,
-   "error": null
-  },
-  {
-   "program_id": "walmart-spark-good-local-grants",
-   "funder": "Walmart.org (Walmart Foundation)",
-   "url": "https://www.walmart.org/how-we-give/program-guidelines/spark-good-local-grants-guidelines",
-   "source_type": "corporate_giving",
-   "is_fixture": false,
-   "eval_sk": "EVAL#2026-09-06T08:04:05.030167+00:00#run-20260906T080405Z",
-   "snapshot_text": "Spark Good Local Grants Guidelines\n\n* [Skip to main](#skipto-main-wrap)\n* [Skip to footer](#skipto-main-footer)\n\n[![](/etc.clientlibs/adp/clientlibs/clientlib-site/resources/images/Corp-Hamburger.svg)](#)\n\n[![home](/content/dam/walmart-org/images/static-resources/Walmart_Org_Site_Logo.png)](/)\n\n* [Who We Are](/who-we-are)\n\n+ [Governance and Values](/who-we-are/governance-and-our-values)\n\n+ [Our Approach](/who-we-are/our-approach)\n\n+ [Our Commitment to Serving All](/who-we-are/our-commitment-to-serving-all)\n\n+ [Our Team](/who-we-are/our-team)\n\n+ [Latest News](/who-we-are/latest-news)\n\n+ [Careers](/who-we-are/careers)\n* [What We Do](/what-we-do)\n\n+ [Creating Opportunity](/what-we-do/creating-opportunity)\n\n+ [Advancing Sustainability](/what-we-do/advancing-sustainability)\n+ [Climate](/what-we-do/advancing-sustainability/climate)\n+ [Waste](/what-we-do/advancing-sustainability/waste)\n+ [Nature](/what-we-do/advancing-sustainability/nature)\n+ [People in Supply Chains](/what-we-do/advancing-sustainability/people-in-supply-chains)\n\n+ [Strengthening Community](/what-we-do/strengthening-community)\n+ [Local Community Support](/what-we-do/strengthening-community/local-community-support)\n+ [Spark Good](/what-we-do/strengthening-community/spark-good)\n+ [Building More Caring & Connected Communities](/what-we-do/strengthening-community/building-more-caring-connected-communities)\n+ [Healthier Food for All](/what-we-do/strengthening-community/healthier-food-for-all)\n+ [Support for our Associates](/what-we-do/strengthening-community/support-for-our-associates)\n+ [Disaster Preparedness and Response](/what-we-do/strengthening-community/disaster-preparedness-and-response)\n\n+ [Center for Racial Equity](/what-we-do/center-for-racial-equity)\n* [How We Give](/how-we-give)\n\n+ [Grant Eligibility](/how-we-give/grant-eligibility)\n\n+ [Program Guidelines](/how-we-give/program-guidelines)\n\n+ [Tools & Resources](/how-we-give/tools-and-resources)\n\n+ [FAQs](/how-we-give/faqs)\n\n+ [Grantee Search](/how-we-give/grantee-search)\n* [FAQs](/faqs)\n\n![](/etc.clientlibs/adp/clientlibs/clientlib-site/resources/images/language-global.svg)\n\n*search*\n\nclose\n\n*search*\n\nPowered by generative AI. Results may not fully be accurate. Use is governed by the\n[Generative AI Guidelines](https://one.walmart.com/content/uswire/en_us/work1/global-governance/digital-citizenship/data-policies/data_governance/dg-guidelines/generative-ai-chatgpt-usage.html) and other applicable [Walmart policies.](https://one.walmart.com/content/uswire/en_us/work1/policies/people-policies/company-issued-equipment-useage.html)\n\n[Shop](https://www.walmart.com/)\n\n[![shop](/etc.clientlibs/adp/clientlibs/clientlib-site/resources/images/corporate-icons/giftBag.svg)](https://www.walmart.com/)\n\nLogout\nLogin\n\nLogout\n\nLogout\n\nNotifications\n\n[Mark All Read](#)\n\nAll\n\n*keyboard\\_arrow\\_down*\n\n* [All](#)\n* [Recalls](#)\n\n[Unread](#)\n\nNo notification selected\n\nSelect a notification to display details\n\n[See All](/content/walmart-org/en_us/notifications)\n\n## Menu\n\n![](/etc.clientlibs/adp/clientlibs/clientlib-site/resources/images/language-global-black.svg)\n\n* [Who We Are](/who-we-are)\n+ [Who We Are](/who-we-are)\n+ [Governance and Values](/who-we-are/governance-and-our-values)\n+ [Our Approach](/who-we-are/our-approach)\n+ [Our Commitment to Serving All](/who-we-are/our-commitment-to-serving-all)\n+ [Our Team](/who-we-are/our-team)\n+ [Latest News](/who-we-are/latest-news)\n+ [Careers](/who-we-are/careers)\n* [What We Do](/what-we-do)\n+ [What We Do](/what-we-do)\n+ [Creating Opportunity](/what-we-do/creating-opportunity)\n+ [Advancing Sustainability](/what-we-do/advancing-sustainability)\n+ [Climate](/what-we-do/advancing-sustainability/climate)\n+ [Waste](/what-we-do/advancing-sustainability/waste)\n+ [Nature](/what-we-do/advancing-sustainability/nature)\n+ [People in Supply Chains](/what-we-do/advancing-sustainability/people-in-supply-chains)\n+ [Strengthening Community](/what-we-do/strengthening-community)\n+ [Local Community Support](/what-we-do/strengthening-community/local-community-support)\n+ [Spark Good](/what-we-do/strengthening-community/spark-good)\n+ [Building More Caring & Connected Communities](/what-we-do/strengthening-community/building-more-caring-connected-communities)\n+ [Healthier Food for All](/what-we-do/strengthening-community/healthier-food-for-all)\n+ [Support for our Associates](/what-we-do/strengthening-community/support-for-our-associates)\n+ [Disaster Preparedness and Response](/what-we-do/strengthening-community/disaster-preparedness-and-response)\n+ [Center for Racial Equity](/what-we-do/center-for-racial-equity)\n* [How We Give](/how-we-give)\n+ [How We Give](/how-we-give)\n+ [Grant Eligibility](/how-we-give/grant-eligibility)\n+ [Program Guidelines](/how-we-give/program-guidelines)\n+ [Tools & Resources](/how-we-give/tools-and-resources)\n+ [FAQs](/how-we-give/faqs)\n+ [Grantee Search](/how-we-give/grantee-search)\n* [FAQs](/faqs)\n\n[Program Guidelines](/how-we-give/program-guidelines)\n\n# **Spark Good Local Grants Guidelines**\n\n![Walmart Spark icon](/content/dam/walmart-org/images/static-resources/WMT-SparkYellow-30x34.png)\n\nWalmart believes that investing in local communities strengthens our business as well as the communities we serve. Local grants are designed to support local organizations that meet the unique needs of the communities where we operate, build pride among all associates, and deepen relationships with our customers and members. Each year, Walmart U.S. stores, Sam’s Clubs and Distribution Centers award local cash grants ranging from $250 to $5,000.\n\nBefore submitting a grant, organizations must review the below guidelines.\n\n## Program Guidelines\n\n* Grants are awarded through an open application process to eligible organizations serving the same service area that the facility they are requesting funding from serves.\n* Organizations must have a Spark Good account on [Walmart.com/nonprofits](https://www.walmart.com/nonprofits) and be verified by Walmart’s third-party verification partner, Deed. Only authorized users of the organization’s Spark Good account may apply.\n* Grant amounts range from $250 to $5,000.\n* Applications are accepted and reviewed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved status), is allowed per organization at any time.\n* Once funded, reapplication to the same facility is not allowed within the same fiscal year.\n* Final decisions are made prior to the next application cycle’s opening.\n* Affirming alignment with Spark Good program guidelines is mandatory for all grant recipients.\n* Agreeing to logo usage and recognition guidelines is required.\n* If recommended for a grant, funds are distributed through electronic payment via JP Morgan, requiring the organization to provide correct banking within 21 days of the organization’s primary owner being notified that the grant was recommended for approval.\n\n## Organization Eligibility\n\n* Organizations must have a [Spark Good account](https://walmart.com/nonprofits) and be verified by Deed, Walmart’s third-party verification service provider.\n* Organizations must serve the same service area that the facility they are requesting funding from serves. Eligible entities must be a:\n+ **501(c)(3) public charity:** An organization holding a current tax-exempt status and recognized as a public charity under Section 501(c)(3) of the Internal Revenue Code, listed on the IRS Master File and conducting activities within the United States; classified as a public charity under Section 509(a)(1), (2) or (3) (Types I or II); and Deed verified.\n+ **Government entity (non-501(c)(3)):** U.S. federal agencies territories and commonwealths, state agencies and departments and political subdivisions (including cities, counties, municipal agencies); and Deed verified.\n+ **School:** All K-12 public or nonprofit private schools, charter schools, community/junior colleges, state/private colleges, or universities. Institutions must have a NCES (National Center for Education Statistics) number or 501c3 tax status and be verified with Deed.\n+ **Church or other faith-based organization with a proposed project that benefits the community at large**, such as food pantries, soup kitchens and clothing closets and Deed verified.\n\n**Note:** Non-charities, including but not limited to organizations such as 501(c)(4)s, (c)(6)s, and (c)(19)s like homeowner’s associations, civic leagues, or volunteer fire companies, are not eligible.\n\n## Selection and Approval Process\n\n* Facility managers review applications and make initial recommendations, informed by guidance on applicable considerations such as community trust, organizational track record and existing relationships.\n* Facility managers consider the following criteria when recommending a grant:\n+ **Mission Aligned:** The request addresses a specific, demonstrated need in their community and falls within areas where Walmart or Sam’s Club is well positioned to contribute (for example, because Walmart is a major grocer, hunger relief is a frequent area of support)**.**\n+ **Builds Trust:**The request supports an organization that is in good standing and compliant with applicable laws and regulations, and whose activities promote community cohesion rather than division.\n+ **Effectiveness:** The application clearly describes the organization’s work, the proposed use of funds, and the expected outcomes and community impact. Click [here](#grant-spotlight) for examples.\n* Managers and grant administrators reserve the right to adjust the amount awarded to each organization without notice.\n* All decisions will be communicated via e-mail, and are final and not subject to appeal.\n* If the grant proposal is approved for funding, the organization will receive an email with instructions to set up electronic grant payment. The organization must complete the payment set up within 21 days of the date of that email; failure to do so will be deemed a rejection, and the grant offer will be withdrawn.\n* Approval is expressly conditioned on the organization’s agreement to the logo usage and recognition guidelines and its affirmation that it aligns with the Spark Good local grant guidelines.\n\n**All grant applications are subject to review of the organization’s reputation and activities and its agreement to comply with applicable terms and conditions. Submission of an application does not guarantee funding. Funding exclusions include organizations that deny service, membership, or other involvement on the basis of race, religion, color, sex, sexual orientation, gender identity, age, national origin, ancestry, citizenship, veteran, or disability status.**\n\n**[Access the application from your Spark Good account on Walmart.com.](https://www.walmart.com/nonprofits)**\n\n## Spark Good Local Grants Spotlight\n\n![Walmart Spark icon](/content/dam/walmart-org/images/static-resources/WMT-SparkYellow-30x34.png)\n\n[Creating Opportunity](#)\n\n**Economic Opportunity**\n\n* Walmart #5440 in Portland, Oregan awarded a $1,500 local grant to Junior Achievement of Oregon and SW Washington to support JA BizTown programming to blend in-class learning with a one-day economic simulation.\n* Walmart #1514 in Brentwood, MO awarded a $250 local grant to Down Syndrome Association of Greater St. Louis to support Ready to Work program improving employment training for adults with down syndrome.\n\n[Advancing Sustainability](#)\n\n**Preservation of nature**\n\n* Walmart #2598 in Sacramento, California awarded a $1,000 local grant to Color the Block to support Green Leaf Swap Meet and Plant Celebration to boost community green spaces in Sacramento.\n* Sam’s Club #4768 in Reno, Nevada, awarded a $2,000 local grant to Truckee Meadows Park Foundation to support the Rosewood Nature Study Area Restoration Project.\n\n**Reducing plastic, food and textile waste**\n\n* Walmart #1119 in Naples, Florida awarded a $1,000 local grant to Keep Collier Beautiful, Inc. to support community clean ups and recycling efforts.\n\n[Strengthening Community](#)\n\n**Access to healthier food for all**\n\n* Sam’s Club #4820 in Saint Helena Island, South Carolina, awarded a $300 local grant to Kelly’s Kitchen to support the Nourishment Beyond the Plate programming, empowering disabled individuals through accessible cooking education and tools.\n* Distribution Center #7033 in Rancho Cucamonga, California, awarded a $1,000 local grant to Malcom’s Heart to support Boxes of Love which delivers care packages for those impacted by Alzheimer’s.\n\n**Disaster preparedness & response**\n\n* Walmart store #1405 in Houston, Texas, awarded a $500 local grant to Angelton Restoration Project to support Hurricane Beryl relief efforts.\n* Sam’s Club #8281 in Houston, Texas, awarded a $500 local grant to Simply Her Movement to support programming to empower families with education and disaster resources.\n\n**Building caring & connected communities**\n\n* Walmart #2702 in Nixa, Missouri, awarded a $1,500 local grant to Nica Police Department to support Shop with a Cop.\n* Walmart store #924 in Holyoke, Colorado, awarded a $3,500 local grant to Phillips County Family Education Services to support Paquime Folkloric Dance program to build connections by students sharing their culture with the community through dance performances.\n* Distribution Center #6299 in Phoenix, Arizona, awarded a $1,000 local grant to Freed Spirits Animal Rescue to support Kindness Matter program, bringing autistic and opportunity youth together to work with rescued farm animals.\n\n## **Grant FAQs**\n\n[**If you have questions about applying, this information may help**](/how-we-give/faqs)\n\n[![Icon_OurWork.svg]()](/what-we-do)\n\n[Our Work](/what-we-do)\n\n[![]()](/who-we-are/governance-and-our-values)\n\n[Governance and Values](/who-we-are/governance-and-our-values)\n\n[![]()](/how-we-give/tools-and-resources)\n\n[Tools and Resources](/how-we-give/tools-and-resources)\n\n[![]()](/how-we-give/grant-eligibility)\n\n[Grant Eligibility](/how-we-give/grant-eligibility)\n\n#f2f2f2\n\n[![walmart logo dark](/content/dam/walmart-org/images/static-resources/Walmart_Org_Site_Logo.png)](/)\n\nWMT\n\n© 2026 Walmart, Inc.\n\n×\n\nOpt-Out Request Honored\n\nWe received a GPC signal or a request to opt-out of selling/sharing your personal information (including for targeted advertising); this notification is to indicate that your opt-out request is being honored. You can find out more about your consumer privacy rights in our Privacy Notice.",
-   "diff_text": null,
-   "receipt_unreadable": false,
-   "verdict": "NEEDS_HUMAN",
-   "disposition": "watch_coming_soon",
-   "liveness_disposition": "watch_coming_soon",
-   "deterministic_disposition": "year_trap_suspect",
-   "pipeline_status": "ok",
-   "fit": {
-    "reachable_amount": null,
-    "quotes_unverified": true,
-    "rejections": 2,
-    "axes": {
-     "effort_to_award": 4,
-     "strategic": 2,
-     "eligibility": 4,
-     "reliability": 4,
-     "explicit_funding": 3
-    },
-    "headline_amount": null,
-    "amount_quote": null,
-    "fit": {
-     "verdict_suggestion": "WATCH",
-     "capped": false,
-     "score": 3.45
-    },
-    "axis_quotes": {
-     "eligibility": "Organizations must serve the same service area that the facility they are requesting funding from serves.",
-     "reliability": "Applications are accepted and reviewed through three application cycles in FY27:",
-     "strategic": "Once funded, reapplication to the same facility is not allowed within the same fiscal year.",
-     "effort_to_award": "Grant amounts range from $250 to $5,000.",
-     "explicit_funding": "Local grants are designed to support local organizations that meet the unique needs of the communities where we operate, build pride among all associates, and deepen relationships with our customers and members."
-    },
-    "amount_verified": false
-   },
-   "verifier": {
-    "evidence_quotes": [
-     "Grants are awarded through an open application process to eligible organizations serving the same service area that the facility they are requesting funding from serves.",
-     "Walmart believes that investing in local communities strengthens our business as well as the communities we serve."
-    ],
-    "rejections": 2,
-    "overridden": false,
-    "final": "watch_coming_soon",
-    "reason": "dates_unclear",
-    "proposed": "watch_coming_soon",
-    "quotes_unverified": true
-   },
-   "decision_package": null,
-   "flags": [
-    "analyst_quotes_unverified",
-    "award_unverified",
-    "clerk_missing",
-    "verifier_quotes_unverified"
-   ],
-   "snapshot_receipt": {
-    "http_status": 200,
-    "fetched_at": "20260906T080405Z",
-    "s3_raw": "snapshots/walmart-spark-good-local-grants/20260906T080405Z_d670bf89.raw.html",
-    "s3_norm": "snapshots/walmart-spark-good-local-grants/20260906T080405Z_d670bf89.norm.md",
-    "sha256": "d670bf893a649b698482fc3be526668f58a7ff872704c1890fc4fdc90c2f7c19"
-   },
-   "diff_receipt": null,
-   "date_scan": {
-    "dates_contradict": false,
-    "dates": [
-     {
-      "context": "ange from $250 to $5,000.\n* Applications are accepted and reviewed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved st",
-      "iso": null,
-      "year_present": false,
-      "raw": "Feb. 1",
-      "day_fabricated": false
-     },
-     {
-      "raw": "April 15",
-      "day_fabricated": false,
-      "year_present": false,
-      "iso": null,
-      "context": " $250 to $5,000.\n* Applications are accepted and reviewed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved status), is a"
-     },
-     {
-      "raw": "May 1",
-      "iso": null,
-      "year_present": false,
-      "context": "pplications are accepted and reviewed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved status), is allowed per organi",
-      "day_fabricated": false
-     },
-     {
-      "context": "ions are accepted and reviewed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved status), is allowed per organization at",
-      "day_fabricated": false,
-      "year_present": false,
-      "raw": "July 15",
-      "iso": null
-     },
-     {
-      "context": "nd reviewed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved status), is allowed per organization at any time.\n* Once ",
-      "day_fabricated": false,
-      "raw": "Aug. 1",
-      "year_present": false,
-      "iso": null
-     },
-     {
-      "year_present": false,
-      "iso": null,
-      "context": "ed through three application cycles in FY27:\n+ Cycle 1: Feb. 1 – April 15\n+ Cycle 2: May 1– July 15\n+ Cycle 3: Aug. 1 – Nov. 30\n* A maximum of 25 applications (pending or approved status), is allowed per organization at any time.\n* Once funded, re",
-      "day_fabricated": false,
-      "raw": "Nov. 30"
-     }
-    ],
-    "all_dates_past": false,
-    "has_yearless_date": true
    },
    "run_id": "run-20260906T080405Z",
    "fetched_at": "20260906T080405Z",
@@ -3836,13 +3758,70 @@
     "analyst": "global.anthropic.claude-sonnet-4-6"
    },
    "error": null
+  },
+  {
+   "verdict_counts": {
+    "APPLY": 1
+   },
+   "run_id": "run-20260906T083424Z",
+   "status": "ok",
+   "node_usage": {
+    "analyst": {
+     "total_tokens": 11040,
+     "execution_ms": 7139,
+     "input_tokens": 10386,
+     "model_id": "global.anthropic.claude-sonnet-4-6",
+     "output_tokens": 654
+    },
+    "verifier": {
+     "total_tokens": 8463,
+     "output_tokens": 469,
+     "execution_ms": 7487,
+     "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+     "input_tokens": 7994
+    },
+    "scout": {
+     "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+     "total_tokens": 1686,
+     "input_tokens": 1609,
+     "output_tokens": 77,
+     "execution_ms": 2478
+    },
+    "clerk": {
+     "input_tokens": 13201,
+     "total_tokens": 14208,
+     "execution_ms": 15378,
+     "output_tokens": 1007,
+     "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+    }
+   },
+   "program_ids": [
+    "fixtures/sunset-fund"
+   ],
+   "flag_counts": {},
+   "overrides": 0,
+   "at": "2026-09-06T08:34:24.853473+00:00",
+   "disposition_counts": {
+    "changed_deadline": 1
+   },
+   "errors": [],
+   "sk": "META",
+   "pk": "RUN#run-20260906T083424Z",
+   "node_models": {
+    "verifier": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "analyst": "global.anthropic.claude-sonnet-4-6",
+    "clerk": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "scout": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+   },
+   "error": null
   }
  ],
  "stats": {
-  "programs": 21,
+  "programs": 20,
   "verdict_counts": {
-   "NEEDS_HUMAN": 13,
+   "NEEDS_HUMAN": 11,
    "PASS": 7,
+   "APPLY": 1,
    "WATCH": 1
   },
   "disposition_counts": {
@@ -3851,41 +3830,38 @@
    "verified_dead_closed": 2,
    "page_unreachable": 1,
    "verified_dead_prior_year": 2,
-   "date_contradiction": 1,
+   "changed_deadline": 1,
    "skipped_fit_low_score": 1,
    "no_program_found": 3,
-   "verified_live": 3,
-   "watch_coming_soon": 1
+   "verified_live": 3
   },
   "flag_counts": {
-   "verifier_quotes_unverified": 5,
-   "analyst_quotes_unverified": 3,
-   "award_unverified": 1,
-   "clerk_missing": 1
+   "verifier_quotes_unverified": 4,
+   "analyst_quotes_unverified": 2
   },
   "families": {
    "live": 5,
    "dead": 7,
-   "suspect": 8,
+   "suspect": 7,
    "unreachable": 1,
    "unchecked": 0,
    "unknown": 0
   },
-  "quotes_stored": 70,
-  "programs_with_dropped_quotes": 6,
+  "quotes_stored": 72,
+  "programs_with_dropped_quotes": 5,
   "receipts_unreadable": 0,
   "tokens_by_node": {
    "scout": {
-    "input_tokens": 58503,
-    "output_tokens": 2663,
-    "total_tokens": 61166,
-    "runs": 17,
+    "input_tokens": 60112,
+    "output_tokens": 2740,
+    "total_tokens": 62852,
+    "runs": 18,
     "models": {
      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
-      "input_tokens": 46566,
-      "output_tokens": 2440,
-      "total_tokens": 49006,
-      "runs": 14
+      "input_tokens": 48175,
+      "output_tokens": 2517,
+      "total_tokens": 50692,
+      "runs": 15
      },
      "global.amazon.nova-2-lite-v1:0": {
       "input_tokens": 11937,
@@ -3896,10 +3872,10 @@
     }
    },
    "clerk": {
-    "input_tokens": 77959,
-    "output_tokens": 3746,
-    "total_tokens": 81705,
-    "runs": 11,
+    "input_tokens": 91160,
+    "output_tokens": 4753,
+    "total_tokens": 95913,
+    "runs": 12,
     "models": {
      "global.amazon.nova-2-lite-v1:0": {
       "input_tokens": 41969,
@@ -3908,18 +3884,18 @@
       "runs": 3
      },
      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
-      "input_tokens": 35990,
-      "output_tokens": 2709,
-      "total_tokens": 38699,
-      "runs": 8
+      "input_tokens": 49191,
+      "output_tokens": 3716,
+      "total_tokens": 52907,
+      "runs": 9
      }
     }
    },
    "analyst": {
-    "input_tokens": 350967,
-    "output_tokens": 16439,
-    "total_tokens": 367406,
-    "runs": 12,
+    "input_tokens": 361353,
+    "output_tokens": 17093,
+    "total_tokens": 378446,
+    "runs": 13,
     "models": {
      "us.amazon.nova-pro-v1:0": {
       "input_tokens": 183505,
@@ -3934,18 +3910,18 @@
       "runs": 1
      },
      "global.anthropic.claude-sonnet-4-6": {
-      "input_tokens": 167462,
-      "output_tokens": 12556,
-      "total_tokens": 180018,
-      "runs": 8
+      "input_tokens": 177848,
+      "output_tokens": 13210,
+      "total_tokens": 191058,
+      "runs": 9
      }
     }
    },
    "verifier": {
-    "input_tokens": 509064,
-    "output_tokens": 16313,
-    "total_tokens": 525377,
-    "runs": 15,
+    "input_tokens": 517058,
+    "output_tokens": 16782,
+    "total_tokens": 533840,
+    "runs": 16,
     "models": {
      "global.amazon.nova-2-lite-v1:0": {
       "input_tokens": 75815,
@@ -3954,17 +3930,17 @@
       "runs": 3
      },
      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
-      "input_tokens": 433249,
-      "output_tokens": 15093,
-      "total_tokens": 448342,
-      "runs": 12
+      "input_tokens": 441243,
+      "output_tokens": 15562,
+      "total_tokens": 456805,
+      "runs": 13
      }
     }
    }
   },
-  "runs": 17,
-  "latest_run_id": "run-20260906T080513Z",
-  "latest_run_at": "2026-09-06T08:05:13.472339+00:00",
+  "runs": 18,
+  "latest_run_id": "run-20260906T083424Z",
+  "latest_run_at": "2026-09-06T08:34:24.853473+00:00",
   "latest_run_status": "ok"
  }
 }
