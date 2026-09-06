@@ -9,10 +9,13 @@ import json
 from pathlib import Path
 
 from aws_cdk import CfnOutput, Duration, RemovalPolicy, Stack
+from aws_cdk import aws_cloudfront as cloudfront
+from aws_cdk import aws_cloudfront_origins as origins
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_s3 as s3
+from aws_cdk import aws_s3_deployment as s3deploy
 from aws_cdk import aws_scheduler as scheduler
 from constructs import Construct
 
@@ -105,3 +108,45 @@ class GranthoundScheduleStack(Stack):
             ),
         )
         CfnOutput(self, "TriggerFunctionName", value=trigger.function_name)
+
+
+WEB_DIR = INFRA_DIR.parent / "web"
+
+
+class GranthoundWebStack(Stack):
+    """The static inbox: private bucket, CloudFront in front, web/ uploaded on deploy.
+
+    Caching is disabled at the edge because the site is a few hundred
+    kilobytes and data.json must show the latest export the moment it is
+    deployed; a stale receipt page would be worse than a slow one.
+    """
+
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+        bucket = s3.Bucket(
+            self,
+            "Site",
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            removal_policy=RemovalPolicy.DESTROY,
+            auto_delete_objects=True,
+        )
+        distribution = cloudfront.Distribution(
+            self,
+            "Distribution",
+            default_root_object="index.html",
+            default_behavior=cloudfront.BehaviorOptions(
+                origin=origins.S3BucketOrigin.with_origin_access_control(bucket),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
+            ),
+        )
+        s3deploy.BucketDeployment(
+            self,
+            "Deploy",
+            sources=[s3deploy.Source.asset(str(WEB_DIR))],
+            destination_bucket=bucket,
+            distribution=distribution,
+            distribution_paths=["/*"],
+        )
+        CfnOutput(self, "SiteUrl", value=f"https://{distribution.distribution_domain_name}")
+        CfnOutput(self, "FixtureUrl", value=f"https://{distribution.distribution_domain_name}/fixtures/sunset-fund/index.html")
