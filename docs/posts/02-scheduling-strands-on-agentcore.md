@@ -2,27 +2,35 @@
 
 GrantHound runs a four-agent Strands graph on Amazon Bedrock AgentCore
 Runtime, once every 12 hours, unattended. This post is about the plumbing
-between "a schedule fires" and "the graph runs" — not because it's the
-interesting part of the product, but because it's the part that silently
-breaks a demo if you get it wrong, and nobody writes it up.
+between "a schedule fires" and "the graph runs" — the part that silently
+breaks a demo if you get it wrong, and nobody writes about it.
 
 ## Why the Scheduler needs a Lambda in front of it
 
-EventBridge Scheduler can call a handful of AWS APIs directly as a
-target, but `InvokeAgentRuntime` isn't tuned for a fire-and-forget
-schedule: the runtime accepts a payload and hands back an acknowledgement,
-and the actual cycle — four agents, real page fetches, real model calls —
-keeps running after that ack, inside the runtime's own async task
-machinery. A raw EventBridge target has no way to read that ack and decide
+EventBridge Scheduler can call a handful of AWS APIs directly, but
+`InvokeAgentRuntime` isn't tuned for a fire-and-forget schedule: the
+runtime acks a payload and keeps the actual cycle — four agents, real
+page fetches, real model calls — running afterward, inside its own async
+task machinery. A raw EventBridge target can't read that ack to know
 whether the cycle actually started. So a small Lambda sits in between: it
 calls `InvokeAgentRuntime`, reads the response body, and treats anything
-that isn't an explicit `{"accepted": true}` as a failure — including a
-`200 OK` with an `"accepted": false` inside it, the runtime's quiet way of
-declining a cycle (bad payload, missing config). If the Lambda didn't read
-the body, that failure would never show up anywhere: no CloudWatch alarm,
-just a schedule that "ran" on every tick and quietly did nothing.
+short of an explicit `{"accepted": true}` as a failure — including a
+`200 OK` with `"accepted": false` inside it, the runtime's quiet way of
+declining a cycle (bad payload, missing config). Skip reading the body and
+that failure never shows up anywhere: no CloudWatch alarm, just a
+schedule that "ran" on every tick and quietly did nothing.
 
 ```python
+RUNTIME_ARN = os.environ["GRANTHOUND_RUNTIME_ARN"]
+# total_max_attempts=1 means exactly one request, no retry. (botocore's
+# "max_attempts" counts retries AFTER the first request, so max_attempts=1
+# would still allow two -- and two requests here means two paid cycles.)
+_client = boto3.client(
+    "bedrock-agentcore",
+    config=Config(retries={"total_max_attempts": 1}, read_timeout=45),
+)
+
+
 def handler(event, context):
     payload = (event or {}).get("payload") or {"mode": "cycle"}
     session_id = f"schedule-{uuid.uuid4()}-{uuid.uuid4()}"
@@ -49,8 +57,8 @@ cycle. `InvokeAgentRuntime` can be slow to ack under load, and boto3's
 default retry behavior would happily fire a second identical request on a
 timeout — except the first request may have already started the cycle, so
 a "helpful" retry means two runs, two sets of model calls, double the
-bill, for one scheduled tick. The client is pinned to `total_max_attempts:
-1` for exactly this reason.
+bill. Hence the `total_max_attempts: 1` client config above: exactly one
+request, no retry, no accidental second cycle.
 
 ## The ack-and-async-task shape, on the runtime side
 
@@ -62,9 +70,9 @@ background `asyncio.Task`, and returns `{"accepted": true, ...}`
 immediately. The runtime reports itself as healthy-busy for as long as
 that task is open, so it isn't reaped mid-cycle. The matching
 `complete_async_task` call lives in a `finally` block around the whole
-background coroutine — not after the happy path, in a `finally` — because
-if a store write or a seed-file read throws before the graph even starts,
-the task still has to close. Skip that and the caller keeps the accepted
+background coroutine, because if a store write or a seed-file read throws
+before the graph even starts, the task still has to close. Skip that and
+the caller keeps the accepted
 reply it already sent, the async task never releases, and the runtime
 looks "busy" forever while zero programs get evaluated. That's a failure
 mode with no error message anywhere, which is worse than a crash.
@@ -72,13 +80,13 @@ mode with no error message anywhere, which is worse than a crash.
 ## Chunking, and one clock read per chunk
 
 The graph doesn't run all of it in one pass — 20 programs watched as of
-run `run-20260906T083424Z` (`docs/measured.md`). Programs are
-split into chunks of five (`CHUNK_SIZE = 5`), and each chunk gets its own
-run through the graph, with its own timestamp read fresh at the top of the
-loop. That timestamp is what generates the run id, so two chunks that land
-in the same second would collide on one RUN row — the code checks for
-that and sleeps a second rather than let it happen silently. One chunk
-failing is logged and skipped, not fatal to the rest of the cycle.
+run `run-20260906T083424Z` (`docs/measured.md`). Programs split into
+chunks of five (`CHUNK_SIZE = 5`), each chunk getting its own run through
+the graph, with its own timestamp read fresh at the top of the loop. That
+timestamp generates the run id, so two chunks landing in the same second
+would collide on one RUN row — the code sleeps a second rather than let
+that happen silently. One chunk failing is logged and skipped, not fatal
+to the rest of the cycle.
 
 ## What the RUN row records
 

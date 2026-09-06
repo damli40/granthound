@@ -80,7 +80,9 @@ count covers only the programs that already have two evaluations on
 record — most of the 20 seeds have one eval so far, because this is the
 first cycle exported, not yet two full 12-hour cycles apart. It will be
 replaced by a bigger, more meaningful comparison once the unattended
-schedule has run twice.
+schedule has run twice. Stability compares each program's two latest
+evaluations across all runs in the store, not only the runs in the table
+above.
 
 ## The agents
 

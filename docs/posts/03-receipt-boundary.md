@@ -11,22 +11,20 @@ Funders discourage AI-written proposals, and the resentment toward
 generic, templated "AI slop" applications runs through the audience this
 product is for. Building "write my grant proposal" into this product
 would put it at odds with the exact readers it needs to convince.
-It would also be building into a market that's already saturated and
-reputationally radioactive — plenty of tools already generate proposal
-prose, and none of them fix the actual bottleneck for a two-person
-nonprofit, which is finding out which funder pages are real, current, and
-worth the week it takes to write anything at all. So
-GrantHound stays on the finding-out side of that line, on purpose, and
-says so out loud: it never writes your proposal. It decides what's worth
-your time, and proves why.
+It would also mean competing in an already saturated, reputationally
+radioactive market — plenty of tools generate proposal prose, and none of
+them fix the real bottleneck for a two-person nonprofit: finding out
+which funder pages are real, current, and worth the week it takes to
+write anything at all. GrantHound stays on the finding-out side of that
+line, on purpose, and says so out loud: it never writes your proposal. It
+decides what's worth your time, and proves why.
 
 ## The design that makes the boundary real
 
-Saying "we don't write proposals" is a sentence. Making the verdicts an
-agent *does* produce trustworthy enough to act on needs more than a
-sentence, because the alternative — a model that quietly paraphrases or
-half-remembers a page — is worse than no tool at all: it fails exactly
-when a human would have caught it by reading the page themselves.
+Saying "we don't write proposals" is a sentence. Making the verdicts the
+agent *does* produce trustworthy needs more than that, because a model
+that quietly paraphrases or half-remembers a page is worse than no tool:
+it fails exactly where a human reading the page would have caught it.
 
 So every value that ends up in a verdict is checked in code, not taken on
 the model's word:
@@ -44,8 +42,9 @@ the model's word:
   instead of getting an unearned APPLY or PASS.
 
 Here is what that second failure looks like in the code that runs it —
-the Verifier's own record function, rejecting a call that didn't cite
-anything checkable:
+not the Verifier's own function, but `_reject_or_accept`, the one shared
+rejection helper that the Verifier, the Analyst, and the Clerk all route
+their bad answers through:
 
 ```python
 def _reject_or_accept(work: ProgramWork, stage: str, bad: list[tuple[str, str]]) -> str | None:
@@ -74,18 +73,21 @@ NEEDS_HUMAN — never an APPLY built on a quote nobody checked.
 ## The honest caveat
 
 This doesn't mean every verdict GrantHound produces is stable from one run
-to the next — and we're not going to claim it is. From run
-`run-20260906T083424Z`, only 4 of the 20 watched programs have two
-evaluations on record yet, because this is the first exported cycle and
-not two full 12-hour schedules apart. Of those 4, 3 verdicts flipped, and
-every one of those flips moved away from NEEDS_HUMAN, into an APPLY or a
-PASS — none flipped the other way, into NEEDS_HUMAN. We're not reading
-that as the system drifting toward the safe, cautious side: 4 programs is
-too small a sample to say which direction verdicts drift at all, and a
-fairer read lands once two full 12-hour scheduled cycles are on record.
-What the boundary rule guarantees is narrower than "stable": a quote that
-fails the verbatim check, a date the scanner never found, or a page whose
-own timeline contradicts itself all route to NEEDS_HUMAN by construction,
-not to an unearned APPLY or PASS.
+to the next — and we're not going to claim it is. Across all runs in the
+store, only 4 of the 20 watched programs have two evaluations on record
+yet, because this is the first exported cycle and not two full 12-hour
+schedules apart. Of those 4, 3 verdicts flipped, and every one of those
+flips moved away from NEEDS_HUMAN, into an APPLY or a PASS — none flipped
+the other way, into NEEDS_HUMAN. One of those three flips is our own
+disclosed fixture, whose deadline we changed on purpose on camera (see
+the video) — that one isn't independent evidence about real funder
+behavior, it's a demonstration. We're not reading the other two as the
+system drifting toward the safe, cautious side either: 4 programs is too
+small a sample to say which direction verdicts drift at all, and a fairer
+read lands once two full 12-hour scheduled cycles are on record. What the
+boundary rule guarantees is narrower than "stable": a quote that fails
+the verbatim check, a date the scanner never found, or a page whose own
+timeline contradicts itself all route to NEEDS_HUMAN by construction, not
+to an unearned APPLY or PASS.
 
 Repo: https://github.com/damli40/granthound.

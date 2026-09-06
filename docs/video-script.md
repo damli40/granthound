@@ -7,9 +7,10 @@ minute; narration budget 650–700 words for a 5:00 video.
 ## Narration
 
 **0:00** (cold open, no greeting, over the measured table on screen) — We
-pointed GrantHound at 19 real funder pages. 14 were dead, stale, or
-self-contradictory. Five were live. This is what happened when we actually
-checked, instead of trusting the page.
+pointed GrantHound at 19 real funder pages. 14 were dead, stale,
+unfindable, or self-contradictory. Four were live, and one page would not
+load at all. This is what happened when we actually checked, instead of
+trusting the page.
 
 **0:20** (cut to a photo of a library reference desk, then to Maya's
 persona card) — The best free grant database in America is a desktop at
@@ -81,7 +82,7 @@ repo, and this page on Devpost are on screen now.
 | 0:20 | Library reference-desk photo, then Maya persona card | `docs/superpowers/SPEC.md` persona facts | Who this is for |
 | 0:45 | Presenter to camera, plain background | — | The one thing this agent will not do |
 | 1:10 | Architecture diagram | `docs/architecture.svg` | Four agents, one pipeline |
-| 1:40 | Live inbox, filtered to NEEDS REVIEW; calendar tab; phone with Telegram message | `https://d39zkv96tau3is.cloudfront.net` | Clerk's decision, in your inbox |
+| 1:40 | Live inbox, filtered to NEEDS REVIEW; the "Add deadlines to your calendar (.ics)" download link in the deadline strip; phone with Telegram message | `https://d39zkv96tau3is.cloudfront.net` | Clerk's decision, in your inbox |
 | 2:10 | Receipt "What we read" tab; split screen with funder's live page | live inbox + the real funder's page | Step 2 of 4: verifying dates against the live page |
 | 2:50 | Terminal running `aws lambda invoke`; AgentCore trace view; refreshed inbox row | live AWS console / CLI | Step 1 of 4 through Step 4 of 4: Scout, Verifier, Analyst, Clerk |
 | 3:40 | Fixture page before/after edit; deploy command; inbox row showing `changed_deadline` | `https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html` | Disclosed: this page is ours |
