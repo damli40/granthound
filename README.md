@@ -57,13 +57,14 @@ model that produced it.
 
 ### Measured, not asserted
 
-Numbers below cover runs from 2026-09-06, the current model configuration;
-August runs, made while models were being selected, used Amazon Nova and
-remain in the store. They are the ones a fresh
-`scripts/stats.py --since 2026-09-06` prints right now against the
+The table covers runs from 2026-09-06, the first cycle over the full seed
+list. Ten earlier runs remain in the store: three failed attempts against
+a larger Claude model, three on Amazon Nova during model selection, and
+four on the current models over the three original seeds. This is the
+output of a fresh `scripts/stats.py --since 2026-09-06` against the
 committed export, not a copy kept up by hand — running it again after the
 next scheduled cycle will print different, newer numbers in this same
-shape (drop `--since` to see the full 18-run history, Nova included).
+shape (drop `--since` to see the full 18-run history).
 
 | Measure | Value |
 |---|---|
@@ -87,7 +88,9 @@ record — most of the 20 seeds have one eval so far, because this is the
 first cycle exported, not yet two full 12-hour cycles apart. It will be
 replaced by a bigger, more meaningful comparison once the unattended
 schedule has run twice (tracked separately; see `docs/measured.md` for the
-raw per-program lines this table and this line are pasted from).
+raw per-program lines this table and this line are pasted from). Stability
+compares each program's two latest evaluations across all runs in the
+store, not only the runs in the table above.
 Every number above regenerates with `scripts/stats.py`; nothing is typed by
 hand.
 

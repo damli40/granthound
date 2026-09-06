@@ -1,6 +1,8 @@
 import json
 from datetime import datetime, timezone
 
+import pytest
+
 from granthound.export import PROGRAM_FIELDS, build_export, build_stats, filter_runs_since, render_stats, verdict_flips
 from granthound.pipeline.run import run_batch
 from granthound.store.models import Disposition
@@ -257,3 +259,10 @@ def test_filter_runs_since_feeds_build_stats_and_drops_the_excluded_models():
     assert stats["runs"] == 1
     assert set(stats["tokens_by_node"]["analyst"]["models"]) == {"sonnet-4-6"}
     assert stats["latest_run_id"] == "sep"
+
+
+@pytest.mark.parametrize("bad", ["2026/09/06", "not-a-date", "2026-13-40", ""])
+def test_filter_runs_since_rejects_a_malformed_date_instead_of_returning_an_empty_slice(bad):
+    runs = [{"run_id": "r1", "at": "2026-09-06T08:34:24.853473+00:00"}]
+    with pytest.raises(ValueError):
+        filter_runs_since(runs, bad)

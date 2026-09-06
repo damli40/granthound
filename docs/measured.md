@@ -20,14 +20,19 @@
 
 Generated 2026-09-06T08:37:09.614948+00:00 by scripts/stats.py. Source: /Users/Admin/Desktop/granthound/web/data.json
 
-The 10 runs made on 2026-08-23 and earlier on 2026-09-05 are excluded from
-the table above by `--since 2026-09-06`: those were made while models were
-still being selected, including one failed attempt against a larger model
-this account does not have enabled, before the project settled on the two
-models used in every run since. They stay in the store for history;
-`scripts/stats.py` with no `--since` flag still reports on all 18.
+The cutoff is the first cycle over the full 20-program seed list
+(2026-09-06). The 10 earlier runs in the store: 3 failed attempts on
+2026-08-23 against a larger Claude model this account cannot use, 3 runs
+on 2026-08-23 on Amazon Nova while models were being selected, and 4 runs
+(one on 2026-08-23, three on 2026-09-05) on the current Claude Haiku 4.5 /
+Claude Sonnet 4.6 pair over the three original seeds. They stay in the
+store for history; `scripts/stats.py` with no `--since` flag still reports
+on all 18.
 
 ## stability.py
+
+(stability compares each program's two latest evaluations across all runs
+in the store, not only the runs in the table)
 
 ```
 akron-community-foundation-competitive-grants None         -> NEEDS_HUMAN  one-run  (None -> year_trap_suspect)

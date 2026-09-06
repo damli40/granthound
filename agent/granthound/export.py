@@ -7,7 +7,7 @@ video is read off `build_stats` (product rule 5).
 """
 
 from collections import Counter
-from datetime import datetime
+from datetime import date, datetime
 
 from granthound.seeds.profile import OrgProfile
 from granthound.store.models import Disposition
@@ -190,8 +190,14 @@ def filter_runs_since(runs: list[dict], iso_date: str) -> list[dict]:
     "2026-08-23T21:28:44.152252+00:00"); comparing it lexically against
     the date's own midnight, in the same zero-padded ISO 8601 shape, gives
     the same order as comparing the parsed datetimes -- so no date-parsing
-    library is needed here.
+    library is needed for the comparison itself.
+
+    Raises `ValueError` if `iso_date` is not a real calendar date in
+    "YYYY-MM-DD" form -- a silent empty slice from a typo'd flag would
+    otherwise print a technically-truthful table ("0 of 18 runs") for the
+    wrong reason, with nothing on the page saying the date itself was bad.
     """
+    date.fromisoformat(iso_date)
     cutoff = f"{iso_date}T00:00:00"
     return [r for r in runs if (r.get("at") or "") >= cutoff]
 

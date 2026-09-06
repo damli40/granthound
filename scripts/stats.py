@@ -42,7 +42,11 @@ def main() -> int:
 
     if args.since:
         all_runs = data["runs"]
-        kept = filter_runs_since(all_runs, args.since)
+        try:
+            kept = filter_runs_since(all_runs, args.since)
+        except ValueError as exc:
+            print(f"--since {args.since!r}: {exc}", file=sys.stderr)
+            return 2
         # The real path, not a hardcoded one: the footer is a provenance claim, and
         # a table generated from a sample file must not say it came from the live one.
         data = {**data, "stats": build_stats(data["programs"], kept)}
