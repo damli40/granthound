@@ -93,7 +93,7 @@
   }
   function deadlines(p) { return (p.decision_package && p.decision_package.deadlines) || []; }
   function nextDeadline(p) {
-    const future = deadlines(p).filter(d => !d.is_past).sort((a, b) => a.days_until - b.days_until);
+    const future = deadlines(p).filter(d => !d.is_past).sort((a, b) => earliestDays(a) - earliestDays(b));
     return future[0] || null;
   }
   function bucketOf(d) {
@@ -124,7 +124,10 @@
     if ((p.flags || []).some(f => /quotes_unverified/.test(f))) parts.push("A quote could not be found on the page word for word; sent to a human.");
     if (p.verdict === "NEEDS_HUMAN") {
       const flags = p.flags || [];
-      Object.keys(FLAG_TEXT).forEach(f => { if (flags.includes(f)) parts.push(FLAG_TEXT[f]); });
+      Object.keys(FLAG_TEXT).forEach(f => {
+        if (f === "scout_missed" && flags.includes("scout_error")) return;
+        if (flags.includes(f)) parts.push(FLAG_TEXT[f]);
+      });
     }
     return parts.join(" ");
   }
@@ -139,8 +142,11 @@
     const labels = { "30": "Due within 30 days", "60": "31 to 60 days", "90": "61 to 90 days" };
     $("#strip").innerHTML = ["30", "60", "90"].map(b =>
       `<button class="bucket" type="button" data-bucket="${b}" aria-pressed="${state.bucket === b}">${labels[b]}<span class="n">${counts[b]}</span></button>`
-    ).join("") + `<button class="bucket" type="button" data-bucket="ALL" aria-pressed="${state.bucket === "ALL"}">All<span class="n">${state.data.programs.length}</span></button>`;
-    $("#strip").querySelectorAll(".bucket").forEach(b => b.addEventListener("click", () => {
+    ).join("") + `<button class="bucket" type="button" data-bucket="ALL" aria-pressed="${state.bucket === "ALL"}">All<span class="n">${state.data.programs.length}</span></button>`
+      + `<a class="bucket" href="deadlines.ics" download>Add deadlines to your calendar (.ics)</a>`;
+    // Scoped to [data-bucket] so the trailing calendar-export link -- same
+    // .bucket class, no data-bucket -- never gets treated as a filter button.
+    $("#strip").querySelectorAll(".bucket[data-bucket]").forEach(b => b.addEventListener("click", () => {
       state.bucket = b.dataset.bucket; render();
       // render() rebuilds the strip via innerHTML, which drops focus to
       // body; put it back on the button that now represents this filter.

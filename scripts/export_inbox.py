@@ -71,12 +71,17 @@ def main() -> int:
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    from granthound.calendar import build_ics
+    ics_path = out.with_name("deadlines.ics")
+    ics_path.write_text(build_ics(data["programs"], now=datetime.now(timezone.utc)), encoding="utf-8", newline="")
+
     s = data["stats"]
     unreadable = s["receipts_unreadable"]
     tag = "SAMPLE" if args.sample else "live"
     print(
         f"wrote {out} [{tag}] programs={s['programs']} runs={s['runs']} "
-        f"verdicts={s['verdict_counts']} receipts_unreadable={unreadable}"
+        f"verdicts={s['verdict_counts']} receipts_unreadable={unreadable} ics={ics_path}"
     )
     # The file is written either way -- the page still needs it. The non-zero
     # exit is how a scheduled export says "evidence I have a receipt for is
