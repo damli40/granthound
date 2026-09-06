@@ -71,3 +71,8 @@ def get_norm_snapshot(key: str) -> str:
         return body.read().decode("utf-8")
     finally:
         body.close()
+
+
+def get_text(key: str) -> str:
+    """Fetch any text object (snapshot, diff) by key."""
+    return get_norm_snapshot(key)

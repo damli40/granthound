@@ -44,6 +44,12 @@ class Store(Protocol):
 
     def get_norm_snapshot(self, key: str) -> str: ...
 
+    def list_evals(self, program_id: str) -> list[dict]: ...
+
+    def list_runs(self) -> list[dict]: ...
+
+    def get_text(self, key: str) -> str: ...
+
 
 class LiveStore:
     """Production Store: thin delegation, no logic of its own."""
@@ -93,3 +99,12 @@ class LiveStore:
 
     def get_norm_snapshot(self, key: str) -> str:
         return s3.get_norm_snapshot(key)
+
+    def list_evals(self, program_id: str) -> list[dict]:
+        return ddb.list_evals(program_id)
+
+    def list_runs(self) -> list[dict]:
+        return ddb.list_runs()
+
+    def get_text(self, key: str) -> str:
+        return s3.get_text(key)

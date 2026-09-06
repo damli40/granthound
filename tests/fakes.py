@@ -101,6 +101,15 @@ class MemoryStore:
     def get_norm_snapshot(self, key: str) -> str:
         return self.objects[key]
 
+    def get_text(self, key: str) -> str:
+        return self.objects[key]
+
+    def list_runs(self) -> list[dict]:
+        return [copy.deepcopy(item) for item in self.runs.values()]
+
+    def list_evals(self, program_id: str) -> list[dict]:
+        return [copy.deepcopy(self.evals[program_id][sk]) for sk in sorted(self.evals.get(program_id, {}))]
+
 
 def make_fetcher(pages: dict[str, "tuple[int, str] | Exception"]):
     """Build a Fetcher from a url -> (status, body) | exception map.

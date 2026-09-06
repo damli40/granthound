@@ -181,6 +181,20 @@ def get_last_eval(program_id: str, *, with_snapshot: bool = False) -> dict | Non
     return None
 
 
+def list_evals(program_id: str) -> list[dict]:
+    """Every EVAL item for a program, oldest first (ascending SK)."""
+    paginator = _table().meta.client.get_paginator("query")
+    items: list[dict] = []
+    for page in paginator.paginate(
+        TableName=os.environ["GRANTHOUND_TABLE"],
+        KeyConditionExpression="pk = :pk AND begins_with(sk, :sk_prefix)",
+        ExpressionAttributeValues={":pk": _program_pk(program_id), ":sk_prefix": "EVAL#"},
+        ScanIndexForward=True,
+    ):
+        items.extend(_from_dynamo(item) for item in page.get("Items", []))
+    return items
+
+
 def update_meta_pointers(
     program_id: str,
     *,
