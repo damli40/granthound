@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GrantHound: decisions, not listings</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="brand">GrantHound</p>
+    <h1>Decisions, not listings.</h1>
+    <p class="sub">Every verdict carries a receipt: the page we read, when we read it, and what changed.</p>
+    <p class="mono meta" id="generated"></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="banner mono" id="banner" hidden>SAMPLE DATA: scripted test run, not a live export.</p>
+  <section class="strip" id="strip" aria-label="Deadline buckets"></section>
+  <section class="filters" id="filters" aria-label="Verdict filters"></section>
+  <section class="cards" id="cards" aria-label="Decisions"></section>
+  <p class="quiet" id="quiet" hidden>Nothing needs you today.<br><span class="mono" id="quiet-detail"></span></p>
+</main>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Receipt" role="dialog" aria-modal="true">
+  <div class="drawer-head">
+    <div>
+      <p class="mono meta" id="drawer-kicker"></p>
+      <h2 id="drawer-title"></h2>
+    </div>
+    <button class="btn" id="drawer-close" aria-label="Close receipt">Close</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="read">What we read</button>
+    <button class="tab" role="tab" data-tab="changed">What changed</button>
+    <button class="tab" role="tab" data-tab="proof">Proof</button>
+  </div>
+  <div class="tabpanel" id="panel"></div>
+</aside>
+
+<footer class="wrap foot">
+  <p>GrantHound never writes your proposal. It decides what is worth your time, and proves why.</p>
+  <p class="mono meta">Strands Agents on Amazon Bedrock AgentCore. Scout, Verifier, Clerk on Claude Haiku 4.5; Analyst on Claude Sonnet 4.6.</p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

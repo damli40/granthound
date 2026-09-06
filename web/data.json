@@ -1,0 +1,400 @@
+{
+ "generated_at": "2026-09-06T00:40:53.968056+00:00",
+ "sample": true,
+ "org": {
+  "name": "Riverbend Youth Collective",
+  "profile": "501(c)(3) youth org, Columbus OH, budget ~$185K.",
+  "commitment_windows": [
+   {
+    "label": "fall program launch",
+    "start": "2026-09-01",
+    "end": "2026-09-20"
+   }
+  ]
+ },
+ "programs": [
+  {
+   "program_id": "fixtures/sunset-fund",
+   "funder": "Sunset Community Fund",
+   "url": "https://example.invalid/fixtures/sunset-fund/index.html",
+   "source_type": "fixture",
+   "is_fixture": true,
+   "eval_sk": null,
+   "snapshot_text": null,
+   "diff_text": null,
+   "receipt_unreadable": false,
+   "verdict": null,
+   "disposition": null,
+   "liveness_disposition": null,
+   "deterministic_disposition": null,
+   "pipeline_status": null,
+   "fit": null,
+   "verifier": null,
+   "decision_package": null,
+   "flags": [],
+   "snapshot_receipt": null,
+   "diff_receipt": null,
+   "date_scan": null,
+   "run_id": null,
+   "fetched_at": null,
+   "http_status": null,
+   "is_first_eval": null,
+   "error": null
+  },
+  {
+   "program_id": "p-dead",
+   "funder": "p-dead",
+   "url": "https://x.org/dead",
+   "source_type": "test",
+   "is_fixture": false,
+   "eval_sk": "EVAL#2026-08-21T12:00:00+00:00#run-20260821T120000Z",
+   "snapshot_text": "Fund\n\n2025 Grant Cycle. Applications were due March 1, 2025. Thank you to all applicants.",
+   "diff_text": null,
+   "receipt_unreadable": false,
+   "verdict": "PASS",
+   "disposition": "verified_dead_prior_year",
+   "liveness_disposition": "verified_dead_prior_year",
+   "deterministic_disposition": "stale_date_suspect",
+   "pipeline_status": "ok",
+   "fit": null,
+   "verifier": {
+    "proposed": "verified_dead_prior_year",
+    "final": "verified_dead_prior_year",
+    "overridden": false,
+    "reason": "prior_cycle_only",
+    "evidence_quotes": [
+     "Applications were due March 1, 2025."
+    ],
+    "quotes_unverified": false,
+    "rejections": 0
+   },
+   "decision_package": null,
+   "flags": [],
+   "snapshot_receipt": {
+    "sha256": "1b0fa77680f2de81c5d3fc9ad2c4ba7b93990769e7e99bcfab92993baab93190",
+    "s3_raw": "snapshots/p-dead/20260821T120000Z_1b0fa776.raw.html",
+    "s3_norm": "snapshots/p-dead/20260821T120000Z_1b0fa776.norm.md",
+    "fetched_at": "20260821T120000Z",
+    "http_status": 200
+   },
+   "diff_receipt": null,
+   "date_scan": {
+    "dates": [
+     {
+      "raw": "March 1, 2025",
+      "iso": "2025-03-01",
+      "year_present": true,
+      "context": "Fund\n\n2025 Grant Cycle. Applications were due March 1, 2025. Thank you to all applicants.",
+      "day_fabricated": false
+     }
+    ],
+    "all_dates_past": true,
+    "has_yearless_date": false,
+    "dates_contradict": false
+   },
+   "run_id": "run-20260821T120000Z",
+   "fetched_at": "20260821T120000Z",
+   "http_status": 200,
+   "is_first_eval": true,
+   "error": null
+  },
+  {
+   "program_id": "p-down",
+   "funder": "p-down",
+   "url": "https://x.org/down",
+   "source_type": "test",
+   "is_fixture": false,
+   "eval_sk": "EVAL#2026-08-21T12:00:00+00:00#run-20260821T120000Z",
+   "snapshot_text": null,
+   "diff_text": null,
+   "receipt_unreadable": false,
+   "verdict": "NEEDS_HUMAN",
+   "disposition": "page_unreachable",
+   "liveness_disposition": null,
+   "deterministic_disposition": "page_unreachable",
+   "pipeline_status": "ok",
+   "fit": null,
+   "verifier": null,
+   "decision_package": null,
+   "flags": [],
+   "snapshot_receipt": null,
+   "diff_receipt": null,
+   "date_scan": null,
+   "run_id": "run-20260821T120000Z",
+   "fetched_at": "20260821T120000Z",
+   "http_status": null,
+   "is_first_eval": true,
+   "error": null
+  },
+  {
+   "program_id": "p-live",
+   "funder": "p-live",
+   "url": "https://x.org/live",
+   "source_type": "test",
+   "is_fixture": false,
+   "eval_sk": "EVAL#2026-08-21T12:00:00+00:00#run-20260821T120000Z",
+   "snapshot_text": "Fund\n\nRiverbend Community Grants. Applications are due October 5, 2026. Letters of intent are due September 10, 2026. Eligible applicants are 501(c)(3) organizations serving Franklin County youth. Awards range from $5,000 to $25,000 per organization.",
+   "diff_text": null,
+   "receipt_unreadable": false,
+   "verdict": "APPLY",
+   "disposition": "verified_live",
+   "liveness_disposition": "verified_live",
+   "deterministic_disposition": "added",
+   "pipeline_status": "ok",
+   "fit": {
+    "axes": {
+     "eligibility": 5.0,
+     "explicit_funding": 4.0,
+     "effort_to_award": 4.0,
+     "strategic": 3.0,
+     "reliability": 4.0
+    },
+    "axis_quotes": {
+     "eligibility": "Eligible applicants are 501(c)(3) organizations serving Franklin County youth.",
+     "explicit_funding": "Riverbend Community Grants.",
+     "effort_to_award": "Applications are due October 5, 2026.",
+     "strategic": "Letters of intent are due September 10, 2026.",
+     "reliability": "Applications are due October 5, 2026."
+    },
+    "fit": {
+     "score": 4.15,
+     "capped": false,
+     "verdict_suggestion": "APPLY"
+    },
+    "headline_amount": 25000.0,
+    "reachable_amount": 25000.0,
+    "amount_quote": "Awards range from $5,000 to $25,000 per organization.",
+    "amount_verified": true,
+    "quotes_unverified": false,
+    "rejections": 0
+   },
+   "verifier": {
+    "proposed": "verified_live",
+    "final": "verified_live",
+    "overridden": false,
+    "reason": "deadline_in_future",
+    "evidence_quotes": [
+     "Applications are due October 5, 2026."
+    ],
+    "quotes_unverified": false,
+    "rejections": 0
+   },
+   "decision_package": {
+    "deadlines": [
+     {
+      "iso": "2026-09-10",
+      "kind": "loi",
+      "days_until": 20,
+      "within_14_days": false,
+      "is_past": false,
+      "collides_with": [
+       "fall program launch"
+      ],
+      "day_fabricated": false
+     },
+     {
+      "iso": "2026-10-05",
+      "kind": "full_application",
+      "days_until": 45,
+      "within_14_days": false,
+      "is_past": false,
+      "collides_with": [],
+      "day_fabricated": false
+     }
+    ],
+    "requirement_quotes": [
+     "Awards range from $5,000 to $25,000 per organization."
+    ],
+    "eligibility_quotes": [
+     "Eligible applicants are 501(c)(3) organizations serving Franklin County youth."
+    ],
+    "quotes_unverified": false,
+    "rejections": 0
+   },
+   "flags": [],
+   "snapshot_receipt": {
+    "sha256": "29f2c2ec44e7eec023d2db327fcbb682c79b02295e91db7497f55f888ac5d686",
+    "s3_raw": "snapshots/p-live/20260821T120000Z_29f2c2ec.raw.html",
+    "s3_norm": "snapshots/p-live/20260821T120000Z_29f2c2ec.norm.md",
+    "fetched_at": "20260821T120000Z",
+    "http_status": 200
+   },
+   "diff_receipt": null,
+   "date_scan": {
+    "dates": [
+     {
+      "raw": "October 5, 2026",
+      "iso": "2026-10-05",
+      "year_present": true,
+      "context": "Fund\n\nRiverbend Community Grants. Applications are due October 5, 2026. Letters of intent are due September 10, 2026. Eligible applicants are 501(c)(3) organizations serving Franklin County ",
+      "day_fabricated": false
+     },
+     {
+      "raw": "September 10, 2026",
+      "iso": "2026-09-10",
+      "year_present": true,
+      "context": "Fund\n\nRiverbend Community Grants. Applications are due October 5, 2026. Letters of intent are due September 10, 2026. Eligible applicants are 501(c)(3) organizations serving Franklin County youth. Awards range from $5,000 to $25,000 per",
+      "day_fabricated": false
+     }
+    ],
+    "all_dates_past": false,
+    "has_yearless_date": false,
+    "dates_contradict": false
+   },
+   "run_id": "run-20260821T120000Z",
+   "fetched_at": "20260821T120000Z",
+   "http_status": 200,
+   "is_first_eval": true,
+   "error": null
+  }
+ ],
+ "runs": [
+  {
+   "run_id": "run-20260821T120000Z",
+   "at": "2026-08-21T12:00:00+00:00",
+   "status": "ok",
+   "error": null,
+   "errors": [],
+   "program_ids": [
+    "p-dead",
+    "p-down",
+    "p-live"
+   ],
+   "node_models": {
+    "scout": "fake-haiku",
+    "verifier": "fake-haiku",
+    "analyst": "fake-sonnet",
+    "clerk": "fake-haiku"
+   },
+   "node_usage": {
+    "scout": {
+     "model_id": "fake-haiku",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "total_tokens": 0,
+     "execution_ms": 1
+    },
+    "verifier": {
+     "model_id": "fake-haiku",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "total_tokens": 0,
+     "execution_ms": 0
+    },
+    "analyst": {
+     "model_id": "fake-sonnet",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "total_tokens": 0,
+     "execution_ms": 0
+    },
+    "clerk": {
+     "model_id": "fake-haiku",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "total_tokens": 0,
+     "execution_ms": 0
+    }
+   },
+   "verdict_counts": {
+    "PASS": 1,
+    "NEEDS_HUMAN": 1,
+    "APPLY": 1
+   },
+   "disposition_counts": {
+    "verified_dead_prior_year": 1,
+    "page_unreachable": 1,
+    "verified_live": 1
+   },
+   "flag_counts": {},
+   "overrides": 0
+  }
+ ],
+ "stats": {
+  "programs": 4,
+  "verdict_counts": {
+   "PASS": 1,
+   "NEEDS_HUMAN": 1,
+   "APPLY": 1
+  },
+  "disposition_counts": {
+   "verified_dead_prior_year": 1,
+   "page_unreachable": 1,
+   "verified_live": 1
+  },
+  "flag_counts": {},
+  "families": {
+   "live": 1,
+   "dead": 1,
+   "suspect": 0,
+   "unreachable": 1,
+   "unchecked": 1,
+   "unknown": 0
+  },
+  "quotes_stored": 6,
+  "programs_with_dropped_quotes": 0,
+  "receipts_unreadable": 0,
+  "tokens_by_node": {
+   "scout": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "runs": 1,
+    "models": {
+     "fake-haiku": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "runs": 1
+     }
+    }
+   },
+   "verifier": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "runs": 1,
+    "models": {
+     "fake-haiku": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "runs": 1
+     }
+    }
+   },
+   "analyst": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "runs": 1,
+    "models": {
+     "fake-sonnet": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "runs": 1
+     }
+    }
+   },
+   "clerk": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "runs": 1,
+    "models": {
+     "fake-haiku": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "runs": 1
+     }
+    }
+   }
+  },
+  "runs": 1,
+  "latest_run_id": "run-20260821T120000Z",
+  "latest_run_at": "2026-08-21T12:00:00+00:00",
+  "latest_run_status": "ok"
+ }
+}
