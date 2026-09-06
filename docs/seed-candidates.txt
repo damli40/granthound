@@ -1,0 +1,268 @@
+# Seed candidates for Maya (Riverbend Youth Collective, Columbus OH).
+# Gathered by web search 2026-09-06, favoring Columbus / Franklin County / Ohio.
+# Format: a comment line `# <funder> | <source_type> | why | seen <date>`
+# followed by the URL on the next line. Not hand-verified for liveness --
+# that is what scripts/seed_check.py and the pipeline itself are for.
+
+# --- bucket: community foundations (6-8 target) ---
+
+# The Columbus Foundation | community_foundation | Focused Funds program page, one click deeper than the deadlines table, states a Fall 2026 deadline | seen 2026-09-06
+https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/focused-funds
+
+# The Columbus Foundation | community_foundation | Columbus Youth Foundation supporting-foundation page, youth-specific, local | seen 2026-09-06
+https://columbusfoundation.org/nonprofit-center/grant-opportunities/supporting-foundation-grants/columbus-youth-foundation
+
+# Cleveland Foundation | community_foundation | Apply for a Grant page, one click deeper than the /grants/ landing (provisional-2), states 4 annual deadlines | seen 2026-09-06
+https://www.clevelandfoundation.org/grants/apply-for-a-grant
+
+# Greater Cincinnati Foundation | community_foundation | RFP hub page, one click deeper than the funding-opportunities landing, names named RFPs with 2026 release windows and award caps | seen 2026-09-06
+https://www.gcfdn.org/nonprofits/funding-opportunities/rfps/
+
+# The Dayton Foundation | community_foundation | Discretionary Grants program page, states award range $7,500-$75,000 and a live application portal | seen 2026-09-06
+https://www.daytonfoundation.org/discretionary-grants
+
+# Greater Toledo Community Foundation | community_foundation | Grant Opportunities for Nonprofits page, names youth-specific funds (Katherine R. Smith Funds for Youth, Bill Rowles Youth Foundation Fund) | seen 2026-09-06
+https://toledocf.org/grant-opportunities-for-nonprofits
+
+# Akron Community Foundation | community_foundation | Competitive Grants overview, names the Millennium Fund for Children (youth) window Aug 1 - Sept 1 | seen 2026-09-06
+https://www.akroncf.org/grantmaking-initiatives/overview/competitive-grants/
+
+# Stark Community Foundation | community_foundation | Community Responsive Grants Program page, one click deeper than the /for-organizations landing | seen 2026-09-06
+https://www.starkcf.org/for-grantees/for-organizations/community-responsive-grants-program
+
+# GAR Foundation (Akron/Summit County, NE Ohio-wide reach) | community_foundation | Grants for Nonprofits apply page, names focus areas and an eligibility quiz | seen 2026-09-06
+https://www.garfoundation.org/apply
+
+# Community Foundation of the Mahoning Valley | community_foundation | Grant Opportunities page, names quarterly deadlines through 2026 (Apr 15/Jul 15/Oct 15) plus youth-relevant funds (Fund for Women & Girls, Young Philanthropist Fund) | seen 2026-09-06
+https://www.cfmv.org/grant-opportunities/
+
+# Osteopathic Heritage Foundations (Columbus, Ohio-wide reach) | community_foundation | Funding Opportunities page for a statewide-reach central-Ohio funder; site itself warns RFP windows open/close within 60 days -- worth a liveness check rather than trusting a stale bookmark | seen 2026-09-06
+https://osteopathicheritage.org/funding-opportunities/
+
+# --- bucket: state / regional arts & youth agencies (5-6 target) ---
+
+# Ohio Arts Council | state_agency | Grants Info & Guidelines hub page, states org must be incorporated + operating in Ohio | seen 2026-09-06
+https://oac.ohio.gov/grants/01-guidelines
+
+# Ohio Arts Council | state_agency | ArtsRISE program page, one click deeper, states award cap $5,000 and match requirement | seen 2026-09-06
+https://oac.ohio.gov/grants/10-grant-opportunities/35-artsrise
+
+# Greater Columbus Arts Council | state_agency | 2026 General Support program page, names the current cycle | seen 2026-09-06
+https://www.gcac.org/grant/2026-general-support/
+
+# Greater Columbus Arts Council | state_agency | Organization Grants overview page, states Project Support award increased to $30,000 | seen 2026-09-06
+https://www.gcac.org/for-organizations/organization-grants/
+
+# Greater Columbus Arts Council | state_agency | LOOKS STALE ON PURPOSE: a "2025 Grants Guidelines" press release still live on the site at Sept 2026, a prior-year cycle notice that never came down | seen 2026-09-06
+https://www.gcac.org/press-release/gcac-2025-grants-guidelines/
+
+# Ohio Department of Education and Workforce | state_agency | 21st Century Community Learning Centers program topic page, out-of-school-time funding for ages served by Maya's programs | seen 2026-09-06
+https://education.ohio.gov/Topics/Federal-Programs/Programs/21st-Century
+
+# Ohio Department of Education and Workforce | state_agency | general Grant Opportunities index page, one click from the 21st-CCLC topic page | seen 2026-09-06
+https://education.ohio.gov/Topics/Finance-and-Funding/Grants-Administration/Grant-Opportunities
+
+# Ohio Children's Foundation | state_agency | Grant Requests page, states focus on ages 0-5 and vulnerable/at-risk children, rolling submission | seen 2026-09-06
+https://www.ohiochildrensfoundation.org/grant-requests/
+
+# --- bucket: corporate giving with local grants (10-12 target) ---
+
+# Walmart.org (Walmart Foundation) | corporate_giving | Spark Good Local Grants Guidelines page, one click deeper than the /local-community-grants landing already held as provisional-3, states award range $250-$5,000 | seen 2026-09-06
+https://www.walmart.org/how-we-give/program-guidelines/spark-good-local-grants-guidelines
+
+# Lowe's | corporate_giving | Lowe's Hometowns community-impact program page, states the $100M five-year commitment | seen 2026-09-06
+https://corporate.lowes.com/our-responsibilities/lowes-hometowns
+
+# T-Mobile | corporate_giving | Hometown Grants brand page, states award cap $50,000 and town-population eligibility under 50,000 | seen 2026-09-06
+https://www.t-mobile.com/brand/hometown-grants
+
+# T-Mobile | corporate_giving | LOOKS STALE ON PURPOSE: a "nearly $18M across 400 communities" milestone newsroom page from an earlier round, superseded by later $20M/$21.5M milestone pages but still live | seen 2026-09-06
+https://www.t-mobile.com/news/un-carrier/t-mobiles-hometown-grants-program-delivers-nearly-18m-across-400-communities
+
+# Dollar General Literacy Foundation | corporate_giving | main apply site, states Youth Literacy grant window (opens Mar 5 / due Apr 2, 2026) and a 15-mile-of-a-store eligibility rule | seen 2026-09-06
+https://www.dgliteracy.org/
+
+# Finish Line Youth Foundation | corporate_giving | Foundation grants page, states 2025 total ($550,000) and eligibility-quiz application flow | seen 2026-09-06
+https://www.finishline.com/foundation-grants
+
+# DICK'S Sporting Goods Foundation | corporate_giving | Sports Matter "Apply for Funding" page, states award range $1,000-$25,000 and the poverty-rate eligibility gate | seen 2026-09-06
+https://www.sportsmatter.org/s/apply-for-funding
+
+# State Farm | corporate_giving | LOOKS STALE ON PURPOSE: Good Neighbor Citizenship community-grants page names no year anywhere, only "application periods typically in October" -- a year-trap by omission | seen 2026-09-06
+https://www.statefarm.com/about-us/corporate-responsibility/community-grants
+
+# The Kroger Co. | corporate_giving | Community page, links to the communitygifts.com donation-request platform and states quarterly 2026 deadlines | seen 2026-09-06
+https://www.thekrogerco.com/community/
+
+# Huntington Bank | corporate_giving | Corporate Giving page, states grants are invitation-only and reviewed quarterly | seen 2026-09-06
+https://www.huntington.com/Community/corporate-giving
+
+# Nationwide Foundation | corporate_giving | Apply Now page, states three funding categories and a community-impact model prioritizing children's wellbeing | seen 2026-09-06
+https://www.nationwide.com/personal/about-us/giving/nationwide-foundation/apply-now/
+
+# Cardinal Health Foundation | corporate_giving | Community Relations page (Dublin, OH headquartered), states Community Health Grants of $1,000-$13,500 | seen 2026-09-06
+https://www.cardinalhealth.com/en/about-us/environmental-social-governance/community-relations.html
+
+# Columbus Blue Jackets Foundation | corporate_giving | Community Report site, states $1M+ awarded to central Ohio nonprofits for the 2025-26 season across four pillar areas | seen 2026-09-06
+https://communityreport.bluejackets.com/
+
+# Big Lots Foundation | corporate_giving | Corporate Community Support page, states four focus areas (hunger, housing, healthcare, education) and Columbus-OH-headquartered eligibility footprint | seen 2026-09-06
+https://www.biglots.com/corporate/community/support
+
+# --- bucket: national youth funders (6-8 target) ---
+
+# Youth Service America | national_funder | Grants page, states Youth Grants ($250/$500/$1,000) tied to Global Youth Service Day | seen 2026-09-06
+https://ysa.org/grants/
+
+# Sony Electronics (CREATE ACTION) | national_funder | LOOKS STALE / YEAR-TRAP ON PURPOSE: the program's own terms-and-conditions page is versioned "create-action-2024-program" and still live, while the initiative runs annually under a new cycle | seen 2026-09-06
+https://alphauniverse.com/legal/create-action-2024-program/
+
+# Fender Play Foundation | national_funder | main site, states music-program eligibility (weekly instruction, min 8 months/year, 1+ year operating) | seen 2026-09-06
+https://fenderplayfoundation.org/
+
+# VH1 Save The Music Foundation | national_funder | Our Grant Programs FAQ page, states program tiers (Intro to Music, Core, Music Technology) though invitation-only | seen 2026-09-06
+https://www.savethemusic.org/faqs/our-program/
+
+# NEA Big Read (administered by Arts Midwest) | national_funder | program hub page, states award cap $20,000 and the 2026-27 application cycle tied to the America250 theme | seen 2026-09-06
+https://artsmidwest.org/get-support/nea-big-read/
+
+# Hasbro (Global Philanthropy & Social Impact) | national_funder | Guidelines and Policies page, states Community Action Grants of $5,000-$50,000 for youth-recreation projects | seen 2026-09-06
+https://globalphilanthropy.hasbro.com/en-us/guidelines-and-policies
+
+# Build-A-Bear Foundation | national_funder | Hearts 'n' Hugs Fund charitable-donations page, states a 50-mile-of-a-store eligibility rule | seen 2026-09-06
+https://www.buildabear.com/build-a-bear-foundation-hearts-n-hugs-fund-charitable-donations.html
+
+# --- round 2: first pass under-shot 15 KEEP (several corporate/state sites
+# block the plain-GET fetcher with a bot-protection 403/401/418, which is a
+# legitimate REJECT, not a bug). Adding smaller Ohio community foundations
+# and a few more national youth funders, favoring plain-HTML sites. ---
+
+# Wayne County Community Foundation | community_foundation | Apply for a Grant page | seen 2026-09-06
+https://www.waynecountycommunityfoundation.org/grants-and-scholarships/apply-for-a-grant-2
+
+# Wayne County Community Youth Foundation (a WCCF fund) | community_foundation | youth-specific fund page, states a Feb 1 annual deadline | seen 2026-09-06
+https://www.waynecountycommunityfoundation.org/community-initiatives/wayne-county-community-youth-foundation
+
+# Licking County Foundation | community_foundation | Community Grant Program instructions page | seen 2026-09-06
+https://www.thelcfoundation.org/grants/our-grant-programs/community/overview.html
+
+# Foundation for Appalachian Ohio | community_foundation | Grant Opportunities page (2026 cycle open for 7 affiliate foundations) | seen 2026-09-06
+https://appalachianohio.org/opportunities/grants/grant-opportunities
+
+# Richland County Foundation (Mansfield, OH) | community_foundation | Grant Opportunities page, one click deeper than the nonprofit-organizations landing | seen 2026-09-06
+https://www.richlandcountyfoundation.org/nonprofit-organizations/grant-opportunities/
+
+# U.S. Soccer Foundation | national_funder | Safe Places to Play press page, states grant categories and award caps for youth sports facilities | seen 2026-09-06
+https://ussoccerfoundation.org/press/u-s-soccer-foundation-awards-seven-grants-to-increase-access-to-safe-places-to-play/
+
+# Best Buy Foundation | national_funder | Teen Tech Center grants page, ages 13-18, out-of-school-time tech programming (close fit to Maya's 10-16 after-school program) | seen 2026-09-06
+https://www.bestbuyfoundation.org/grants
+
+# Target | corporate_giving | Target Circle Community Giving page, states the $7M annual local-nonprofit voting program | seen 2026-09-06
+https://corporate.target.com/about/purpose-history/communities/grants-corporate-giving/target-circle-community-giving
+
+# KABOOM! | national_funder | Apply for a Grant page (play-space / playground grants) | seen 2026-09-06
+https://kaboom.org/become-a-partner/apply-for-a-grant/
+
+# --- round 3: still short of 15 KEEP after round 2; adding more small Ohio
+# community foundations (plain HTML, no bot-protection observed on this
+# class of site so far) and two more same-domain Columbus Foundation pages
+# since columbusfoundation.org already returned a KEEP once. ---
+
+# The Columbus Foundation | community_foundation | Arts and Culture Grants program page (same domain as the Youth Foundation KEEP above) | seen 2026-09-06
+https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/arts-and-culture-grants
+
+# The Columbus Foundation | community_foundation | Community Garden Grants program page (same domain) | seen 2026-09-06
+https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/community-garden-grants
+
+# Cleveland Foundation | community_foundation | Other Grant Opportunities overview page, one click deeper than the Apply-for-a-Grant page already tried above | seen 2026-09-06
+https://www.clevelandfoundation.org/grants/other-grant-opportunities/overview
+
+# Muskingum County Community Foundation | community_foundation | Grant Guidelines and Application page, names Spring/Fall cycles | seen 2026-09-06
+https://www.mcfohio.org/grants
+
+# Delaware County Foundation (Delaware, OH) | community_foundation | Community Grants page, states a $5,000-$25,000 Associates Board program and a Jul 31 2026 deadline | seen 2026-09-06
+https://delawarecf.org/community-grants-3/
+
+# Fairfield County Foundation (Lancaster, OH) | community_foundation | Grants page | seen 2026-09-06
+https://www.fairfieldcountyfoundation.org/grants
+
+# Union County Foundation (Marysville, OH) | community_foundation | homepage, states a quarterly grant program | seen 2026-09-06
+https://ucfoundationinc.org/
+
+# --- round 4: 17 real KEEP already clears the 15 minimum, but every
+# state_agency candidate tried so far 404'd or was a JS shell. One more
+# attempt at a corrected OAC URL (the old path moved under /wps/portal/)
+# and one adjacent state humanities agency, for source_type diversity. ---
+
+# Ohio Arts Council | state_agency | Grants Info & Guidelines page at the corrected /wps/portal/ path (the plain oac.ohio.gov/grants/01-guidelines path 404'd above) | seen 2026-09-06
+https://oac.ohio.gov/wps/portal/gov/art/grants/01-guidelines
+
+# Ohio Humanities | state_agency | Getting Started grants page; site currently discloses Spark Grants are paused after NEH funding cuts | seen 2026-09-06
+https://www.ohiohumanities.org/getting-started/
+
+# --- fixture (Task 7's disclosed test page) ---
+
+# Sunset Community Fund (test fixture) | fixture | GrantHound's own disclosed fixture page, from infra/web-outputs.json FixtureUrl, used to demonstrate a page CHANGE on camera | seen 2026-09-06
+https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html
+
+# --- seed_check 2026-09-06 ---
+REJECT https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/focused-funds (4681 chars < 5000 (js-shell suspect))
+KEEP https://columbusfoundation.org/nonprofit-center/grant-opportunities/supporting-foundation-grants/columbus-youth-foundation (5183 chars, 2 date hits)
+REJECT https://www.clevelandfoundation.org/grants/apply-for-a-grant (zero date-candidate hits)
+REJECT https://www.gcfdn.org/nonprofits/funding-opportunities/rfps/ (http status 403)
+KEEP https://www.daytonfoundation.org/discretionary-grants (12475 chars, 4 date hits)
+KEEP https://toledocf.org/grant-opportunities-for-nonprofits (6059 chars, 2 date hits)
+KEEP https://www.akroncf.org/grantmaking-initiatives/overview/competitive-grants/ (16663 chars, 27 date hits)
+KEEP https://www.starkcf.org/for-grantees/for-organizations/community-responsive-grants-program (11010 chars, 1 date hits)
+REJECT https://www.garfoundation.org/apply (3724 chars < 5000 (js-shell suspect), zero date-candidate hits)
+KEEP https://www.cfmv.org/grant-opportunities/ (27497 chars, 11 date hits)
+REJECT https://osteopathicheritage.org/funding-opportunities/ (2654 chars < 5000 (js-shell suspect), zero date-candidate hits)
+REJECT https://oac.ohio.gov/grants/01-guidelines (http status 404)
+REJECT https://oac.ohio.gov/grants/10-grant-opportunities/35-artsrise (http status 404)
+REJECT https://www.gcac.org/grant/2026-general-support/ (http status 403)
+REJECT https://www.gcac.org/for-organizations/organization-grants/ (http status 403)
+REJECT https://www.gcac.org/press-release/gcac-2025-grants-guidelines/ (http status 403)
+REJECT https://education.ohio.gov/Topics/Federal-Programs/Programs/21st-Century (169 chars < 5000 (js-shell suspect), zero date-candidate hits)
+REJECT https://education.ohio.gov/Topics/Finance-and-Funding/Grants-Administration/Grant-Opportunities (169 chars < 5000 (js-shell suspect), zero date-candidate hits)
+REJECT https://www.ohiochildrensfoundation.org/grant-requests/ (1880 chars < 5000 (js-shell suspect), zero date-candidate hits)
+KEEP https://www.walmart.org/how-we-give/program-guidelines/spark-good-local-grants-guidelines (14534 chars, 6 date hits)
+KEEP https://corporate.lowes.com/our-responsibilities/lowes-hometowns (6415 chars, 3 date hits)
+REJECT https://www.t-mobile.com/brand/hometown-grants (http status 403)
+REJECT https://www.t-mobile.com/news/un-carrier/t-mobiles-hometown-grants-program-delivers-nearly-18m-across-400-communities (http status 403)
+REJECT https://www.dgliteracy.org/ (1627 chars < 5000 (js-shell suspect), zero date-candidate hits)
+REJECT https://www.finishline.com/foundation-grants (http status 403)
+REJECT https://www.sportsmatter.org/s/apply-for-funding (http status 418)
+REJECT https://www.statefarm.com/about-us/corporate-responsibility/community-grants (http status 401)
+REJECT https://www.thekrogerco.com/community/ (zero date-candidate hits)
+REJECT https://www.huntington.com/Community/corporate-giving (http status 403)
+REJECT https://www.nationwide.com/personal/about-us/giving/nationwide-foundation/apply-now/ (http status 403)
+REJECT https://www.cardinalhealth.com/en/about-us/environmental-social-governance/community-relations.html (transport error: HTTPSConnectionPool(host='www.cardinalhealth.com', port=443): Read timed out. (read timeout=20))
+REJECT https://communityreport.bluejackets.com/ (3661 chars < 5000 (js-shell suspect), zero date-candidate hits)
+REJECT https://www.biglots.com/corporate/community/support (http status 404)
+REJECT https://ysa.org/grants/ (2025 chars < 5000 (js-shell suspect))
+KEEP https://alphauniverse.com/legal/create-action-2024-program/ (24319 chars, 10 date hits)
+REJECT https://fenderplayfoundation.org/ (transport error: HTTPSConnectionPool(host='fenderplayfoundation.org', port=443): Max retries exceeded with url: / (Caused by NameResolutionError("HTTPSConnection(host='fenderplayfoundation.org', port=443): Failed to resolve 'fenderplayfoundation.org' ([Errno 8] nodename nor servname provided, or not known)")))
+KEEP https://www.savethemusic.org/faqs/our-program/ (11012 chars, 1 date hits)
+KEEP https://artsmidwest.org/get-support/nea-big-read/ (24464 chars, 18 date hits)
+REJECT https://globalphilanthropy.hasbro.com/en-us/guidelines-and-policies (zero date-candidate hits)
+REJECT https://www.buildabear.com/build-a-bear-foundation-hearts-n-hugs-fund-charitable-donations.html (http status 403)
+KEEP https://www.waynecountycommunityfoundation.org/grants-and-scholarships/apply-for-a-grant-2 (9605 chars, 10 date hits)
+REJECT https://www.waynecountycommunityfoundation.org/community-initiatives/wayne-county-community-youth-foundation (zero date-candidate hits)
+REJECT https://www.thelcfoundation.org/grants/our-grant-programs/community/overview.html (http status 404)
+REJECT https://appalachianohio.org/opportunities/grants/grant-opportunities (645 chars < 5000 (js-shell suspect), zero date-candidate hits)
+KEEP https://www.richlandcountyfoundation.org/nonprofit-organizations/grant-opportunities/ (8006 chars, 14 date hits)
+REJECT https://ussoccerfoundation.org/press/u-s-soccer-foundation-awards-seven-grants-to-increase-access-to-safe-places-to-play/ (http status 403)
+REJECT https://www.bestbuyfoundation.org/grants (transport error: HTTPSConnectionPool(host='www.bestbuyfoundation.org', port=443): Read timed out. (read timeout=20))
+REJECT https://corporate.target.com/about/purpose-history/communities/grants-corporate-giving/target-circle-community-giving (http status 429)
+REJECT https://kaboom.org/become-a-partner/apply-for-a-grant/ (1775 chars < 5000 (js-shell suspect), zero date-candidate hits)
+REJECT https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/arts-and-culture-grants (3656 chars < 5000 (js-shell suspect))
+KEEP https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/community-garden-grants (8191 chars, 3 date hits)
+KEEP https://www.clevelandfoundation.org/grants/other-grant-opportunities/overview (14484 chars, 15 date hits)
+KEEP https://www.mcfohio.org/grants (43717 chars, 43 date hits)
+KEEP https://delawarecf.org/community-grants-3/ (7016 chars, 17 date hits)
+REJECT https://www.fairfieldcountyfoundation.org/grants (1952 chars < 5000 (js-shell suspect))
+REJECT https://ucfoundationinc.org/ (4976 chars < 5000 (js-shell suspect))
+REJECT https://oac.ohio.gov/wps/portal/gov/art/grants/01-guidelines (http status 404)
+REJECT https://www.ohiohumanities.org/getting-started/ (4789 chars < 5000 (js-shell suspect), zero date-candidate hits)
+KEEP https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html (6423 chars, 11 date hits)

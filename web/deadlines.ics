@@ -4,20 +4,12 @@ PRODID:-//GrantHound//deadlines//EN
 CALSCALE:GREGORIAN
 X-WR-CALNAME:GrantHound deadlines
 BEGIN:VEVENT
-UID:granthound-p-live-2026-09-10-loi@granthound
-DTSTAMP:20260906T041800Z
-DTSTART;VALUE=DATE:20260910
-SUMMARY:p-live: LOI
-DESCRIPTION:Verdict APPLY. Collides with: fall program launch. https:/
- /x.org/live
-URL:https://x.org/live
-END:VEVENT
-BEGIN:VEVENT
-UID:granthound-p-live-2026-10-05-full_application@granthound
-DTSTAMP:20260906T041800Z
-DTSTART;VALUE=DATE:20261005
-SUMMARY:p-live: Full application
-DESCRIPTION:Verdict APPLY. https://x.org/live
-URL:https://x.org/live
+UID:granthound-nea-big-read-arts-midwest-2027-06-30-other@granthound
+DTSTAMP:20260906T080618Z
+DTSTART;VALUE=DATE:20270630
+SUMMARY:NEA Big Read (Arts Midwest): Date
+DESCRIPTION:Verdict WATCH. https://artsmidwest.org/get-support/nea-big
+ -read/
+URL:https://artsmidwest.org/get-support/nea-big-read/
 END:VEVENT
 END:VCALENDAR

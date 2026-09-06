@@ -1,15 +1,11 @@
-# Maya's org profile + seed grant candidates.
+# Maya's org profile + the funder pages GrantHound watches for her.
 #
-# This file is data, not code: `org` describes the nonprofit GrantHound is
-# watching grants on behalf of; `seeds` is the list of funder pages the
-# pipeline checks. The 3 entries below are real, fetch-checked candidate
-# pages (see scripts/seed_check.py), picked to exercise the deterministic
-# path end-to-end -- NOT the final curated list. Every entry is marked
-# `# provisional`: the Aug 22 seed-assembly session (~60 candidates ->
-# 25-40 kept) replaces this list with the real one. Task 7's own
-# provisional-1 program (rows/objects it wrote to the live store during the
-# M1 integration run) is deliberately left in place as the seed of the real
-# dataset -- do not delete it.
+# Data, not code. `seeds` were assembled on 2026-09-06 from ~40 candidates
+# (docs/seed-candidates.txt) and filtered by scripts/seed_check.py, which
+# rejects pages that render client-side (the pipeline never runs a browser).
+# Nobody checked liveness by hand: the agent doing that is the product.
+# One entry, fixtures/sunset-fund, is a test page we control (is_fixture: true),
+# disclosed in the README and on camera, so a page CHANGE can be demonstrated.
 
 org:
   name: Riverbend Youth Collective
@@ -50,3 +46,111 @@ seeds:
     # provisional -- fetch-checked 2026-08-20: reachable (200, substantial
     # static HTML). Corporate-giving example alongside the two community
     # foundations above for source_type diversity.
+
+  - id: columbus-youth-foundation
+    url: https://columbusfoundation.org/nonprofit-center/grant-opportunities/supporting-foundation-grants/columbus-youth-foundation
+    funder: Columbus Youth Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: columbus-foundation-community-garden-grants
+    url: https://columbusfoundation.org/nonprofit-center/grant-opportunities/columbus-foundation-grants/operating-and-program-support/community-garden-grants
+    funder: The Columbus Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: cleveland-foundation-other-grant-opportunities
+    url: https://www.clevelandfoundation.org/grants/other-grant-opportunities/overview
+    funder: Cleveland Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: dayton-foundation-discretionary-grants
+    url: https://www.daytonfoundation.org/discretionary-grants
+    funder: The Dayton Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: greater-toledo-community-foundation
+    url: https://toledocf.org/grant-opportunities-for-nonprofits
+    funder: Greater Toledo Community Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: akron-community-foundation-competitive-grants
+    url: https://www.akroncf.org/grantmaking-initiatives/overview/competitive-grants/
+    funder: Akron Community Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: stark-community-foundation-responsive-grants
+    url: https://www.starkcf.org/for-grantees/for-organizations/community-responsive-grants-program
+    funder: Stark Community Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: community-foundation-mahoning-valley
+    url: https://www.cfmv.org/grant-opportunities/
+    funder: Community Foundation of the Mahoning Valley
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: wayne-county-community-foundation
+    url: https://www.waynecountycommunityfoundation.org/grants-and-scholarships/apply-for-a-grant-2
+    funder: Wayne County Community Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: richland-county-foundation
+    url: https://www.richlandcountyfoundation.org/nonprofit-organizations/grant-opportunities/
+    funder: Richland County Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: muskingum-county-community-foundation
+    url: https://www.mcfohio.org/grants
+    funder: Muskingum County Community Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: delaware-county-foundation-oh
+    url: https://delawarecf.org/community-grants-3/
+    funder: Delaware County Foundation
+    source_type: community_foundation
+    is_fixture: false
+
+  - id: walmart-spark-good-local-grants
+    url: https://www.walmart.org/how-we-give/program-guidelines/spark-good-local-grants-guidelines
+    funder: Walmart.org (Walmart Foundation)
+    source_type: corporate_giving
+    is_fixture: false
+
+  - id: lowes-hometowns
+    url: https://corporate.lowes.com/our-responsibilities/lowes-hometowns
+    funder: Lowe's
+    source_type: corporate_giving
+    is_fixture: false
+
+  - id: sony-create-action-2024-program
+    url: https://alphauniverse.com/legal/create-action-2024-program/
+    funder: Sony Electronics (CREATE ACTION)
+    source_type: national_funder
+    is_fixture: false
+
+  - id: vh1-save-the-music-foundation
+    url: https://www.savethemusic.org/faqs/our-program/
+    funder: VH1 Save The Music Foundation
+    source_type: national_funder
+    is_fixture: false
+
+  - id: nea-big-read-arts-midwest
+    url: https://artsmidwest.org/get-support/nea-big-read/
+    funder: NEA Big Read (Arts Midwest)
+    source_type: national_funder
+    is_fixture: false
+
+  - id: fixtures/sunset-fund
+    url: https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html
+    funder: Sunset Community Fund (test fixture)
+    source_type: fixture
+    is_fixture: true
