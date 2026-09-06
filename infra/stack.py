@@ -159,23 +159,43 @@ class GranthoundWebStack(Stack):
         )
         # Two BucketDeployments, not one, because content_type on BucketDeployment
         # applies to the whole deployment, not per file, and deadlines.ics needs
-        # text/calendar while everything else keeps its guessed type. The .ics
-        # deployment must run with prune=False: a pruning deployment deletes any
-        # bucket key its own sources didn't just write, so two pruning
-        # deployments into the same bucket would each erase what the other one
-        # uploaded (the main deploy would delete deadlines.ics on every deploy,
-        # and vice versa for everything else).
+        # text/calendar while everything else keeps its guessed type.
+        #
+        # The main deployment does NOT exclude deadlines.ics and DOES prune.
+        # That means every deploy writes deadlines.ics as part of the normal
+        # sync (guessed as generic binary, since the sync tool doesn't know
+        # .ics means text/calendar) -- deliberately, so the file can never go
+        # missing just because some unrelated web/ change (a CSS tweak, a
+        # fixture edit) triggered a deploy. A deploy that doesn't touch
+        # deadlines.ics's own bytes still re-writes it with the same content,
+        # so pruning never sees it as "not in the manifest" and never deletes
+        # it. The second deployment below (prune=False, so it only ever adds/
+        # overwrites, never deletes) runs after the main one -- enforced by
+        # the explicit dependency -- and re-applies content_type=text/calendar
+        # whenever it runs. Net trade: the worst case is deadlines.ics
+        # temporarily serving as the wrong content type until the next deploy
+        # that actually changes its bytes; it is never a missing file.
         deploy = s3deploy.BucketDeployment(
             self,
             "Deploy",
-            sources=[s3deploy.Source.asset(str(WEB_DIR), exclude=["deadlines.ics"])],
+            sources=[s3deploy.Source.asset(str(WEB_DIR))],
             destination_bucket=bucket,
             distribution=distribution,
             distribution_paths=["/*"],
         )
+        # Construct id below is "DeployIcsContentType", not "DeployDeadlinesIcs":
+        # CloudFormation only re-invokes a Custom::CDKBucketDeployment when one
+        # of its own properties changes, and this resource's only real input
+        # (deadlines.ics's bytes) does not change on an unrelated web/ edit --
+        # so a plain rename-free deploy leaves it correctly un-touched *and*
+        # leaves whatever content type Deploy's own sync just guessed. Giving
+        # it a fresh logical id forces a real Create here so today's deploy
+        # actually lands with the correct content type live, matching this
+        # id's purpose (fixing up the content type) rather than implying an
+        # ongoing "v2" of the same thing.
         deploy_ics = s3deploy.BucketDeployment(
             self,
-            "DeployDeadlinesIcs",
+            "DeployIcsContentType",
             sources=[s3deploy.Source.asset(str(WEB_DIR), exclude=["**", "!deadlines.ics"])],
             destination_bucket=bucket,
             content_type="text/calendar",
@@ -186,10 +206,10 @@ class GranthoundWebStack(Stack):
         # CloudFormation has no natural ordering between these two custom
         # resources -- neither references the other's output -- so without an
         # explicit dependency it can run DeployDeadlinesIcs before Deploy, and
-        # Deploy (prune=True, and deadlines.ics is outside its own manifest)
-        # then deletes the .ics key that DeployDeadlinesIcs just wrote. Forcing
-        # DeployDeadlinesIcs to run after Deploy on every deployment is what
-        # actually keeps deadlines.ics in the bucket.
+        # Deploy's own sync of deadlines.ics (see above) would overwrite the
+        # correct content type back to the generic guess in the same
+        # deployment. Forcing DeployDeadlinesIcs to run after Deploy is what
+        # makes the content-type correction stick.
         deploy_ics.node.add_dependency(deploy)
         CfnOutput(self, "SiteUrl", value=f"https://{distribution.distribution_domain_name}")
         CfnOutput(self, "FixtureUrl", value=f"https://{distribution.distribution_domain_name}/fixtures/sunset-fund/index.html")

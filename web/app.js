@@ -143,7 +143,7 @@
     $("#strip").innerHTML = ["30", "60", "90"].map(b =>
       `<button class="bucket" type="button" data-bucket="${b}" aria-pressed="${state.bucket === b}">${labels[b]}<span class="n">${counts[b]}</span></button>`
     ).join("") + `<button class="bucket" type="button" data-bucket="ALL" aria-pressed="${state.bucket === "ALL"}">All<span class="n">${state.data.programs.length}</span></button>`
-      + `<a class="bucket" href="deadlines.ics" download>Add deadlines to your calendar (.ics)</a>`;
+      + `<a class="bucket" href="/deadlines.ics" download>Add deadlines to your calendar (.ics)</a>`;
     // Scoped to [data-bucket] so the trailing calendar-export link -- same
     // .bucket class, no data-bucket -- never gets treated as a filter button.
     $("#strip").querySelectorAll(".bucket[data-bucket]").forEach(b => b.addEventListener("click", () => {
@@ -304,7 +304,7 @@
 
   function render() { renderStrip(); renderFilters(); renderCards(); }
 
-  fetch("data.json", { cache: "no-store" }).then(r => r.json()).then(data => {
+  fetch("/data.json", { cache: "no-store" }).then(r => r.json()).then(data => {
     state.data = data;
     const s = data.stats || {};
     /* The export marks a scripted test run. Say so on the page itself, so a
