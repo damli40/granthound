@@ -92,6 +92,16 @@ class GranthoundScheduleStack(Stack):
                 arn=trigger.function_arn,
                 role_arn=role.role_arn,
                 input=json.dumps({"payload": {"mode": "cycle"}}),
+                # Scheduler's defaults are 185 attempts over 24 hours. Firing the
+                # cycle is not idempotent -- a retry after the runtime already
+                # accepted starts a second paid cycle -- so the blast radius is
+                # capped at two extra tries inside 15 minutes, which still covers
+                # a transient Lambda throttle and stops well short of the next
+                # scheduled fire.
+                retry_policy=scheduler.CfnSchedule.RetryPolicyProperty(
+                    maximum_retry_attempts=2,
+                    maximum_event_age_in_seconds=900,
+                ),
             ),
         )
         CfnOutput(self, "TriggerFunctionName", value=trigger.function_name)
