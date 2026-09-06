@@ -39,10 +39,10 @@ ambiguous than silently pick one for you.
 
 **Unfindable.** Three of the fourteen weren't a bad date at all — the
 agent read the whole page and there was no grant program on it any more.
-A foundation's site can stay up, the domain can keep renewing, while the
-specific grants page it once hosted is gone or folded into something
-else. The agent doesn't invent a program to fill that gap. It says the
-page has no program on it any more, instead of guessing.
+A foundation's site can stay up while the grants page it once hosted is
+gone or folded into something else. The agent doesn't invent a program to
+fill that gap. It says the page has no program on it any more, instead of
+guessing.
 
 ## The measured numbers
 
@@ -72,9 +72,9 @@ waiting on a real funder to edit their site for us.
 ## What the agent does with a page it can't trust
 
 Every disposition the agent can assign comes from a closed set, not free
-text the model invents. Here's the suspect and dead half of that set —
-the pipeline also has a live half (`verified_live`, `watch_coming_soon`,
-and others) for pages that check out:
+text the model invents. Here's the half of that set that means you cannot
+trust the page — the pipeline also has a live half (`verified_live`,
+`watch_coming_soon`, and others) for pages that check out:
 
 ```python
 VERIFIED_DEAD_CLOSED = "verified_dead_closed"
@@ -87,8 +87,9 @@ YEAR_TRAP_SUSPECT = "year_trap_suspect"
 DATE_CONTRADICTION = "date_contradiction"
 ```
 
-When a page lands in one of these, the agent doesn't pick a side. The
-verdict becomes NEEDS_HUMAN — not APPLY, not PASS — and the inbox shows
+When a page lands in one of the suspect dispositions, the agent doesn't
+pick a side. The verdict becomes NEEDS_HUMAN — not APPLY, not PASS — and
+the inbox shows
 exactly which quote or date triggered it, next to a link to the funder's
 own live page so you can check it yourself in under a minute. NEEDS_HUMAN
 isn't a failure state for the product; the failure state is a tool that
