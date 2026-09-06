@@ -57,17 +57,20 @@ model that produced it.
 
 ### Measured, not asserted
 
-Numbers below are from the cycle recorded on 2026-09-06 (run id in the
-"Latest run" row). They are the ones a fresh `scripts/stats.py` prints
-right now, not a copy kept up by hand — running the script again after the
+Numbers below cover runs from 2026-09-06, the current model configuration;
+August runs, made while models were being selected, used Amazon Nova and
+remain in the store. They are the ones a fresh
+`scripts/stats.py --since 2026-09-06` prints right now against the
+committed export, not a copy kept up by hand — running it again after the
 next scheduled cycle will print different, newer numbers in this same
-shape.
+shape (drop `--since` to see the full 18-run history, Nova included).
 
 | Measure | Value |
 |---|---|
+| Runs from: 2026-09-06 (8 of 18 runs in the store) |  |
 | Programs watched | 20 |
 | Latest run | run-20260906T083424Z at 2026-09-06T08:34:24.853473+00:00 (ok) |
-| Runs on record | 18 |
+| Runs on record | 8 |
 | Verdicts | APPLY 1 · NEEDS_HUMAN 11 · PASS 7 · WATCH 1 |
 | Verified live | 5 |
 | Verified dead (closed, final call, prior year) | 7 |
@@ -76,7 +79,7 @@ shape.
 | Not yet checked | 0 |
 | Distinct quotes stored (each verbatim-checked against its snapshot) | 72 |
 | Programs where a quote had to be dropped | 5 |
-| Tokens by node (model) | analyst 378,446 (global.anthropic.claude-sonnet-4-6 191,058 · global.anthropic.claude-sonnet-5 0 · us.amazon.nova-pro-v1:0 187,388) · clerk 95,913 (global.amazon.nova-2-lite-v1:0 43,006 · global.anthropic.claude-haiku-4-5-20251001-v1:0 52,907) · scout 62,852 (global.amazon.nova-2-lite-v1:0 12,160 · global.anthropic.claude-haiku-4-5-20251001-v1:0 50,692) · verifier 533,840 (global.amazon.nova-2-lite-v1:0 77,035 · global.anthropic.claude-haiku-4-5-20251001-v1:0 456,805) |
+| Tokens by node (model) | analyst 126,187 (global.anthropic.claude-sonnet-4-6 126,187) · clerk 42,320 (global.anthropic.claude-haiku-4-5-20251001-v1:0 42,320) · scout 35,311 (global.anthropic.claude-haiku-4-5-20251001-v1:0 35,311) · verifier 341,016 (global.anthropic.claude-haiku-4-5-20251001-v1:0 341,016) |
 
 Verdict stability so far: 4 programs with two evals; 3 verdict flip(s). That
 count covers only the programs that already have two evaluations on
@@ -141,11 +144,11 @@ Edit `agent/granthound/seeds/maya.yml`: the `org` block is your profile and comm
 
 - The web inbox is a static export; it refreshes when `export_inbox.py` runs, not live.
 - Corporate and state-agency sites that block plain fetches, or that render their content only in a browser (client-side JavaScript), cannot be watched in this version — the seed filter rejects any candidate whose plain-fetch HTML comes back too short or with no dates in it. No state-agency page survived that filter; every seed in the current list is a community foundation, a corporate-giving page, a national funder, or the disclosed test fixture.
-- A page whose future deadline-looking dates (any date found within 120 characters of a word like "deadline", "due", or "closes") span more than 30 days is treated as self-contradictory and sent to a human rather than acted on. Real funder pages that lay out a multi-stage timeline (an "opens", an "early deadline", and a "final deadline" months apart, say) trip this on purpose — it is conservative by design, and it is why several of the 20 programs in the table above show NEEDS REVIEW instead of a verdict.
+- A page whose future deadline-looking dates (any date found within 120 characters of a word like "deadline", "due", or "closes") span more than 30 days is treated as self-contradictory and sent to a human rather than acted on. Real funder pages that lay out a multi-stage timeline (an "opens", an "early deadline", and a "final deadline" months apart, say) trip this on purpose — it is conservative by design. No program in the current table is held for this reason; the test fixture hit it once before its wording was fixed.
 - Verdicts are not guaranteed stable run to run. The stability line above is measured from only 4 programs with two evaluations so far (most of the 20 seeds have one eval on record); in that small, early sample 3 of the 4 flipped, and none of the three flipped into NEEDS REVIEW — the sample is too small yet to say which direction verdicts drift, and a bigger, fairer read lands once two full 12-hour scheduled cycles are on record. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
 - `changed_terms` is never emitted: there is no deterministic gate for it, and page-hash diffs false-positive on every nav tweak.
 - Month-only deadlines compare against day 1 for commitment-window collisions (a collision late in the month can be missed).
-- The Analyst was designed for Claude Sonnet 5; that model is not enabled on this account, so every run on record used Claude Sonnet 4.6.
+- The Analyst was designed for a larger Claude model that is not enabled on this account, so every run in the table used Claude Sonnet 4.6.
 
 ## Provenance
 

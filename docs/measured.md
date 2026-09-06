@@ -4,9 +4,10 @@
 
 | Measure | Value |
 |---|---|
+| Runs from: 2026-09-06 (8 of 18 runs in the store) |  |
 | Programs watched | 20 |
 | Latest run | run-20260906T083424Z at 2026-09-06T08:34:24.853473+00:00 (ok) |
-| Runs on record | 18 |
+| Runs on record | 8 |
 | Verdicts | APPLY 1 · NEEDS_HUMAN 11 · PASS 7 · WATCH 1 |
 | Verified live | 5 |
 | Verified dead (closed, final call, prior year) | 7 |
@@ -15,9 +16,16 @@
 | Not yet checked | 0 |
 | Distinct quotes stored (each verbatim-checked against its snapshot) | 72 |
 | Programs where a quote had to be dropped | 5 |
-| Tokens by node (model) | analyst 378,446 (global.anthropic.claude-sonnet-4-6 191,058 · global.anthropic.claude-sonnet-5 0 · us.amazon.nova-pro-v1:0 187,388) · clerk 95,913 (global.amazon.nova-2-lite-v1:0 43,006 · global.anthropic.claude-haiku-4-5-20251001-v1:0 52,907) · scout 62,852 (global.amazon.nova-2-lite-v1:0 12,160 · global.anthropic.claude-haiku-4-5-20251001-v1:0 50,692) · verifier 533,840 (global.amazon.nova-2-lite-v1:0 77,035 · global.anthropic.claude-haiku-4-5-20251001-v1:0 456,805) |
+| Tokens by node (model) | analyst 126,187 (global.anthropic.claude-sonnet-4-6 126,187) · clerk 42,320 (global.anthropic.claude-haiku-4-5-20251001-v1:0 42,320) · scout 35,311 (global.anthropic.claude-haiku-4-5-20251001-v1:0 35,311) · verifier 341,016 (global.anthropic.claude-haiku-4-5-20251001-v1:0 341,016) |
 
-Generated 2026-09-06T08:54:13.915256+00:00 by scripts/stats.py. Source: /Users/Admin/Desktop/granthound/web/data.json
+Generated 2026-09-06T08:37:09.614948+00:00 by scripts/stats.py. Source: /Users/Admin/Desktop/granthound/web/data.json
+
+The 10 runs made on 2026-08-23 and earlier on 2026-09-05 are excluded from
+the table above by `--since 2026-09-06`: those were made while models were
+still being selected, including one failed attempt against a larger model
+this account does not have enabled, before the project settled on the two
+models used in every run since. They stay in the store for history;
+`scripts/stats.py` with no `--since` flag still reports on all 18.
 
 ## stability.py
 

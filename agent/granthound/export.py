@@ -173,6 +173,29 @@ def build_stats(programs: list[dict], runs: list[dict]) -> dict:
     }
 
 
+def filter_runs_since(runs: list[dict], iso_date: str) -> list[dict]:
+    """Runs whose `at` timestamp is on or after `iso_date` (a UTC calendar
+    day, e.g. "2026-09-06").
+
+    Used to recompute `build_stats`'s run-count and per-model token rows
+    over a recent slice -- a model swap mid-project (say, from a model
+    still being evaluated to the one actually shipped) otherwise stays
+    mixed into a lifetime total forever, in a token figure no future run
+    will ever add to again. This never touches `programs`: a program's
+    verdict/disposition/quote counts come from its latest eval regardless
+    of which runs are in scope here, and the live export this reads from
+    is left alone -- only the printed table changes.
+
+    A run's `at` is a full ISO 8601 timestamp with a UTC offset (e.g.
+    "2026-08-23T21:28:44.152252+00:00"); comparing it lexically against
+    the date's own midnight, in the same zero-padded ISO 8601 shape, gives
+    the same order as comparing the parsed datetimes -- so no date-parsing
+    library is needed here.
+    """
+    cutoff = f"{iso_date}T00:00:00"
+    return [r for r in runs if (r.get("at") or "") >= cutoff]
+
+
 def build_export(store: Store, org: OrgProfile, *, now: datetime, sample: bool = False) -> dict:
     """The whole data file. `sample=True` marks an export built from the
     scripted test fixtures, so nothing downstream can mistake it for a live

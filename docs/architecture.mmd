@@ -11,6 +11,7 @@ flowchart LR
   end
   S -. "raw + normalized page,<br/>sha256" .-> S3[("S3 evidence bucket")]
   RT -- "one EVAL row per program per run,<br/>one RUN row with tokens + model ids" --> DDB[("DynamoDB")]
+  RT --> TG["Telegram summary<br/>token in SSM Parameter Store"]
   DDB --> X["export_inbox.py<br/>+ stats.py"]
   S3 --> X
   X --> WEB["Static inbox<br/>S3 + CloudFront"]

@@ -1,7 +1,7 @@
 import json
 from datetime import datetime, timezone
 
-from granthound.export import PROGRAM_FIELDS, build_export, build_stats, render_stats, verdict_flips
+from granthound.export import PROGRAM_FIELDS, build_export, build_stats, filter_runs_since, render_stats, verdict_flips
 from granthound.pipeline.run import run_batch
 from granthound.store.models import Disposition
 from tests.fakes import (
@@ -228,3 +228,32 @@ def test_verdict_flips_compare_the_two_latest_evals():
     assert by_id["p-down"]["flipped"] is False and by_id["p-down"]["latest"] == "NEEDS_HUMAN"
     assert by_id["p-live"]["flipped"] is True
     assert (by_id["p-live"]["previous"], by_id["p-live"]["latest"]) == ("APPLY", "NEEDS_HUMAN")
+
+
+def test_filter_runs_since_keeps_the_cutoff_day_and_drops_earlier_ones():
+    runs = [
+        {"run_id": "old", "at": "2026-08-23T23:59:59.999999+00:00"},
+        {"run_id": "midnight", "at": "2026-09-06T00:00:00.000000+00:00"},
+        {"run_id": "new", "at": "2026-09-06T08:34:24.853473+00:00"},
+        {"run_id": "no-at"},
+    ]
+    kept = filter_runs_since(runs, "2026-09-06")
+    assert [r["run_id"] for r in kept] == ["midnight", "new"]
+
+
+def test_filter_runs_since_feeds_build_stats_and_drops_the_excluded_models():
+    runs = [
+        {
+            "run_id": "aug", "at": "2026-08-23T21:29:06.912362+00:00", "status": "ok",
+            "node_usage": {"analyst": {"model_id": "nova-pro", "input_tokens": 10, "output_tokens": 5, "total_tokens": 15}},
+        },
+        {
+            "run_id": "sep", "at": "2026-09-06T08:34:24.853473+00:00", "status": "ok",
+            "node_usage": {"analyst": {"model_id": "sonnet-4-6", "input_tokens": 100, "output_tokens": 50, "total_tokens": 150}},
+        },
+    ]
+    kept = filter_runs_since(runs, "2026-09-06")
+    stats = build_stats([], kept)
+    assert stats["runs"] == 1
+    assert set(stats["tokens_by_node"]["analyst"]["models"]) == {"sonnet-4-6"}
+    assert stats["latest_run_id"] == "sep"
