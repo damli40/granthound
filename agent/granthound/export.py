@@ -19,7 +19,10 @@ EVAL_FIELDS = (
     "fit", "verifier", "decision_package", "flags", "snapshot_receipt", "diff_receipt", "date_scan",
     "run_id", "fetched_at", "http_status", "is_first_eval", "error",
 )
-PROGRAM_FIELDS = ("program_id", "funder", "url", "source_type", "is_fixture", "eval_sk", "snapshot_text", "diff_text") + EVAL_FIELDS
+PROGRAM_FIELDS = (
+    "program_id", "funder", "url", "source_type", "is_fixture", "eval_sk",
+    "snapshot_text", "diff_text", "receipt_unreadable",
+) + EVAL_FIELDS
 
 
 def _read_text(store: Store, key: str | None) -> str | None:
@@ -42,6 +45,12 @@ def program_entry(store: Store, meta: dict) -> dict:
         "eval_sk": None,
         "snapshot_text": None,
         "diff_text": None,
+        # True only when a receipt names a snapshot we then could not read.
+        # Without this, "the page was never fetched" and "the evidence is
+        # missing from the bucket" both arrive as snapshot_text=None, and the
+        # second one -- the one that means the receipt cannot be checked --
+        # would never be counted anywhere.
+        "receipt_unreadable": False,
         **{field: None for field in EVAL_FIELDS},
         "flags": [],
     }
@@ -54,6 +63,7 @@ def program_entry(store: Store, meta: dict) -> dict:
     entry["eval_sk"] = ev.get("sk")
     receipt = ev.get("snapshot_receipt") or {}
     entry["snapshot_text"] = _read_text(store, receipt.get("s3_norm"))
+    entry["receipt_unreadable"] = bool(ev.get("snapshot_receipt")) and entry["snapshot_text"] is None
     diff = ev.get("diff_receipt") or {}
     entry["diff_text"] = _read_text(store, diff.get("s3_key"))
     return entry
@@ -71,23 +81,44 @@ def _family(entry: dict) -> str:
         return "dead"
     if liveness in {d.value for d in SUSPECT_FAMILY}:
         return "suspect"
-    return "unreachable" if entry.get("snapshot_receipt") is None else "live"
+    # A disposition that belongs to no family is something this code has never
+    # seen. Guessing "live" here would quietly add it to the headline count of
+    # verified-live programs -- the one number a funder-facing page must not
+    # overstate. Say so instead, and let the table ask for an investigation.
+    return "unknown"
 
 
-def _quote_counts(entry: dict) -> tuple[int, bool]:
-    stored = 0
+FAMILY_NAMES = ("live", "dead", "suspect", "unreachable", "unchecked", "unknown")
+
+
+def _normalize_quote(text: str) -> str:
+    """Collapse whitespace so the same sentence counts once however it was stored."""
+    return " ".join(text.split())
+
+
+def _quote_texts(entry: dict) -> tuple[set[str], bool]:
+    """The DISTINCT quotes stored for one program, plus whether any were dropped.
+
+    Counting slots overstates the evidence: two fit axes routinely cite the
+    same sentence, and the Clerk repeats quotes the Analyst already used. The
+    number worth publishing is how many distinct sentences were checked
+    verbatim against the snapshot, not how many times they were cited.
+    """
+    quotes: list[str] = []
     dropped = False
     verifier = entry.get("verifier") or {}
-    stored += len(verifier.get("evidence_quotes") or [])
+    quotes += list(verifier.get("evidence_quotes") or [])
     dropped = dropped or bool(verifier.get("quotes_unverified"))
     fit = entry.get("fit") or {}
-    stored += len(fit.get("axis_quotes") or {})
-    stored += 1 if fit.get("amount_quote") else 0
+    quotes += list((fit.get("axis_quotes") or {}).values())
+    if fit.get("amount_quote"):
+        quotes.append(fit["amount_quote"])
     dropped = dropped or bool(fit.get("quotes_unverified"))
     package = entry.get("decision_package") or {}
-    stored += len(package.get("requirement_quotes") or []) + len(package.get("eligibility_quotes") or [])
+    quotes += list(package.get("requirement_quotes") or [])
+    quotes += list(package.get("eligibility_quotes") or [])
     dropped = dropped or bool(package.get("quotes_unverified"))
-    return stored, dropped
+    return {_normalize_quote(q) for q in quotes if q}, dropped
 
 
 def build_stats(programs: list[dict], runs: list[dict]) -> dict:
@@ -97,28 +128,43 @@ def build_stats(programs: list[dict], runs: list[dict]) -> dict:
     families = Counter(_family(p) for p in programs)
     quotes_stored = 0
     dropped_programs = 0
+    receipts_unreadable = 0
     for p in programs:
-        stored, dropped = _quote_counts(p)
-        quotes_stored += stored
+        quotes, dropped = _quote_texts(p)
+        quotes_stored += len(quotes)
         dropped_programs += 1 if dropped else 0
+        receipts_unreadable += 1 if p.get("receipt_unreadable") else 0
     tokens: dict[str, dict] = {}
     for run in runs:
         for node, usage in (run.get("node_usage") or {}).items():
-            slot = tokens.setdefault(node, {"model_id": None, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "runs": 0})
-            slot["model_id"] = usage.get("model_id") or slot["model_id"]
-            slot["input_tokens"] += int(usage.get("input_tokens") or 0)
-            slot["output_tokens"] += int(usage.get("output_tokens") or 0)
-            slot["total_tokens"] += int(usage.get("total_tokens") or 0)
-            slot["runs"] += 1
+            counts = (
+                int(usage.get("input_tokens") or 0),
+                int(usage.get("output_tokens") or 0),
+                int(usage.get("total_tokens") or 0),
+            )
+            slot = tokens.setdefault(node, {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "runs": 0, "models": {}})
+            # Tokens are kept per model, not just per node. A node whose model
+            # was swapped between runs would otherwise show one lifetime total
+            # under whichever model id happened to be newest -- a cost figure
+            # attributed to a model that never billed most of it.
+            per_model = slot["models"].setdefault(
+                usage.get("model_id") or "n/a", {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "runs": 0}
+            )
+            for bucket in (slot, per_model):
+                bucket["input_tokens"] += counts[0]
+                bucket["output_tokens"] += counts[1]
+                bucket["total_tokens"] += counts[2]
+                bucket["runs"] += 1
     latest = runs[-1] if runs else None
     return {
         "programs": len(programs),
         "verdict_counts": dict(verdicts),
         "disposition_counts": dict(dispositions),
         "flag_counts": dict(flags),
-        "families": {name: families.get(name, 0) for name in ("live", "dead", "suspect", "unreachable", "unchecked")},
+        "families": {name: families.get(name, 0) for name in FAMILY_NAMES},
         "quotes_stored": quotes_stored,
         "programs_with_dropped_quotes": dropped_programs,
+        "receipts_unreadable": receipts_unreadable,
         "tokens_by_node": tokens,
         "runs": len(runs),
         "latest_run_id": latest["run_id"] if latest else None,
@@ -127,11 +173,15 @@ def build_stats(programs: list[dict], runs: list[dict]) -> dict:
     }
 
 
-def build_export(store: Store, org: OrgProfile, *, now: datetime) -> dict:
+def build_export(store: Store, org: OrgProfile, *, now: datetime, sample: bool = False) -> dict:
+    """The whole data file. `sample=True` marks an export built from the
+    scripted test fixtures, so nothing downstream can mistake it for a live
+    one and publish its numbers."""
     programs = sorted((program_entry(store, meta) for meta in store.list_programs()), key=lambda p: p["program_id"])
     runs = sorted(store.list_runs(), key=lambda r: (r.get("at") or "", r.get("run_id") or ""))
     return {
         "generated_at": now.isoformat(),
+        "sample": sample,
         "org": org.model_dump(mode="json"),
         "programs": programs,
         "runs": runs,
@@ -139,15 +189,28 @@ def build_export(store: Store, org: OrgProfile, *, now: datetime) -> dict:
     }
 
 
-def render_stats(data: dict) -> str:
+def _render_node_tokens(node: str, usage: dict) -> str:
+    models = " · ".join(
+        f"{model} {counts['total_tokens']:,}" for model, counts in sorted(usage["models"].items())
+    ) or "no model recorded"
+    return f"{node} {usage['total_tokens']:,} ({models})"
+
+
+def render_stats(data: dict, source: str = "web/data.json") -> str:
+    """The measured table. Every key it reads is required, not `.get`-ed: an
+    export from before a field existed must fail loudly here rather than print
+    a table that silently omits a warning row."""
     s = data["stats"]
     fam = s["families"]
     verdicts = " · ".join(f"{k} {v}" for k, v in sorted(s["verdict_counts"].items())) or "none yet"
     tokens = " · ".join(
-        f"{node} {u['total_tokens']:,} ({u['model_id'] or 'n/a'})" for node, u in sorted(s["tokens_by_node"].items())
+        _render_node_tokens(node, u) for node, u in sorted(s["tokens_by_node"].items())
     ) or "none yet"
     latest = f"{s['latest_run_id']} at {s['latest_run_at']} ({s['latest_run_status']})" if s["latest_run_id"] else "none yet"
-    rows = [
+    rows = []
+    if data["sample"]:
+        rows.append(("SAMPLE DATA (scripted test run, not a live export)", "do not publish"))
+    rows += [
         ("Programs watched", s["programs"]),
         ("Latest run", latest),
         ("Runs on record", s["runs"]),
@@ -157,13 +220,21 @@ def render_stats(data: dict) -> str:
         ("Suspect (stale date, year trap, contradiction)", fam["suspect"]),
         ("Unreachable", fam["unreachable"]),
         ("Not yet checked", fam["unchecked"]),
-        ("Quotes stored (each verbatim-checked against its snapshot)", s["quotes_stored"]),
-        ("Programs where a quote had to be dropped", s["programs_with_dropped_quotes"]),
-        ("Tokens by node (model)", tokens),
     ]
+    # The two warning rows appear only when there is something to warn about,
+    # so a clean table is not padded with zeroes a reader learns to skip.
+    if fam["unknown"]:
+        rows.append(("Unclassified disposition (investigate)", fam["unknown"]))
+    rows += [
+        ("Distinct quotes stored (each verbatim-checked against its snapshot)", s["quotes_stored"]),
+        ("Programs where a quote had to be dropped", s["programs_with_dropped_quotes"]),
+    ]
+    if s["receipts_unreadable"]:
+        rows.append(("Receipts on file but unreadable at export", s["receipts_unreadable"]))
+    rows.append(("Tokens by node (model)", tokens))
     lines = ["| Measure | Value |", "|---|---|"]
     lines += [f"| {name} | {value} |" for name, value in rows]
-    lines.append(f"\nGenerated {data['generated_at']} by scripts/stats.py over web/data.json.")
+    lines.append(f"\nGenerated {data['generated_at']} by scripts/stats.py. Source: {source}")
     return "\n".join(lines)
 
 

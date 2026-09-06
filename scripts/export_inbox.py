@@ -67,13 +67,21 @@ def main() -> int:
         store = LiveStore()
         org = load_seed_file(DEFAULT_SEED_PATH).org
 
-    data = build_export(store, org, now=datetime.now(timezone.utc))
+    data = build_export(store, org, now=datetime.now(timezone.utc), sample=args.sample)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     s = data["stats"]
-    print(f"wrote {out} programs={s['programs']} runs={s['runs']} verdicts={s['verdict_counts']} sample={args.sample}")
-    return 0
+    unreadable = s["receipts_unreadable"]
+    tag = "SAMPLE" if args.sample else "live"
+    print(
+        f"wrote {out} [{tag}] programs={s['programs']} runs={s['runs']} "
+        f"verdicts={s['verdict_counts']} receipts_unreadable={unreadable}"
+    )
+    # The file is written either way -- the page still needs it. The non-zero
+    # exit is how a scheduled export says "evidence I have a receipt for is
+    # missing from the bucket" instead of finishing quietly.
+    return 1 if unreadable else 0
 
 
 if __name__ == "__main__":

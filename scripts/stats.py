@@ -18,7 +18,9 @@ from granthound.export import render_stats  # noqa: E402
 def main() -> int:
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else REPO_ROOT / "web" / "data.json"
     data = json.loads(path.read_text(encoding="utf-8"))
-    print(render_stats(data))
+    # The real path, not a hardcoded one: the footer is a provenance claim, and
+    # a table generated from a sample file must not say it came from the live one.
+    print(render_stats(data, source=str(path)))
     return 0
 
 
