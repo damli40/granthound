@@ -1,6 +1,8 @@
 :root {
   --paper: #f7f5ef; --ink: #171614; --ink-2: #4a4741; --rule: #d9d4c7; --panel: #fffdf8;
-  --accent: #2b4c7e; --apply: #1f6f43; --pass: #6b6b6b; --watch: #b7791f; --review: #9b3b2e; --fixture: #5b4a9e;
+  --accent: #2b4c7e; --apply: #1f6f43; --pass: #6b6b6b; --watch: #8a5a12; --review: #9b3b2e; --fixture: #5b4a9e;
+  --watch-text: #7a4f0e;
+  --chip-ink: #fff;
   --add: #dff3e4; --del: #f8dcd6; --mark: #f3e7a8;
   --sans: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -9,6 +11,8 @@
   :root {
     --paper: #15171a; --ink: #ece9e1; --ink-2: #b5b0a5; --rule: #34383e; --panel: #1d2024;
     --accent: #8fb0e6; --apply: #4fbf7d; --pass: #9a9a9a; --watch: #e0a83a; --review: #e0705c; --fixture: #a795e6;
+    --watch-text: #e0a83a;
+    --chip-ink: #171614;
     --add: #1f3a2a; --del: #4a2520; --mark: #5a4d14;
   }
 }
@@ -30,7 +34,7 @@ h1 { margin: 4px 0 6px; font-size: 2rem; font-weight: 600; }
 .bucket .n { font-family: var(--mono); font-weight: 600; margin-left: 6px; }
 
 .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-.chip { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.05em; color: #fff; border: 0; cursor: default; }
+.chip { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.05em; color: var(--chip-ink); border: 0; cursor: default; }
 .chip.APPLY { background: var(--apply); } .chip.PASS { background: var(--pass); } .chip.WATCH { background: var(--watch); }
 .chip.NEEDS_HUMAN { background: var(--review); } .chip.NONE { background: var(--ink-2); } .chip.FIXTURE { background: var(--fixture); }
 button.chip { cursor: pointer; opacity: 0.55; } button.chip[aria-pressed="true"] { opacity: 1; outline: 2px solid var(--ink); outline-offset: 1px; }
@@ -43,7 +47,7 @@ button.chip { cursor: pointer; opacity: 0.55; } button.chip[aria-pressed="true"]
 .card .why { margin: 0 0 8px; }
 .card .row { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.9rem; color: var(--ink-2); }
 .card .fit { font-family: var(--mono); }
-.card .due.soon { color: var(--watch); font-weight: 600; } .card .due.urgent { color: var(--review); font-weight: 600; }
+.card .due.soon { color: var(--watch-text); font-weight: 600; } .card .due.urgent { color: var(--review); font-weight: 600; }
 .card .receipt { margin-top: 8px; font-family: var(--mono); font-size: 0.8rem; color: var(--ink-2); }
 .card .receipt.unreadable { color: var(--review); }
 .card .collide { font-family: var(--mono); font-size: 0.8rem; color: var(--review); }

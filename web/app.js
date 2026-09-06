@@ -40,6 +40,20 @@
      the evidence is missing from the bucket. Only the second one means a
      receipt on file cannot be checked, so it gets its own sentence. */
   const UNREADABLE = "receipt on file, not readable at export";
+  /* NEEDS_HUMAN can mean a node produced no record at all, not just that the
+     page/dates were ambiguous. One fixed sentence per flag, so a card that
+     is empty for this reason never reads like a normal APPLY/PASS card.
+     Order here is the fixed display order when more than one flag is set. */
+  const FLAG_TEXT = {
+    verifier_missing: "The liveness check recorded nothing; sent to a human.",
+    analyst_missing: "The fit scorer recorded nothing; sent to a human.",
+    clerk_missing: "The date and requirement collector recorded nothing; sent to a human.",
+    eval_write_failed: "The evaluation row could not be written.",
+    scout_error: "The page fetch failed.",
+    scout_missed: "The page was never fetched.",
+    meta_missing: "This program is not registered in the store.",
+    meta_pointer_failed: "The program's latest-run pointer could not be updated."
+  };
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
   function fmtDate(iso) {
@@ -55,6 +69,15 @@
   function compactStamp(s) { // 20260824T001230Z -> 2026-08-24 00:12 UTC
     const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/.exec(s || "");
     return m ? `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]} UTC` : (s || "");
+  }
+  function monthYear(iso) { // "2026-09-01" -> "Sep 2026"
+    const d = new Date(iso + "T00:00:00Z");
+    return isNaN(d) ? iso : d.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+  }
+  function daysInMonth(iso) { // "2026-09-01" -> 30
+    const m = /^(\d{4})-(\d{2})/.exec(iso || "");
+    if (!m) return null;
+    return new Date(Date.UTC(Number(m[1]), Number(m[2]), 0)).getUTCDate();
   }
   function deadlines(p) { return (p.decision_package && p.decision_package.deadlines) || []; }
   function nextDeadline(p) {
@@ -83,6 +106,10 @@
     if (p.fit && p.fit.fit) parts.push(`Fit ${p.fit.fit.score}/5${p.fit.fit.capped ? " (capped: eligibility)" : ""}.`);
     if (p.verifier && p.verifier.overridden) parts.push("Model and page disagreed on liveness; sent to a human.");
     if ((p.flags || []).some(f => /quotes_unverified/.test(f))) parts.push("A quote could not be found on the page word for word; sent to a human.");
+    if (p.verdict === "NEEDS_HUMAN") {
+      const flags = p.flags || [];
+      Object.keys(FLAG_TEXT).forEach(f => { if (flags.includes(f)) parts.push(FLAG_TEXT[f]); });
+    }
     return parts.join(" ");
   }
   function chip(verdict, extra) {
@@ -97,14 +124,24 @@
     $("#strip").innerHTML = ["30", "60", "90"].map(b =>
       `<button class="bucket" type="button" data-bucket="${b}" aria-pressed="${state.bucket === b}">${labels[b]}<span class="n">${counts[b]}</span></button>`
     ).join("") + `<button class="bucket" type="button" data-bucket="ALL" aria-pressed="${state.bucket === "ALL"}">All<span class="n">${state.data.programs.length}</span></button>`;
-    $("#strip").querySelectorAll(".bucket").forEach(b => b.addEventListener("click", () => { state.bucket = b.dataset.bucket; render(); }));
+    $("#strip").querySelectorAll(".bucket").forEach(b => b.addEventListener("click", () => {
+      state.bucket = b.dataset.bucket; render();
+      // render() rebuilds the strip via innerHTML, which drops focus to
+      // body; put it back on the button that now represents this filter.
+      document.querySelector(`.bucket[data-bucket="${CSS.escape(state.bucket)}"]`)?.focus();
+    }));
   }
   function renderFilters() {
     const keys = ["ALL", "APPLY", "WATCH", "NEEDS_HUMAN", "PASS", "NONE"];
     $("#filters").innerHTML = keys.map(k =>
       `<button class="chip ${k === "ALL" ? "NONE" : esc(k)}" type="button" data-verdict="${k}" aria-pressed="${state.verdict === k}">${k === "ALL" ? "ALL" : esc(VERDICT_LABEL[k])}</button>`
     ).join("");
-    $("#filters").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.verdict = b.dataset.verdict; render(); }));
+    $("#filters").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      state.verdict = b.dataset.verdict; render();
+      // Same innerHTML-rebuild focus loss as the bucket strip; re-focus the
+      // button for the verdict that is now active.
+      document.querySelector(`.filters .chip[data-verdict="${CSS.escape(state.verdict)}"]`)?.focus();
+    }));
   }
   function visible() {
     return state.data.programs.filter(p => {
@@ -125,8 +162,24 @@
     const cards = $("#cards");
     cards.innerHTML = rows.map(p => {
       const d = nextDeadline(p);
-      const dueClass = d ? (d.days_until <= 3 ? "urgent" : d.days_until <= 14 ? "soon" : "") : "";
-      const due = d ? `<span class="due ${dueClass}">${esc(KIND[d.kind] || "Date")} ${esc(fmtDate(d.iso))}${d.day_fabricated ? " (month only)" : ""} · ${d.days_until} days as of run</span>` : "";
+      let due = "";
+      if (d) {
+        if (d.day_fabricated) {
+          // The stored day was invented (the page only said a month and
+          // year), so days_until was measured to the LAST day of that
+          // month (see deadlines.py). Print the bound the count was
+          // actually measured to, and key urgency off the EARLIEST day the
+          // deadline could fall on -- the first of the month -- so a
+          // possibly-imminent month-only deadline is never shown calm.
+          const dim = daysInMonth(d.iso);
+          const earliest = dim ? d.days_until - (dim - 1) : d.days_until;
+          const dueClass = earliest <= 3 ? "urgent" : earliest <= 14 ? "soon" : "";
+          due = `<span class="due ${dueClass}">${esc(KIND[d.kind] || "Date")} by end of ${esc(monthYear(d.iso))} · ${d.days_until} days as of run</span>`;
+        } else {
+          const dueClass = d.days_until <= 3 ? "urgent" : d.days_until <= 14 ? "soon" : "";
+          due = `<span class="due ${dueClass}">${esc(KIND[d.kind] || "Date")} ${esc(fmtDate(d.iso))} · ${d.days_until} days as of run</span>`;
+        }
+      }
       const collide = d && d.collides_with && d.collides_with.length ? `<span class="collide">collides with: ${esc(d.collides_with.join(", "))}</span>` : "";
       const fit = p.fit && p.fit.fit ? `<span class="fit">fit ${esc(p.fit.fit.score)} / 5${p.fit.fit.capped ? " · capped: eligibility" : ""}</span>` : "";
       const receipt = receiptLine(p);
