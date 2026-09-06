@@ -214,7 +214,7 @@
     }).join("");
     $("#quiet").hidden = rows.length > 0;
     const s = state.data.stats || {};
-    $("#quiet-detail").textContent = s.latest_run_id ? `GrantHound checked ${s.programs} pages in ${s.latest_run_id}. Receipts on file.` : "No cycle has run yet.";
+    $("#quiet-detail").textContent = s.latest_run_id ? `GrantHound watches ${s.programs} programs. Latest run ${s.latest_run_id}.` : "No cycle has run yet.";
     cards.querySelectorAll(".card").forEach(c => {
       c.addEventListener("click", () => openDrawer(c.dataset.id));
       c.addEventListener("keydown", e => {

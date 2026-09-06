@@ -245,7 +245,7 @@ def render_stats(data: dict, source: str = "web/data.json") -> str:
         ("Runs on record", s["runs"]),
         ("Verdicts", verdicts),
         ("Verified live", fam["live"]),
-        ("Verified dead (closed, final call, prior year)", fam["dead"]),
+        ("Verified dead (closed, final call, prior year, no program found)", fam["dead"]),
         ("Suspect (stale date, year trap, contradiction)", fam["suspect"]),
         ("Unreachable", fam["unreachable"]),
         ("Not yet checked", fam["unchecked"]),

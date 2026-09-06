@@ -6,8 +6,8 @@ the program live, do you qualify, and when is it due — each claim backed
 by a snapshot of the page it read.
 
 Before we say anything about what the agent decides, here is what it
-found. We pointed GrantHound at 19 real funder pages. 14 were dead,
-stale, unfindable, or self-contradictory. Four were live, and one page
+found. We pointed GrantHound at 19 real funder pages. 13 were dead,
+stale, unfindable, or self-contradictory. Five were live, and one page
 would not load at all. The pages were community foundations,
 corporate-giving programs, and national funders — pages a one-person
 shop checks by hand every week. This isn't a hypothetical about "AI
@@ -37,7 +37,7 @@ trap." We also treat a page whose deadline-looking dates span more than
 lay out a multi-stage timeline months apart, and we'd rather flag that as
 ambiguous than silently pick one for you.
 
-**Unfindable.** Three of the fourteen weren't a bad date at all — the
+**Unfindable.** Three of the thirteen weren't a bad date at all — the
 agent read the whole page and there was no grant program on it any more.
 A foundation's site can stay up while the grants page it once hosted is
 gone or folded into something else. The agent doesn't invent a program to
@@ -46,23 +46,23 @@ guessing.
 
 ## The measured numbers
 
-Every number below is from run `run-20260906T083424Z`, printed by
+Every number below is from run `run-20260906T114140Z`, printed by
 `scripts/stats.py --since 2026-09-06` — not typed by hand. Runs made in
 August, while models were still being selected, are excluded and stay in
 the store for history.
 
 | Measure | Value |
 |---|---|
-| Runs from: 2026-09-06 (8 of 18 runs in the store) |  |
+| Runs from: 2026-09-06 (12 of 22 runs in the store) |  |
 | Programs watched | 20 |
-| Latest run | run-20260906T083424Z at 2026-09-06T08:34:24.853473+00:00 (ok) |
-| Runs on record | 8 |
-| Verdicts | APPLY 1 · NEEDS_HUMAN 11 · PASS 7 · WATCH 1 |
-| Verified live | 5 |
-| Verified dead (closed, final call, prior year) | 7 |
-| Suspect (stale date, year trap, contradiction) | 7 |
+| Latest run | run-20260906T114140Z at 2026-09-06T11:41:40.869884+00:00 (ok) |
+| Runs on record | 12 |
+| Verdicts | NEEDS_HUMAN 11 · PASS 8 · WATCH 1 |
+| Verified live | 6 |
+| Verified dead (closed, final call, prior year, no program found) | 7 |
+| Suspect (stale date, year trap, contradiction) | 6 |
 | Unreachable | 1 |
-| Distinct quotes stored (each verbatim-checked against its snapshot) | 72 |
+| Distinct quotes stored (each verbatim-checked against its snapshot) | 76 |
 | Programs where a quote had to be dropped | 5 |
 
 Twenty watched, not nineteen: one seed is a disclosed fixture page we

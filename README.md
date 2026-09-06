@@ -64,33 +64,35 @@ four on the current models over the three original seeds. This is the
 output of a fresh `scripts/stats.py --since 2026-09-06` against the
 committed export, not a copy kept up by hand — running it again after the
 next scheduled cycle will print different, newer numbers in this same
-shape (drop `--since` to see the full 18-run history).
+shape (drop `--since` to see the full 22-run history).
 
 | Measure | Value |
 |---|---|
-| Runs from: 2026-09-06 (8 of 18 runs in the store) |  |
+| Runs from: 2026-09-06 (12 of 22 runs in the store) |  |
 | Programs watched | 20 |
-| Latest run | run-20260906T083424Z at 2026-09-06T08:34:24.853473+00:00 (ok) |
-| Runs on record | 8 |
-| Verdicts | APPLY 1 · NEEDS_HUMAN 11 · PASS 7 · WATCH 1 |
-| Verified live | 5 |
-| Verified dead (closed, final call, prior year) | 7 |
-| Suspect (stale date, year trap, contradiction) | 7 |
+| Latest run | run-20260906T114140Z at 2026-09-06T11:41:40.869884+00:00 (ok) |
+| Runs on record | 12 |
+| Verdicts | NEEDS_HUMAN 11 · PASS 8 · WATCH 1 |
+| Verified live | 6 |
+| Verified dead (closed, final call, prior year, no program found) | 7 |
+| Suspect (stale date, year trap, contradiction) | 6 |
 | Unreachable | 1 |
 | Not yet checked | 0 |
-| Distinct quotes stored (each verbatim-checked against its snapshot) | 72 |
+| Distinct quotes stored (each verbatim-checked against its snapshot) | 76 |
 | Programs where a quote had to be dropped | 5 |
-| Tokens by node (model) | analyst 126,187 (global.anthropic.claude-sonnet-4-6 126,187) · clerk 42,320 (global.anthropic.claude-haiku-4-5-20251001-v1:0 42,320) · scout 35,311 (global.anthropic.claude-haiku-4-5-20251001-v1:0 35,311) · verifier 341,016 (global.anthropic.claude-haiku-4-5-20251001-v1:0 341,016) |
+| Tokens by node (model) | analyst 219,590 (global.anthropic.claude-sonnet-4-6 219,590) · clerk 67,192 (global.anthropic.claude-haiku-4-5-20251001-v1:0 67,192) · scout 63,949 (global.anthropic.claude-haiku-4-5-20251001-v1:0 63,949) · verifier 649,256 (global.anthropic.claude-haiku-4-5-20251001-v1:0 649,256) |
 
-Verdict stability so far: 4 programs with two evals; 3 verdict flip(s). That
-count covers only the programs that already have two evaluations on
-record — most of the 20 seeds have one eval so far, because this is the
-first cycle exported, not yet two full 12-hour cycles apart. It will be
-replaced by a bigger, more meaningful comparison once the unattended
-schedule has run twice (tracked separately; see `docs/measured.md` for the
-raw per-program lines this table and this line are pasted from). Stability
-compares each program's two latest evaluations across all runs in the
-store, not only the runs in the table above.
+Verdict stability so far: 20 programs with two evals; 2 verdict flip(s), now
+that the unattended schedule has run twice over the full seed list (the
+manual full cycle at 2026-09-06T08:01Z and the scheduled fire at
+2026-09-06T11:38Z). One flip is the disclosed fixture page, changed on
+purpose to demonstrate a live edit on camera — expected, not a finding.
+The other is real: a stale, no-year deadline the agent had flagged
+NEEDS_HUMAN resolved, on the second pass, to a confirmed dead program (see
+`docs/measured.md` for the raw per-program lines this table and this line
+are pasted from). Stability compares each program's two latest
+evaluations across all runs in the store, not only the runs in the table
+above.
 Every number above regenerates with `scripts/stats.py`; nothing is typed by
 hand.
 
