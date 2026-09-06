@@ -17,7 +17,7 @@ KIND_LABEL = {
 
 
 def _escape(text: str) -> str:
-    return str(text).replace("\\", "\\\\").replace(";", "\;").replace(",", "\\,").replace("\n", "\\n")
+    return str(text).replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
 
 
 def _event_date(iso: str, day_fabricated: bool) -> date:

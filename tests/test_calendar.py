@@ -24,7 +24,7 @@ def test_one_all_day_event_per_future_deadline_with_escaping_and_crlf():
     assert ics.startswith("BEGIN:VCALENDAR\r\n") and ics.endswith("END:VCALENDAR\r\n")
     assert ics.count("BEGIN:VEVENT") == 2                      # the past one is skipped
     assert "DTSTART;VALUE=DATE:20261005" in ics and "DTSTART;VALUE=DATE:20260910" in ics
-    assert "SUMMARY:Riverbend\\, Fund\; Inc: LOI" in ics        # comma and semicolon escaped, kind label fixed
+    assert "SUMMARY:Riverbend\\, Fund\\; Inc: LOI" in ics        # comma and semicolon escaped, kind label fixed
     assert "UID:granthound-p-live-2026-09-10-loi@granthound" in ics
     assert "DESCRIPTION:Verdict APPLY. Collides with: fall launch. https://x.org/live" in ics
     assert "\n" not in ics.replace("\r\n", "")                  # every line break is CRLF
@@ -36,7 +36,7 @@ def test_month_only_deadline_lands_on_month_end_and_says_so():
     ]})
     ics = build_ics([p], now=NOW)
     assert "DTSTART;VALUE=DATE:20260930" in ics
-    assert "SUMMARY:Riverbend\\, Fund\; Inc: Full application (month only)" in ics
+    assert "SUMMARY:Riverbend\\, Fund\\; Inc: Full application (month only)" in ics
 
 
 def test_programs_without_a_package_or_with_no_future_dates_produce_no_events():
@@ -46,4 +46,4 @@ def test_programs_without_a_package_or_with_no_future_dates_produce_no_events():
 
 def test_fixture_events_are_labelled():
     ics = build_ics([program(is_fixture=True)], now=NOW)
-    assert "SUMMARY:[TEST FUNDER] Riverbend\\, Fund\; Inc: LOI" in ics
+    assert "SUMMARY:[TEST FUNDER] Riverbend\\, Fund\\; Inc: LOI" in ics
