@@ -1,0 +1,20 @@
+flowchart LR
+  subgraph Schedule["Every 12 hours"]
+    EB["EventBridge Scheduler<br/>rate(12 hours)"] --> L["Trigger Lambda<br/>InvokeAgentRuntime"]
+  end
+  L --> RT
+  subgraph RT["Amazon Bedrock AgentCore Runtime (Strands Graph)"]
+    direction LR
+    S["Scout<br/>Claude Haiku 4.5<br/>fetch + snapshot"] --> V["Verifier<br/>Claude Haiku 4.5<br/>is it live?"]
+    V -- "only if something is live" --> A["Analyst<br/>Claude Sonnet 4.6<br/>fit score"]
+    A --> C["Clerk<br/>Claude Haiku 4.5<br/>dates + requirements"]
+  end
+  S -. "raw + normalized page,<br/>sha256" .-> S3[("S3 evidence bucket")]
+  RT -- "one EVAL row per program per run,<br/>one RUN row with tokens + model ids" --> DDB[("DynamoDB")]
+  DDB --> X["export_inbox.py<br/>+ stats.py"]
+  S3 --> X
+  X --> WEB["Static inbox<br/>S3 + CloudFront"]
+  WEB --> Maya["Maya<br/>apply / pass / watch / needs review"]
+  classDef rule fill:#f3e7a8,stroke:#171614,color:#171614
+  R["Boundary rule: a quote is stored only if it appears word for word in the snapshot;<br/>a date only if the scanner found it; fail twice and the program goes to a human"]:::rule
+  R -.- RT
