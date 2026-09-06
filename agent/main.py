@@ -22,6 +22,7 @@ load_runtime_env(HERE / "runtime.env")
 # Store modules read AWS_REGION at import time, so they import after the env file.
 from bedrock_agentcore.runtime import BedrockAgentCoreApp  # noqa: E402
 from granthound.config import Settings  # noqa: E402
+from granthound.notify import notify_cycle  # noqa: E402
 from granthound.pipeline.deterministic import run_id_for  # noqa: E402
 from granthound.pipeline.run import run_batch_async  # noqa: E402
 from granthound.seeds.profile import DEFAULT_SEED_PATH, load_seed_file  # noqa: E402
@@ -44,6 +45,7 @@ async def run_chunks(chunks: list[list[str]], settings: Settings, task_id: int) 
         store = LiveStore()
         org = load_seed_file(DEFAULT_SEED_PATH).org
         last_run_id = None
+        summaries = []
         for ids in chunks:
             at = datetime.now(timezone.utc)
             if run_id_for(at) == last_run_id:
@@ -60,8 +62,14 @@ async def run_chunks(chunks: list[list[str]], settings: Settings, task_id: int) 
                     summary.run_id, summary.status,
                     [(o.program_id, o.verdict.value, o.disposition.value) for o in summary.outcomes],
                 )
+                summaries.append(summary)
             except Exception:  # noqa: BLE001 -- one chunk failing must not stop the cycle
                 log.exception("chunk failed ids=%s", ids)
+        if summaries:
+            try:
+                log.info("telegram: %s", notify_cycle(summaries, env=os.environ))
+            except Exception:  # noqa: BLE001 -- belt and braces; notify_cycle already swallows
+                log.exception("telegram notify raised")
     except Exception:  # noqa: BLE001 -- a failed cycle must still release the async task
         log.exception("cycle failed before finishing chunks=%d", len(chunks))
     finally:

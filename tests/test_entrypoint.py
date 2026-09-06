@@ -101,3 +101,30 @@ def test_a_failed_cycle_still_releases_the_async_task(monkeypatch):
     asyncio.run(main.run_chunks([["p-a"]], settings, 123))
 
     assert completed == [123]
+
+
+def test_run_chunks_notifies_after_the_chunks_and_a_notify_failure_does_not_block_completion(monkeypatch):
+    pytest.importorskip("bedrock_agentcore")
+    import asyncio
+
+    import main
+    from granthound.config import Settings
+
+    settings = Settings.from_env({"GRANTHOUND_TABLE": "t", "GRANTHOUND_BUCKET": "b"})
+    completed = []
+    monkeypatch.setattr(main.app, "complete_async_task", lambda task_id: completed.append(task_id))
+    monkeypatch.setattr(main, "LiveStore", lambda: object())
+    monkeypatch.setattr(main, "load_seed_file", lambda path: type("S", (), {"org": None})())
+
+    async def fake_batch(ids, at, **kw):
+        from granthound.pipeline.finalize import RunSummary
+        return RunSummary(run_id="run-x", status="ok", outcomes=[], run_item={"verdict_counts": {}}, errors=[])
+    monkeypatch.setattr(main, "run_batch_async", fake_batch)
+    seen = []
+    def boom(summaries, **kw):
+        seen.append(len(summaries))
+        raise RuntimeError("telegram exploded")
+    monkeypatch.setattr(main, "notify_cycle", boom)
+
+    asyncio.run(main.run_chunks([["p-a"], ["p-b"]], settings, 7))
+    assert seen == [2] and completed == [7]
