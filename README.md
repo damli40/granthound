@@ -82,10 +82,11 @@ shape (drop `--since` to see the full 22-run history).
 | Programs where a quote had to be dropped | 5 |
 | Tokens by node (model) | analyst 219,590 (global.anthropic.claude-sonnet-4-6 219,590) · clerk 67,192 (global.anthropic.claude-haiku-4-5-20251001-v1:0 67,192) · scout 63,949 (global.anthropic.claude-haiku-4-5-20251001-v1:0 63,949) · verifier 649,256 (global.anthropic.claude-haiku-4-5-20251001-v1:0 649,256) |
 
-Verdict stability so far: 20 programs with two evals; 2 verdict flip(s), now
-that the unattended schedule has run twice over the full seed list (the
-manual full cycle at 2026-09-06T08:01Z and the scheduled fire at
-2026-09-06T11:38Z). One flip is the disclosed fixture page, changed on
+Verdict stability so far: 20 programs with two evals; 2 verdict flip(s).
+The unattended schedule has fired twice: once at creation over the three
+original seeds (2026-09-05T23:39Z) and once over the full seed list
+(2026-09-06T11:38Z). The other full-list cycle (2026-09-06T08:01Z) was
+started by hand. One flip is the disclosed fixture page, changed on
 purpose to demonstrate a live edit on camera — expected, not a finding.
 The other is real: a stale, no-year deadline the agent had flagged
 NEEDS_HUMAN resolved, on the second pass, to a confirmed dead program (see
@@ -150,7 +151,7 @@ Edit `agent/granthound/seeds/maya.yml`: the `org` block is your profile and comm
 - The web inbox is a static export; it refreshes when `export_inbox.py` runs, not live.
 - Corporate and state-agency sites that block plain fetches, or that render their content only in a browser (client-side JavaScript), cannot be watched in this version — the seed filter rejects any candidate whose plain-fetch HTML comes back too short or with no dates in it. No state-agency page survived that filter; every seed in the current list is a community foundation, a corporate-giving page, a national funder, or the disclosed test fixture.
 - A page whose future deadline-looking dates (any date found within 120 characters of a word like "deadline", "due", or "closes") span more than 30 days is treated as self-contradictory and sent to a human rather than acted on. Real funder pages that lay out a multi-stage timeline (an "opens", an "early deadline", and a "final deadline" months apart, say) trip this on purpose — it is conservative by design. No program in the current table is held for this reason; the test fixture hit it once before its wording was fixed.
-- Verdicts are not guaranteed stable run to run. The stability line above is measured from only 4 programs with two evaluations so far (most of the 20 seeds have one eval on record); in that small, early sample 3 of the 4 flipped, and none of the three flipped into NEEDS REVIEW — the sample is too small yet to say which direction verdicts drift, and a bigger, fairer read lands once two full 12-hour scheduled cycles are on record. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
+- Verdicts are not guaranteed stable run to run. The stability line above is measured from all 20 programs, which now have two evaluations on record; 2 of the 20 flipped between them. One is the disclosed test fixture, whose deadline was changed on purpose; the other (`lowes-hometowns`) moved from a stale-date NEEDS REVIEW to a confirmed-dead PASS. The sample is still small, and one more cycle would say more. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
 - `changed_terms` is never emitted: there is no deterministic gate for it, and page-hash diffs false-positive on every nav tweak.
 - Month-only deadlines compare against day 1 for commitment-window collisions (a collision late in the month can be missed).
 - The Analyst was designed for a larger Claude model that is not enabled on this account, so every run in the table used Claude Sonnet 4.6.

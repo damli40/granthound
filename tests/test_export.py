@@ -175,6 +175,36 @@ def test_a_disposition_in_no_family_is_unknown_never_live():
     assert "| Unclassified disposition (investigate) | 1 |" in table
 
 
+def test_the_dead_row_label_names_every_member_of_the_dead_family():
+    # The dead family has four members. The row label must name all of them, so a
+    # reader who sees "7 dead" knows no_program_found is counted there too and does
+    # not go looking for a missing "unfindable" row. Pin the label to the family.
+    entries = []
+    for i, disposition in enumerate(
+        (
+            Disposition.VERIFIED_DEAD_CLOSED,
+            Disposition.VERIFIED_DEAD_FINAL_CALL,
+            Disposition.VERIFIED_DEAD_PRIOR_YEAR,
+            Disposition.NO_PROGRAM_FOUND,
+        )
+    ):
+        entries.append(
+            {
+                "program_id": f"p-dead-{i}",
+                "verdict": "PASS",
+                "disposition": disposition.value,
+                "liveness_disposition": disposition.value,
+                "snapshot_receipt": {"s3_norm": f"snapshots/p-dead-{i}/x.norm.md"},
+                "flags": [],
+                "receipt_unreadable": False,
+            }
+        )
+    stats = build_stats(entries, [])
+    assert stats["families"]["dead"] == 4 and stats["families"]["live"] == 0
+    table = render_stats({"generated_at": NOW.isoformat(), "sample": False, "stats": stats})
+    assert "| Verified dead (closed, final call, prior year, no program found) | 4 |" in table
+
+
 def test_an_unreadable_receipt_is_counted_not_silently_empty():
     store = seeded_store()
     run_once(store)

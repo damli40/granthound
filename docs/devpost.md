@@ -75,10 +75,12 @@ excluded here. They are the ones a fresh `scripts/stats.py --since
 | Programs where a quote had to be dropped | 5 |
 | Tokens by node (model) | analyst 219,590 (global.anthropic.claude-sonnet-4-6 219,590) · clerk 67,192 (global.anthropic.claude-haiku-4-5-20251001-v1:0 67,192) · scout 63,949 (global.anthropic.claude-haiku-4-5-20251001-v1:0 63,949) · verifier 649,256 (global.anthropic.claude-haiku-4-5-20251001-v1:0 649,256) |
 
-Verdict stability so far: 20 programs with two evals; 2 verdict flip(s), now
-that the unattended schedule has run twice over the full seed list. One
-flip is the disclosed fixture page, changed on purpose to demonstrate a
-live edit on camera — expected, not a finding. The other is real: a
+Verdict stability so far: 20 programs with two evals; 2 verdict flip(s).
+The unattended schedule has fired twice: once at creation over the three
+original seeds (2026-09-05T23:39Z) and once over the full seed list
+(2026-09-06T11:38Z). The other full-list cycle (2026-09-06T08:01Z) was
+started by hand. One flip is the disclosed fixture page, changed on
+purpose to demonstrate a live edit on camera — expected, not a finding. The other is real: a
 stale, no-year deadline the agent had flagged NEEDS_HUMAN resolved, on
 the second pass, to a confirmed dead program. Stability compares each
 program's two latest evaluations across all runs in the store, not only

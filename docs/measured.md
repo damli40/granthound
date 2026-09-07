@@ -27,7 +27,7 @@ on 2026-08-23 on Amazon Nova while models were being selected, and 4 runs
 (one on 2026-08-23, three on 2026-09-05) on the current Claude Haiku 4.5 /
 Claude Sonnet 4.6 pair over the three original seeds. They stay in the
 store for history; `scripts/stats.py` with no `--since` flag still reports
-on all 18.
+on all 22.
 
 ## stability.py
 
@@ -92,13 +92,29 @@ project is built to catch.
 
 Two rows per service because MONTHLY granularity split the query's window
 at the calendar-month boundary (2026-08-19 to 2026-09-01, then 2026-09-01
-to 2026-09-06). Bedrock is effectively $0.00, not "under $15" -- all
-figures round to zero or a fraction of a hundred-millionth of a cent.
-`Claude Haiku 4.5 (Amazon Bedrock Edition)` and `Claude Sonnet 4.6 (Amazon
-Bedrock Edition)` are the Marketplace-listed model-access line items (the
-credit gray zone the brief calls out): both are effectively zero too, one
-of them showing as a negative rounding artifact rather than a real refund.
-No CloudFront line appears at all in the unfiltered service list for
-either period, meaning zero recorded cost for the distribution so far.
+to 2026-09-06). Every line shows zero, but that is NOT a measured cost:
+Cost Explorer lags roughly 24 hours behind usage, and this query was run
+the same day as the two full cycles, so the runs in the table above had
+not yet been billed when it ran. `Claude Haiku 4.5 (Amazon Bedrock
+Edition)` and `Claude Sonnet 4.6 (Amazon Bedrock Edition)` are the
+Marketplace-listed model-access line items (the credit gray zone the brief
+calls out); the `-0` is a rounding artifact, not a refund. No CloudFront
+line appears in the unfiltered service list for either period.
+
+What the runs would cost at list price, computed from the `node_usage`
+token counts stored on the 12 in-scope runs (`--since 2026-09-06`) in
+`web/data.json`, at the public on-demand Bedrock rates (Haiku 4.5 $1 per
+million input tokens / $5 per million output; Sonnet 4.6 $3 / $15):
+
+| model | input tokens | output tokens | list price |
+|---|---|---|---|
+| Claude Haiku 4.5 (scout, verifier, clerk) | 754,039 | 26,358 | $0.89 |
+| Claude Sonnet 4.6 (analyst) | 202,887 | 16,703 | $0.86 |
+| total, 12 runs | 956,926 | 43,061 | $1.75 |
+
+So two full 20-program cycles plus the ten smaller runs cost about $1.75
+of model time at list price, before credits; AgentCore, Lambda, DynamoDB,
+S3 and CloudFront add fractions of a cent at this scale. Re-run the Cost
+Explorer query a day or more after the runs to see the billed figure.
 Dami reads the credit balance in the console; this table does not show
 it.
