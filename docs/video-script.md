@@ -79,7 +79,7 @@ repo, and this page on Devpost are on screen now.
 | Timestamp | On screen | Source | Lower-third label |
 |---|---|---|---|
 | 0:00 | The measured table, full screen | `docs/measured.md` (rendered) | 19 pages, checked, not trusted |
-| 0:20 | Library reference-desk photo, then Maya persona card | `docs/superpowers/SPEC.md` persona facts | Who this is for |
+| 0:20 | Library reference-desk photo, then Maya persona card | `README.md`, "Who is it for?" section | Who this is for |
 | 0:45 | Presenter to camera, plain background | — | The one thing this agent will not do |
 | 1:10 | Architecture diagram | `docs/architecture.svg` | Four agents, one pipeline |
 | 1:40 | Live inbox, filtered to NEEDS REVIEW; the "Add deadlines to your calendar (.ics)" download link in the deadline strip; phone with Telegram message | `https://d39zkv96tau3is.cloudfront.net` | Clerk's decision, in your inbox |
