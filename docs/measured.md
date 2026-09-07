@@ -75,7 +75,7 @@ The table above's 3 flips are between the two latest cycles, 11:38Z ->
 23:38Z. The previous pair, 08:xx -> 11:38Z, had 2 flips of its own:
 `fixtures/sunset-fund` APPLY -> NEEDS_HUMAN and `lowes-hometowns`
 NEEDS_HUMAN -> PASS. That is 5 flips across both pairs, and only one of
-them is a page change:
+them is a real change in the program's status:
 
 - `fixtures/sunset-fund`, 08:xx -> 11:38Z (APPLY -> NEEDS_HUMAN): the
   fixture's page had already been reworded before 08:34Z, and that pass
@@ -89,12 +89,14 @@ them is a page change:
   unchanged page, reverified cleanly this time (`reverified_live`, no
   flags) -- the model recovering, not a new edit.
 - `nea-big-read-arts-midwest`, 11:38Z -> 23:38Z (WATCH -> NEEDS_HUMAN): the
-  page did not change; a quote from the Analyst or the Clerk was not found
+  page's diff receipt records no change; a quote from the Analyst or the Clerk was not found
   verbatim in that cycle's snapshot (flags `analyst_quotes_unverified`,
   `clerk_quotes_unverified`).
 - `vh1-save-the-music-foundation`, 11:38Z -> 23:38Z (PASS -> NEEDS_HUMAN):
-  the page did not change; a Verifier quote was not found verbatim in that
-  cycle's snapshot (flag `verifier_quotes_unverified`).
+  the diff receipt did record a change (three Cloudflare email-obfuscation
+  tokens rotating; `date_lines_changed: false`), but no wording a reader
+  sees; what changed the verdict was that a Verifier quote was not found
+  verbatim in that cycle's snapshot (flag `verifier_quotes_unverified`).
 
 The fifth and only real one: `lowes-hometowns`, 08:xx -> 11:38Z
 (NEEDS_HUMAN -> PASS), a stale no-year deadline resolved on the next pass

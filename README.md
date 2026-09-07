@@ -84,7 +84,7 @@ shape (drop `--since` to see the full 26-run history).
 
 Verdict stability so far: 20 programs with two evals; 3 verdict flip(s)
 between the two latest cycles (2026-09-06 11:38Z and 23:38Z); 2 of 20
-flipped between the pair before. None of the five was a page change. Four
+flipped between the pair before. None of the five was a change in what the page says. Four
 are the boundary rule catching a model output that failed a deterministic
 check that cycle: the fixture went to NEEDS_HUMAN at 11:38Z because the
 Clerk's structured output failed to parse (flag `clerk_missing`) and back
@@ -163,7 +163,7 @@ Edit `agent/granthound/seeds/maya.yml`: the `org` block is your profile and comm
 - The web inbox is a static export; it refreshes when `export_inbox.py` runs, not live.
 - Corporate and state-agency sites that block plain fetches, or that render their content only in a browser (client-side JavaScript), cannot be watched in this version — the seed filter rejects any candidate whose plain-fetch HTML comes back too short or with no dates in it. No state-agency page survived that filter; every seed in the current list is a community foundation, a corporate-giving page, a national funder, or the disclosed test fixture.
 - A page whose future deadline-looking dates (any date found within 120 characters of a word like "deadline", "due", or "closes") span more than 30 days is treated as self-contradictory and sent to a human rather than acted on. Real funder pages that lay out a multi-stage timeline (an "opens", an "early deadline", and a "final deadline" months apart, say) trip this on purpose — it is conservative by design. No program in the current table is held for this reason; the test fixture hit it once before its wording was fixed.
-- Verdicts are not guaranteed stable run to run. The stability line above is measured from all 20 programs, which now have two evaluations on record; 3 of the 20 flipped between the two latest cycles, and every one of those flips was the boundary rule catching a model output that failed a deterministic check that cycle, not a change on the funder's page. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
+- Verdicts are not guaranteed stable run to run. The stability line above is measured from all 20 programs, which now have two evaluations on record; 3 of the 20 flipped between the two latest cycles, and every one of those flips was the boundary rule catching a model output that failed a deterministic check that cycle, not a change in what the funder's page says. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
 - `changed_terms` is never emitted: there is no deterministic gate for it, and page-hash diffs false-positive on every nav tweak.
 - Month-only deadlines compare against day 1 for commitment-window collisions (a collision late in the month can be missed).
 - The Analyst was designed for a larger Claude model that is not enabled on this account, so every run in the table used Claude Sonnet 4.6.

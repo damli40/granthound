@@ -62,8 +62,10 @@ the store for history.
 | Verified dead (closed, final call, prior year, no program found) | 8 |
 | Suspect (stale date, year trap, contradiction) | 6 |
 | Unreachable | 1 |
+| Not yet checked | 0 |
 | Distinct quotes stored (each verbatim-checked against its snapshot) | 65 |
 | Programs where a quote had to be dropped | 7 |
+| Tokens by node (model) | analyst 289,066 (global.anthropic.claude-sonnet-4-6 289,066) · clerk 104,938 (global.anthropic.claude-haiku-4-5-20251001-v1:0 104,938) · scout 87,913 (global.anthropic.claude-haiku-4-5-20251001-v1:0 87,913) · verifier 912,548 (global.anthropic.claude-haiku-4-5-20251001-v1:0 912,548) |
 
 Twenty watched, not nineteen: one seed is a disclosed fixture page we
 control, used only to demonstrate a page *changing* on camera without

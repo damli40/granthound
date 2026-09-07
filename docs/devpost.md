@@ -77,7 +77,7 @@ excluded here. They are the ones a fresh `scripts/stats.py --since
 
 Verdict stability so far: 20 programs with two evals; 3 verdict flip(s)
 between the two latest cycles (2026-09-06 11:38Z and 23:38Z); 2 of 20
-flipped between the pair before. None of the five was a page change. Four
+flipped between the pair before. None of the five was a change in what the page says. Four
 are the boundary rule catching a model output that failed a deterministic
 check that cycle: the fixture went to NEEDS_HUMAN at 11:38Z because the
 Clerk's structured output failed to parse (flag `clerk_missing`) and back

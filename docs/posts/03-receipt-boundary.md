@@ -79,10 +79,11 @@ fixture went NEEDS_HUMAN to APPLY after the Clerk's structured output,
 which had failed to parse the cycle before, reverified cleanly; NEA Big
 Read and Save The Music each went to NEEDS_HUMAN when a quote from the
 Analyst, Clerk, or Verifier missed the verbatim check that cycle. None was
-a page change, and the point we couldn't prove last time is true now:
-every flip toward NEEDS_HUMAN has been a model slipping, every flip back
-the same model recovering. The one real exception, `lowes-hometowns`,
-resolved a stale deadline to a confirmed-dead PASS. What the boundary
+a change in what the page says, and the point we couldn't prove last
+time is true now: every flip toward NEEDS_HUMAN has been a model
+slipping, and every flip back was either the same model recovering or,
+once, a page's status genuinely resolving: `lowes-hometowns` went from a
+stale deadline to a confirmed-dead PASS. What the boundary
 rule guarantees is narrower than "stable": a verbatim-check failure, a
 date the scanner never found, or a self-contradictory timeline all route
 to NEEDS_HUMAN by construction, not to an unearned APPLY or PASS.

@@ -2,7 +2,7 @@
 
 Async-judged: the video and the Devpost text carry everything, so nothing
 here assumes a judge also opens the repo. Target pace 130–140 words per
-minute; narration budget 650–700 words for a 5:00 video.
+minute; narration is about 575 spoken words (stage directions in parentheses are not spoken), roughly 4:15 at 135 words a minute, inside the 5:00 limit with room for the live-inbox pauses.
 
 ## Narration
 
