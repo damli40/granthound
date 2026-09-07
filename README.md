@@ -57,43 +57,55 @@ model that produced it.
 
 ### Measured, not asserted
 
-The table covers runs from 2026-09-06, the first cycle over the full seed
-list. Ten earlier runs remain in the store: three failed attempts against
-a larger Claude model, three on Amazon Nova during model selection, and
+The table covers runs from 2026-09-06, the cutoff for the full seed list.
+Ten earlier runs remain in the store: three failed attempts against a
+larger Claude model, three on Amazon Nova during model selection, and
 four on the current models over the three original seeds. This is the
 output of a fresh `scripts/stats.py --since 2026-09-06` against the
 committed export, not a copy kept up by hand — running it again after the
 next scheduled cycle will print different, newer numbers in this same
-shape (drop `--since` to see the full 22-run history).
+shape (drop `--since` to see the full 26-run history).
 
 | Measure | Value |
 |---|---|
-| Runs from: 2026-09-06 (12 of 22 runs in the store) |  |
+| Runs from: 2026-09-06 (16 of 26 runs in the store) |  |
 | Programs watched | 20 |
-| Latest run | run-20260906T114140Z at 2026-09-06T11:41:40.869884+00:00 (ok) |
-| Runs on record | 12 |
-| Verdicts | NEEDS_HUMAN 11 · PASS 8 · WATCH 1 |
-| Verified live | 6 |
-| Verified dead (closed, final call, prior year, no program found) | 7 |
+| Latest run | run-20260906T234110Z at 2026-09-06T23:41:10.603342+00:00 (ok) |
+| Runs on record | 16 |
+| Verdicts | APPLY 1 · NEEDS_HUMAN 12 · PASS 7 |
+| Verified live | 5 |
+| Verified dead (closed, final call, prior year, no program found) | 8 |
 | Suspect (stale date, year trap, contradiction) | 6 |
 | Unreachable | 1 |
 | Not yet checked | 0 |
-| Distinct quotes stored (each verbatim-checked against its snapshot) | 76 |
-| Programs where a quote had to be dropped | 5 |
-| Tokens by node (model) | analyst 219,590 (global.anthropic.claude-sonnet-4-6 219,590) · clerk 67,192 (global.anthropic.claude-haiku-4-5-20251001-v1:0 67,192) · scout 63,949 (global.anthropic.claude-haiku-4-5-20251001-v1:0 63,949) · verifier 649,256 (global.anthropic.claude-haiku-4-5-20251001-v1:0 649,256) |
+| Distinct quotes stored (each verbatim-checked against its snapshot) | 65 |
+| Programs where a quote had to be dropped | 7 |
+| Tokens by node (model) | analyst 289,066 (global.anthropic.claude-sonnet-4-6 289,066) · clerk 104,938 (global.anthropic.claude-haiku-4-5-20251001-v1:0 104,938) · scout 87,913 (global.anthropic.claude-haiku-4-5-20251001-v1:0 87,913) · verifier 912,548 (global.anthropic.claude-haiku-4-5-20251001-v1:0 912,548) |
 
-Verdict stability so far: 20 programs with two evals; 2 verdict flip(s).
-The unattended schedule has fired twice: once at creation over the three
-original seeds (2026-09-05T23:39Z) and once over the full seed list
-(2026-09-06T11:38Z). The other full-list cycle (2026-09-06T08:01Z) was
-started by hand. One flip is the disclosed fixture page, changed on
-purpose to demonstrate a live edit on camera — expected, not a finding.
-The other is real: a stale, no-year deadline the agent had flagged
-NEEDS_HUMAN resolved, on the second pass, to a confirmed dead program (see
-`docs/measured.md` for the raw per-program lines this table and this line
-are pasted from). Stability compares each program's two latest
-evaluations across all runs in the store, not only the runs in the table
-above.
+Verdict stability so far: 20 programs with two evals; 3 verdict flip(s)
+between the two latest cycles (2026-09-06 11:38Z and 23:38Z); 2 of 20
+flipped between the pair before. None of the five was a page change. Four
+are the boundary rule catching a model output that failed a deterministic
+check that cycle: the fixture went to NEEDS_HUMAN at 11:38Z because the
+Clerk's structured output failed to parse (flag `clerk_missing`) and back
+to APPLY at 23:38Z; NEA Big Read (WATCH -> NEEDS_HUMAN) and Save The Music
+(PASS -> NEEDS_HUMAN) had a quote from the Analyst, Clerk, or Verifier
+that was not found verbatim in that cycle's snapshot. The fifth is real:
+`lowes-hometowns`, a stale no-year deadline flagged NEEDS_HUMAN, resolved
+on the next pass to a confirmed dead program (PASS). So the same page can
+get a different verdict on a different day, and in every flip observed so
+far the move was toward NEEDS_HUMAN when a model slipped and back when it
+did not. Treat any single-cycle APPLY or PASS as one cycle's reading.
+
+The EventBridge schedule has fired three times: at creation over the
+three original seeds (`run-20260905T233923Z`), and twice over all 20
+(`run-20260906T113853Z`.. and `run-20260906T233853Z`..; four chunks
+each). The 08:01Z full cycle was started by hand. The proof of an
+unattended fire is the AWS/Scheduler `InvocationAttemptCount` metric, not
+the store. See `docs/measured.md` for the raw per-program lines this
+table and these paragraphs are pasted from. Stability compares each
+program's two latest evaluations across all runs in the store, not only
+the runs in the table above.
 Every number above regenerates with `scripts/stats.py`; nothing is typed by
 hand.
 
@@ -151,7 +163,7 @@ Edit `agent/granthound/seeds/maya.yml`: the `org` block is your profile and comm
 - The web inbox is a static export; it refreshes when `export_inbox.py` runs, not live.
 - Corporate and state-agency sites that block plain fetches, or that render their content only in a browser (client-side JavaScript), cannot be watched in this version — the seed filter rejects any candidate whose plain-fetch HTML comes back too short or with no dates in it. No state-agency page survived that filter; every seed in the current list is a community foundation, a corporate-giving page, a national funder, or the disclosed test fixture.
 - A page whose future deadline-looking dates (any date found within 120 characters of a word like "deadline", "due", or "closes") span more than 30 days is treated as self-contradictory and sent to a human rather than acted on. Real funder pages that lay out a multi-stage timeline (an "opens", an "early deadline", and a "final deadline" months apart, say) trip this on purpose — it is conservative by design. No program in the current table is held for this reason; the test fixture hit it once before its wording was fixed.
-- Verdicts are not guaranteed stable run to run. The stability line above is measured from all 20 programs, which now have two evaluations on record; 2 of the 20 flipped between them. One is the disclosed test fixture, whose deadline was changed on purpose; the other (`lowes-hometowns`) moved from a stale-date NEEDS REVIEW to a confirmed-dead PASS. The sample is still small, and one more cycle would say more. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
+- Verdicts are not guaranteed stable run to run. The stability line above is measured from all 20 programs, which now have two evaluations on record; 3 of the 20 flipped between the two latest cycles, and every one of those flips was the boundary rule catching a model output that failed a deterministic check that cycle, not a change on the funder's page. What holds by construction, not by this small sample: a quote that fails the verbatim check, a date the scanner never found, or the self-contradictory-timeline case above all route to NEEDS REVIEW rather than an unearned APPLY or PASS.
 - `changed_terms` is never emitted: there is no deterministic gate for it, and page-hash diffs false-positive on every nav tweak.
 - Month-only deadlines compare against day 1 for commitment-window collisions (a collision late in the month can be missed).
 - The Analyst was designed for a larger Claude model that is not enabled on this account, so every run in the table used Claude Sonnet 4.6.

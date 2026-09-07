@@ -7,8 +7,8 @@ minute; narration budget 650–700 words for a 5:00 video.
 ## Narration
 
 **0:00** (cold open, no greeting, over the measured table on screen) — We
-pointed GrantHound at 19 real funder pages. 13 were dead, stale,
-unfindable, or self-contradictory. Five were live, and one page would not
+pointed GrantHound at 19 real funder pages. 14 were dead, stale,
+unfindable, or self-contradictory. Four were live, and one page would not
 load at all. This is what happened when we actually checked, instead of
 trusting the page.
 

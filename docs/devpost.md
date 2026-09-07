@@ -54,37 +54,49 @@ has to remember to open a laptop and check.
 ## Measured, not asserted
 
 Numbers below cover runs from 2026-09-06, the current model configuration,
-run `run-20260906T114140Z`; August runs, made while models were being
+run `run-20260906T234110Z`; August runs, made while models were being
 selected, used Amazon Nova and remain in the store for history but are
 excluded here. They are the ones a fresh `scripts/stats.py --since
 2026-09-06` prints right now, not a copy kept up by hand.
 
 | Measure | Value |
 |---|---|
-| Runs from: 2026-09-06 (12 of 22 runs in the store) |  |
+| Runs from: 2026-09-06 (16 of 26 runs in the store) |  |
 | Programs watched | 20 |
-| Latest run | run-20260906T114140Z at 2026-09-06T11:41:40.869884+00:00 (ok) |
-| Runs on record | 12 |
-| Verdicts | NEEDS_HUMAN 11 · PASS 8 · WATCH 1 |
-| Verified live | 6 |
-| Verified dead (closed, final call, prior year, no program found) | 7 |
+| Latest run | run-20260906T234110Z at 2026-09-06T23:41:10.603342+00:00 (ok) |
+| Runs on record | 16 |
+| Verdicts | APPLY 1 · NEEDS_HUMAN 12 · PASS 7 |
+| Verified live | 5 |
+| Verified dead (closed, final call, prior year, no program found) | 8 |
 | Suspect (stale date, year trap, contradiction) | 6 |
 | Unreachable | 1 |
 | Not yet checked | 0 |
-| Distinct quotes stored (each verbatim-checked against its snapshot) | 76 |
-| Programs where a quote had to be dropped | 5 |
-| Tokens by node (model) | analyst 219,590 (global.anthropic.claude-sonnet-4-6 219,590) · clerk 67,192 (global.anthropic.claude-haiku-4-5-20251001-v1:0 67,192) · scout 63,949 (global.anthropic.claude-haiku-4-5-20251001-v1:0 63,949) · verifier 649,256 (global.anthropic.claude-haiku-4-5-20251001-v1:0 649,256) |
+| Distinct quotes stored (each verbatim-checked against its snapshot) | 65 |
+| Programs where a quote had to be dropped | 7 |
+| Tokens by node (model) | analyst 289,066 (global.anthropic.claude-sonnet-4-6 289,066) · clerk 104,938 (global.anthropic.claude-haiku-4-5-20251001-v1:0 104,938) · scout 87,913 (global.anthropic.claude-haiku-4-5-20251001-v1:0 87,913) · verifier 912,548 (global.anthropic.claude-haiku-4-5-20251001-v1:0 912,548) |
 
-Verdict stability so far: 20 programs with two evals; 2 verdict flip(s).
-The unattended schedule has fired twice: once at creation over the three
-original seeds (2026-09-05T23:39Z) and once over the full seed list
-(2026-09-06T11:38Z). The other full-list cycle (2026-09-06T08:01Z) was
-started by hand. One flip is the disclosed fixture page, changed on
-purpose to demonstrate a live edit on camera — expected, not a finding. The other is real: a
-stale, no-year deadline the agent had flagged NEEDS_HUMAN resolved, on
-the second pass, to a confirmed dead program. Stability compares each
-program's two latest evaluations across all runs in the store, not only
-the runs in the table above.
+Verdict stability so far: 20 programs with two evals; 3 verdict flip(s)
+between the two latest cycles (2026-09-06 11:38Z and 23:38Z); 2 of 20
+flipped between the pair before. None of the five was a page change. Four
+are the boundary rule catching a model output that failed a deterministic
+check that cycle: the fixture went to NEEDS_HUMAN at 11:38Z because the
+Clerk's structured output failed to parse (flag `clerk_missing`) and back
+to APPLY at 23:38Z; NEA Big Read (WATCH -> NEEDS_HUMAN) and Save The Music
+(PASS -> NEEDS_HUMAN) had a quote from the Analyst, Clerk, or Verifier
+that was not found verbatim in that cycle's snapshot. The fifth is real:
+`lowes-hometowns`, a stale no-year deadline flagged NEEDS_HUMAN, resolved
+on the next pass to a confirmed dead program (PASS). So the same page can
+get a different verdict on a different day, and in every flip observed so
+far the move was toward NEEDS_HUMAN when a model slipped and back when it
+did not. Treat any single-cycle APPLY or PASS as one cycle's reading.
+
+The EventBridge schedule has fired three times: at creation over the
+three original seeds (`run-20260905T233923Z`), and twice over all 20
+(`run-20260906T113853Z`.. and `run-20260906T233853Z`..; four chunks
+each). The 08:01Z full cycle was started by hand. The proof of an
+unattended fire is the AWS/Scheduler `InvocationAttemptCount` metric, not
+the store. Stability compares each program's two latest evaluations
+across all runs in the store, not only the runs in the table above.
 
 ## The agents
 

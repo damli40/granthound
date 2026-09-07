@@ -4,12 +4,31 @@ PRODID:-//GrantHound//deadlines//EN
 CALSCALE:GREGORIAN
 X-WR-CALNAME:GrantHound deadlines
 BEGIN:VEVENT
+UID:granthound-fixtures/sunset-fund-2026-10-08-info_session@granthound
+DTSTAMP:20260907T001616Z
+DTSTART;VALUE=DATE:20261008
+SUMMARY:[TEST FUNDER] Sunset Community Fund (test fixture): Info session
+DESCRIPTION:Verdict APPLY. https://d39zkv96tau3is.cloudfront.net/fixtu
+ res/sunset-fund/index.html
+URL:https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html
+END:VEVENT
+BEGIN:VEVENT
+UID:granthound-fixtures/sunset-fund-2026-10-15-full_application@granthound
+DTSTAMP:20260907T001616Z
+DTSTART;VALUE=DATE:20261015
+SUMMARY:[TEST FUNDER] Sunset Community Fund (test fixture): Full appli
+ cation
+DESCRIPTION:Verdict APPLY. https://d39zkv96tau3is.cloudfront.net/fixtu
+ res/sunset-fund/index.html
+URL:https://d39zkv96tau3is.cloudfront.net/fixtures/sunset-fund/index.html
+END:VEVENT
+BEGIN:VEVENT
 UID:granthound-nea-big-read-arts-midwest-2027-06-30-other@granthound
-DTSTAMP:20260906T191710Z
+DTSTAMP:20260907T001616Z
 DTSTART;VALUE=DATE:20270630
 SUMMARY:NEA Big Read (Arts Midwest): Date
-DESCRIPTION:Verdict WATCH. https://artsmidwest.org/get-support/nea-big
- -read/
+DESCRIPTION:Verdict NEEDS_HUMAN. https://artsmidwest.org/get-support/n
+ ea-big-read/
 URL:https://artsmidwest.org/get-support/nea-big-read/
 END:VEVENT
 END:VCALENDAR

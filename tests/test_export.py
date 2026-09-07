@@ -6,6 +6,7 @@ import pytest
 from granthound.export import PROGRAM_FIELDS, build_export, build_stats, filter_runs_since, render_stats, verdict_flips
 from granthound.pipeline.run import run_batch
 from granthound.store.models import Disposition
+from granthound.tools.refinement import DEAD_FAMILY
 from tests.fakes import (
     ORG,
     PAGES,
@@ -179,15 +180,12 @@ def test_the_dead_row_label_names_every_member_of_the_dead_family():
     # The dead family has four members. The row label must name all of them, so a
     # reader who sees "7 dead" knows no_program_found is counted there too and does
     # not go looking for a missing "unfindable" row. Pin the label to the family.
+    # Built from DEAD_FAMILY itself (not a hand-typed tuple) so this test tracks the
+    # lattice: if the family grows, this assertion fails and the row label above
+    # must be updated to name the new member too.
+    assert len(DEAD_FAMILY) == 4
     entries = []
-    for i, disposition in enumerate(
-        (
-            Disposition.VERIFIED_DEAD_CLOSED,
-            Disposition.VERIFIED_DEAD_FINAL_CALL,
-            Disposition.VERIFIED_DEAD_PRIOR_YEAR,
-            Disposition.NO_PROGRAM_FOUND,
-        )
-    ):
+    for i, disposition in enumerate(sorted(DEAD_FAMILY, key=lambda d: d.value)):
         entries.append(
             {
                 "program_id": f"p-dead-{i}",

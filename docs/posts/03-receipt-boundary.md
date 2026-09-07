@@ -72,22 +72,19 @@ NEEDS_HUMAN — never an APPLY built on a quote nobody checked.
 
 ## The honest caveat
 
-This doesn't mean every verdict GrantHound produces is stable from one run
-to the next — and we're not going to claim it is. Across all runs in the
-store, only 4 of the 20 watched programs have two evaluations on record
-yet, because this is the first exported cycle and not two full 12-hour
-schedules apart. Of those 4, 3 verdicts flipped, and every one of those
-flips moved away from NEEDS_HUMAN, into an APPLY or a PASS — none flipped
-the other way, into NEEDS_HUMAN. One of those three flips is our own
-disclosed fixture, whose deadline we changed on purpose on camera (see
-the video) — that one isn't independent evidence about real funder
-behavior, it's a demonstration. We're not reading the other two as the
-system drifting toward the safe, cautious side either: 4 programs is too
-small a sample to say which direction verdicts drift at all, and a fairer
-read lands once two full 12-hour scheduled cycles are on record. What the
-boundary rule guarantees is narrower than "stable": a quote that fails
-the verbatim check, a date the scanner never found, or a page whose own
-timeline contradicts itself all route to NEEDS_HUMAN by construction, not
-to an unearned APPLY or PASS.
+This doesn't mean every verdict is stable from one run to the next — we're
+not claiming it is. All 20 watched programs now have two evaluations,
+across three full cycles. Between the two latest, 3 flipped: our disclosed
+fixture went NEEDS_HUMAN to APPLY after the Clerk's structured output,
+which had failed to parse the cycle before, reverified cleanly; NEA Big
+Read and Save The Music each went to NEEDS_HUMAN when a quote from the
+Analyst, Clerk, or Verifier missed the verbatim check that cycle. None was
+a page change, and the point we couldn't prove last time is true now:
+every flip toward NEEDS_HUMAN has been a model slipping, every flip back
+the same model recovering. The one real exception, `lowes-hometowns`,
+resolved a stale deadline to a confirmed-dead PASS. What the boundary
+rule guarantees is narrower than "stable": a verbatim-check failure, a
+date the scanner never found, or a self-contradictory timeline all route
+to NEEDS_HUMAN by construction, not to an unearned APPLY or PASS.
 
 Repo: https://github.com/damli40/granthound.
